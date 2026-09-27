@@ -275,7 +275,7 @@ GameObject:
   - component: {fileID: 239677819}
   - component: {fileID: 239677820}
   m_Layer: 0
-  m_Name: Capsule
+  m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -388,8 +388,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d85623b4a95b2e4a83b482e1aae850a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrialPlayerMovement
+  moveType: 0
+  maxSpeed: 6
+  rotationSpeed: 10
   cam: {fileID: 186821851}
-  speed: 6
+  lookAts: []
+  bobIntensity: 0.2
+  bobSpeed: 2
 --- !u!114 &239677819
 MonoBehaviour:
   m_ObjectHideFlags: 0

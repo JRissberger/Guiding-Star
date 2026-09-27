@@ -15,7 +15,7 @@ public class IsoCam : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        player = GameObject.Find("Capsule");
+        player = GameObject.Find("Player");
         mouse = playerInput.actions.FindAction("Mouse");
         mousePos = mouse.ReadValue<Vector2>();
         currDisp = displacement;

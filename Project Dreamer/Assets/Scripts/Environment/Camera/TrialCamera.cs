@@ -27,7 +27,6 @@ public class TrialCamera : MonoBehaviour
             float t = time * time / (2.0f * ((time * time) - time) + 1.0f);
             
             spline.CameraPosition = Mathf.Lerp(startPos, goal, t);
-            Debug.Log(t);
 
             // If camera has reached the knot (finish transition)
             if (Mathf.Max(spline.CameraPosition, goal) - Mathf.Min(spline.CameraPosition, goal) <= 0.005) { 
@@ -59,6 +58,6 @@ public class TrialCamera : MonoBehaviour
 
         else { goal += index; }
         time = 0;
-        Debug.Log("Moving Camera to " + goal);
+        Debug.Log("Moving Camera to " + goal + " Time: " + Time.time);
     }
 }

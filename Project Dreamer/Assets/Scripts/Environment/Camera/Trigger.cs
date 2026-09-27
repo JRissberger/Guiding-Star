@@ -7,9 +7,9 @@ public class Trigger : MonoBehaviour
     [SerializeField] Trigger pair;
     TrialCamera camera;
     [HideInInspector] public bool colliding = false;
-    [Tooltip("this should be -1 if it is toward the lower end of the spline position as compared to its pair and 1 if it's on the other")]
+    [Tooltip("this should be -1 if it is toward the lower end of the spline position as compared to its pair and 1 if it's higher")]
     [SerializeField]  int nextPos;
-    [Tooltip("if the lerp to the next position should take longer or shorter than the default, write how long in seconds. If not, keep it at 0")]
+    [Tooltip("if the lerp to the next position should take longer or shorter than the default (2s), write how long in seconds. If not, keep it at 0")]
     [SerializeField]  float timeToMove = 0;
     bool transable = true;
 
@@ -22,7 +22,7 @@ public class Trigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.name == "Capsule" && !pair.colliding)
+        if (other.gameObject.name == "Player" && !pair.colliding)
         {
             transable = false;
             colliding = true;
@@ -31,7 +31,7 @@ public class Trigger : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.name == "Capsule")
+        if (other.gameObject.name == "Player")
         {
             if (!pair.colliding && transable)
             {
