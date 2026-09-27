@@ -44,60 +44,60 @@ public class TrialPlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //MovePlayer();
+        MovePlayer();
     }
 
-    //void MovePlayer()
-    //{
-    //    // Apply bobbing movement
-    //    this.transform.position = new Vector3(this.transform.position.x, baseHeight + Mathf.Sin(Time.time * bobSpeed) * bobIntensity, this.transform.position.z);
-    //    moveDirection = Vector3.zero;
-    //    // Get player input
-    //    Vector2 direction = moveAction.ReadValue<Vector2>();
+    void MovePlayer()
+    {
+        // Apply bobbing movement
+        this.transform.position = new Vector3(this.transform.position.x, baseHeight + Mathf.Sin(Time.time * bobSpeed) * bobDistance, this.transform.position.z);
+        moveDirection = Vector3.zero;
+        // Get player input
+        Vector2 direction = moveAction.ReadValue<Vector2>();
 
-    //    if (direction.magnitude > 0)
-    //    {
-    //        // Only change axis if camera is done transitioning
-    //        if (cam.GetComponent<TrialCamera>().transitioning)
-    //            lookAt = transPos;
+        if (direction.magnitude > 0)
+        {
+            // Only change axis if camera is done transitioning
+            if (cam.GetComponent<TrialCamera>().transitioning)
+                lookAt = transPos;
 
-    //        switch (moveType)
-    //        {
-    //            case 0:
-    //                if (!cam.GetComponent<TrialCamera>().transitioning)
-    //                    lookAt = transPos = this.transform.position - cam.transform.position;
+            switch (moveType)
+            {
+                case 0:
+                    if (!cam.GetComponent<TrialCamera>().transitioning)
+                        lookAt = transPos = this.transform.position - cam.transform.position;
 
-    //                moveDirection = velocity = Movement01(direction, Vector3.zero, lookAt);
-    //                break;
+                    moveDirection = velocity = Movement01(direction, Vector3.zero, lookAt);
+                    break;
 
-    //            case 1:
-    //                if (!cam.GetComponent<TrialCamera>().transitioning)
-    //                    lookAt = transPos = lookAts[(int)cam.GetComponent<CinemachineSplineDolly>().CameraPosition].position - cam.transform.position;
+                case 1:
+                    if (!cam.GetComponent<TrialCamera>().transitioning)
+                        lookAt = transPos = lookAts[(int)cam.GetComponent<CinemachineSplineDolly>().CameraPosition].position - cam.transform.position;
 
-    //                moveDirection = velocity = Movement01(direction, Vector3.zero, lookAt);
-    //                break;
+                    moveDirection = velocity = Movement01(direction, Vector3.zero, lookAt);
+                    break;
 
-    //            case 2:
-    //                moveDirection = velocity = Movement2(direction, Vector3.zero);
-    //                break;
+                case 2:
+                    moveDirection = velocity = Movement2(direction, Vector3.zero);
+                    break;
 
-    //            default:
-    //                Debug.Log("There is no movement system #" + moveType + ". Try numbers 0 - 2");
-    //                break;
-    //        }
+                default:
+                    Debug.Log("There is no movement system #" + moveType + ". Try numbers 0 - 2");
+                    break;
+            }
 
-    //        Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-    //        // Smoothly rotate from current to target rotation
-    //        this.transform.rotation = Quaternion.Slerp(this.transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-    //    }
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            // Smoothly rotate from current to target rotation
+            this.transform.rotation = Quaternion.Slerp(this.transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
 
-    //    float targetSpeed = moveDirection.magnitude * maxSpeed;                                     // Calculate target speed from input
-    //    float speedDif = targetSpeed - speed;                                                       // How far we are from target speed
-    //    float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? 5f : 7f;                               // Use acceleration or deceleration
-    //    float movement = Mathf.Pow(Mathf.Abs(speedDif) * accelRate, 0.9f) * Mathf.Sign(speedDif);   // Non-linear acceleration
-    //    speed += movement * Time.deltaTime;                                                         // Apply to current speed
-    //    this.transform.position += velocity * speed * Time.deltaTime;
-    //}
+        float targetSpeed = moveDirection.magnitude * maxSpeed;                                     // Calculate target speed from input
+        float speedDif = targetSpeed - speed;                                                       // How far we are from target speed
+        float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? 5f : 7f;                               // Use acceleration or deceleration
+        float movement = Mathf.Pow(Mathf.Abs(speedDif) * accelRate, 0.9f) * Mathf.Sign(speedDif);   // Non-linear acceleration
+        speed += movement * Time.deltaTime;                                                         // Apply to current speed
+        this.transform.position += velocity * speed * Time.deltaTime;
+    }
 
     public Vector3 Movement01(Vector2 direction, Vector3 vel, Vector3 look)
     {
