@@ -8,8 +8,6 @@ public enum SoundType
     None //Fallback
 }
 
-//Might be better to not have it branch off monogame, just so we can have a constructor with the enum.
-//Would have to move range calc to sound manager (reasonable! and probably better!) (I lied it might stay here)
 public class Sound : MonoBehaviour
 {
     [SerializeField] private SoundType soundType = SoundType.None;
@@ -18,7 +16,7 @@ public class Sound : MonoBehaviour
     private SoundManager soundManager;
     public SoundManager SoundManager { set { soundManager = value; } }
 
-    //Bool for if it's persistent or not
+    //Is the sound persistent
     private bool isPersistent = false;
     public bool IsPersistent { get { return isPersistent; } set { isPersistent = value; } }
 
@@ -44,9 +42,7 @@ public class Sound : MonoBehaviour
     }
 
 
-    //On trigger enter
-    //Check if it's Star (could use tag or just check object directly? tag makes more sense though)
-    //Add this sound to the heard sounds list on manager
+    //Adds sound to heard list if star enters range
     private void OnTriggerEnter(Collider other)
     {
 
@@ -69,11 +65,7 @@ public class Sound : MonoBehaviour
         }
     }
 
-    //Update timer
-    // -deltatime from timer
-    //If it's at or below 0, destroy object (remove from manager list first)
-    //NOTE: how to handle if a sound ends as Star's moving towards it? Need to check if BB saves a copy or a reference. Could cause null issue
-    //Would the sound need to know if it's being targeted?
+    //Update timer, destroy object when timer runs out
     private void UpdateTimer()
     {
         timer -= Time.deltaTime;
