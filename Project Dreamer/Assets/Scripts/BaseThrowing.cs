@@ -45,7 +45,6 @@ public class BaseThrowing : MonoBehaviour
     protected virtual void Start()
     {
         _lineRenderer = gameObject.AddComponent<LineRenderer>();
-        _lineRenderer.useWorldSpace = false;
         _lineRenderer.widthMultiplier = _curveDisplayWidth;
         _lineRenderer.enabled = false;
     }
@@ -74,8 +73,8 @@ public class BaseThrowing : MonoBehaviour
             }
 
             _heldItem = item;
-            _heldItem.transform.SetParent(transform, false);
-            _heldItem.transform.localPosition = _handOffset;
+            _heldItem.transform.position = transform.position + _handOffset;
+            _heldItem.transform.SetParent(transform, true);
         }
         else
         {
@@ -106,8 +105,8 @@ public class BaseThrowing : MonoBehaviour
     protected bool CreateThrowCurve(Vector3 position, Vector3 normal)
     {
         //Create the Bezier curve
-        Vector3 startPos = _handOffset;
-        Vector3 endPos = position - transform.position;
+        Vector3 startPos = transform.position + _handOffset;
+        Vector3 endPos = position;
 
         Collider heldCollider = _heldItem.GetComponent<Collider>();
         Vector3 heldExtents = Vector3.zero;
@@ -141,8 +140,8 @@ public class BaseThrowing : MonoBehaviour
             Vector3 raycastStart = CurveUtility.EvaluatePosition(_throwCurve.Value, progressStart);
             Vector3 raycastEnd = CurveUtility.EvaluatePosition(_throwCurve.Value, progressEnd);
             //Curve is in local space; raycast uses world space
-            raycastStart += transform.position;
-            raycastEnd += transform.position;
+            //raycastStart += transform.position;
+            //raycastEnd += transform.position;
 
             Vector3 raycastRay = raycastEnd - raycastStart;
 
@@ -234,10 +233,10 @@ public class BaseThrowing : MonoBehaviour
     {
         for (float i = 0; i < 1; i += Time.deltaTime * _throwSpeed)
         {
-            item.transform.position = (Vector3)CurveUtility.EvaluatePosition(throwCurve, i) + transform.position;
+            item.transform.position = (Vector3)CurveUtility.EvaluatePosition(throwCurve, i);
             yield return new WaitForEndOfFrame();
         }
-        item.transform.position = (Vector3)throwCurve.P3 + transform.position;
+        item.transform.position = (Vector3)throwCurve.P3;
         _throwLandEvent.Invoke();
     }
 }
