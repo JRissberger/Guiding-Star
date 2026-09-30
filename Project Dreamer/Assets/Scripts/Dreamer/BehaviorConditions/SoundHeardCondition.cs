@@ -17,7 +17,7 @@ public partial class SoundHeardCondition : Condition
         List<Sound> soundList = SoundManager.Value.HeardSounds;
 
         //Are there current sounds in hearing range?
-        if (soundList.Count > 0)
+        if (soundList.Count > 0 && soundList != null)
         {
             Debug.Log(soundList.Count);
 
