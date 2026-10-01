@@ -5,12 +5,12 @@ using UnityEngine;
 using System.Collections.Generic;
 
 [Serializable, Unity.Properties.GeneratePropertyBag]
-[Condition(name: "Sound Heard", story: "Sound heard? [Star] [SoundManager] [TargetSound]", category: "Conditions", id: "0d54f36f5442cb9cf2faf000615d9f0f")]
+[Condition(name: "Sound Heard", story: "Sound heard? [Star] [SoundManager] [LastHeardSound]", category: "Conditions", id: "0d54f36f5442cb9cf2faf000615d9f0f")]
 public partial class SoundHeardCondition : Condition
 {
     [SerializeReference] public BlackboardVariable<SoundManager> SoundManager;
     [SerializeReference] public BlackboardVariable<GameObject> Star;
-    [SerializeReference] public BlackboardVariable<Sound> TargetSound;
+    [SerializeReference] public BlackboardVariable<LastHeardSound> LastHeardSound;
 
     public override bool IsTrue()
     {
@@ -38,14 +38,28 @@ public partial class SoundHeardCondition : Condition
                 }
             }
 
-            //Update blackboard with target sound
-            TargetSound.Value = closestSound;
-
+            //Create last heard sound scriptable object, set it to value
+            /* IMPORTANT: Scriptable objects aren't gotten by the garbage collector.
+             * They need to be deleted manually otherwise it'll eventually cause a memory leak.
+             * Current solution is if there's an existing one that doesn't match the data, destroy the old one
+             */
+            LastHeardSound.Value = ScriptableObject.CreateInstance<LastHeardSound>();
+            LastHeardSound.Value.SoundType = closestSound.SoundType;
+            LastHeardSound.Value.Location = closestSound.gameObject.transform.position;
+            Debug.Log(LastHeardSound.Value);
             return true;
 
         }
 
+        //Still tracking a sound, follow it
+        else if (LastHeardSound.Value != null)
+        {
+            Debug.Log("Retaining sound data!");
+            return true;
+        }
+
         //List is empty, nothing heard
+        
         return false;
     }
 
