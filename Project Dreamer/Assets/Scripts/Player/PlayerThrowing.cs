@@ -68,14 +68,18 @@ public class PlayerThrowing : BaseThrowing
                         //This is done by comparing the surface normal to the vector from the hand to the target point
                         //If these vectors are facing the same way, the dot product will be positive
                         bool validCurve;
+
                         Vector3 dotLeft = clickedPoint - (transform.position + _handOffset);
-                        Vector3 dotRight = clickedNormal;
-                        //Ignore upwards component - throwing to a higher floor is possible due to gravity
+                        //Ignore y component if positive (upwards) - throwing to a higher floor is possible due to gravity
                         dotLeft.y = Mathf.Min(dotLeft.y, 0);
-                        dotRight.y = Mathf.Min(dotRight.y, 0);
+
+                        Vector3 dotRight = clickedNormal;
+                        
+                        //dotRight.y = Mathf.Min(dotRight.y, 0);
                         if (Vector3.Dot(dotLeft, dotRight) > 0)
                         {
                             validCurve = false;
+                            ResetThrow();
                         }
                         else
                         {

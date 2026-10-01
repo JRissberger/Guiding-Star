@@ -60,12 +60,13 @@ public class BaseThrowing : MonoBehaviour
 
     /// <summary>
     /// Sets the currently held item, parenting it to this object's Transform.
+    /// This item must have the ThrowableItem script attached to it.
     /// If an item is already being held, it will be dropped in favor of the new one.
     /// </summary>
     /// <param name="item">The GameObject to set as the held item.</param>
     public void SetHeldItem(GameObject item)
     {
-        if (item.CompareTag("Throwable"))
+        if (item.GetComponent<ThrowableItem>())
         {
             if (GetHeldItem())
             {
@@ -78,7 +79,7 @@ public class BaseThrowing : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Tried to call SetHeldItem on an item not tagged as \"Throwable\"! This item will be ignored.");
+            Debug.LogWarning("Tried to call SetHeldItem on an item without the ThrowableItem script! This item will be ignored.");
         }
     }
 
@@ -237,6 +238,7 @@ public class BaseThrowing : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         item.transform.position = (Vector3)throwCurve.P3;
+        item.GetComponent<ThrowableItem>().Land();
         _throwLandEvent.Invoke();
     }
 }

@@ -24,7 +24,7 @@ public class SoundManager : MonoBehaviour
 
     void Update()
     {
-       
+       /*
         //DEBUG -- Clicking to place sounds in scene, remove later
             //Bypasses inputsystem, will likely need to be commented out when merging
         if (mouse.leftButton.wasPressedThisFrame)
@@ -48,6 +48,7 @@ public class SoundManager : MonoBehaviour
                 SpawnSound(newSoundPos, SoundType.Soft, 5, 0.5f, false);
             }
         }
+       */
     }
 
     //Places a sound at a given location and assigns a type to it
