@@ -13,4 +13,10 @@ public class LastHeardSound : ScriptableObject
     //Location of the sound
     private Vector3 location;
     public Vector3 Location { get { return location; } set { location = value; } }
+
+    //DEBUG--Confirming destruction
+    private void OnDestroy()
+    {
+        Debug.Log("ScriptableObject destroyed.");
+    }
 }

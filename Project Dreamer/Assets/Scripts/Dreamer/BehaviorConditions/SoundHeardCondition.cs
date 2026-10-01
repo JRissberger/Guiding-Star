@@ -51,6 +51,7 @@ public partial class SoundHeardCondition : Condition
                 (LastHeardSound.Value.SoundType != closestSound.SoundType || LastHeardSound.Value.Location != closestSound.gameObject.transform.position))
             {
                 Debug.Log("Updating sound data");
+
                 //Destroy old sound if applicable
                 if (LastHeardSound.Value != null)
                 {
