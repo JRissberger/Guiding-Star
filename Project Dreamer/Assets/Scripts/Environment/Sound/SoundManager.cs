@@ -10,6 +10,7 @@ public class SoundManager : MonoBehaviour
     public List<Sound> HeardSounds = new List<Sound>();
 
     //Default sound prefab
+    [Tooltip("The default sound prefab to spawn")]
     [SerializeField] private GameObject soundPrefab;
 
     //DEBUG
@@ -50,7 +51,14 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    //Places a sound at a given location and assigns a type to it
+    /// <summary>
+    /// Creates a sound prefab at the given location
+    /// </summary>
+    /// <param name="pos">Location to place sound</param>
+    /// <param name="type">Type of sound</param>
+    /// <param name="audibleRange">Radius of hearing trigger collider</param>
+    /// <param name="duration">How long the sound persists</param>
+    /// <param name="isPersistent">Is the sound persistent</param>
     public void SpawnSound(Vector3 pos, SoundType type, float audibleRange, float duration, bool isPersistent)
     {
         //Spawn sound prefab
