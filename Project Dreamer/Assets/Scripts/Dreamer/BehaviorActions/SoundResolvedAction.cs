@@ -9,15 +9,14 @@ using Unity.Properties;
 public partial class SoundResolvedAction : Action
 {
 
-    [SerializeReference] public BlackboardVariable<LastHeardSound> Sound;
+    [SerializeReference] public BlackboardVariable<LastHeardSound> TargetSound;
+    [SerializeReference] public BlackboardVariable<LastHeardSound> PrevTargetSound;
 
     protected override Status OnStart()
     {
-        //Destroys the current scriptable object
-        UnityEngine.Object.Destroy(Sound.Value);
-
-        //Nulls sound value as an extra precaution
-        Sound.Value = null;
+        //Updates previous sound and nulls target sound
+        PrevTargetSound.Value = TargetSound.Value;
+        TargetSound.Value = null;
 
         return Status.Running;
     }

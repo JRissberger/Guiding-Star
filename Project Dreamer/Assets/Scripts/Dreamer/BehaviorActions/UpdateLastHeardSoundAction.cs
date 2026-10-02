@@ -71,8 +71,8 @@ public partial class UpdateLastHeardSoundAction : Action
             //Otherwise, bump target data to previous target and update target
             else
             {
-                //Destroy the last scriptable object for prev target
-                UnityEngine.Object.Destroy(PrevTargetSound.Value);
+                
+                LastHeardSound soundToDestroy = PrevTargetSound.Value;
 
                 //Do this even if the last target is null, since this is done to track if the target sound has changed
                 PrevTargetSound.Value = TargetSound.Value;
@@ -81,6 +81,9 @@ public partial class UpdateLastHeardSoundAction : Action
                 TargetSound.Value = ScriptableObject.CreateInstance<LastHeardSound>();
                 TargetSound.Value.Location = closestSound.gameObject.transform.position;
                 TargetSound.Value.SoundType = closestSound.SoundType;
+
+                //Destroy the last scriptable object for prev target
+                UnityEngine.Object.Destroy(soundToDestroy);
             }
         }
 
@@ -91,7 +94,7 @@ public partial class UpdateLastHeardSoundAction : Action
             PrevTargetSound.Value = TargetSound.Value;
         }
 
-        return Status.Running;
+        return Status.Success;
     }
 
 }
