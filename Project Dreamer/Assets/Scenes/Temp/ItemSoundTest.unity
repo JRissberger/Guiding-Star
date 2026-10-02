@@ -843,7 +843,7 @@ GameObject:
   - component: {fileID: 1540716209}
   - component: {fileID: 1540716213}
   m_Layer: 0
-  m_Name: Item
+  m_Name: Throwable Item
   m_TagString: Throwable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -956,7 +956,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f72a09eb0e201ff46b577b3d0151140d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ThrowableItem
-  _soundType: 1
+  _soundType: 0
   _soundRadius: 2
   _soundDuration: 5
   _willDespawn: 0

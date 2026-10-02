@@ -131,7 +131,7 @@ public class PlayerThrowing : BaseThrowing
     {
         Ray screenRay = Camera.main.ScreenPointToRay(mousePosition);
         RaycastHit hitInfo;
-        if (Physics.Raycast(screenRay, out hitInfo, Mathf.Infinity, clickableLayers))
+        if (Physics.Raycast(screenRay, out hitInfo, Mathf.Infinity, clickableLayers, QueryTriggerInteraction.Ignore))
         {
             return hitInfo;
         }

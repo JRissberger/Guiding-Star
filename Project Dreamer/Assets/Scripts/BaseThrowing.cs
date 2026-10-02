@@ -152,11 +152,11 @@ public class BaseThrowing : MonoBehaviour
             
             if (heldCollider)
             {
-                raycastResult = Physics.BoxCast(raycastStart, heldExtents, raycastRay, out hitInfo, Quaternion.LookRotation(normal), Vector3.Magnitude(raycastRay), LayerMask.GetMask(LayerMask.LayerToName(0)));
+                raycastResult = Physics.BoxCast(raycastStart, heldExtents, raycastRay, out hitInfo, Quaternion.LookRotation(normal), Vector3.Magnitude(raycastRay), LayerMask.GetMask(LayerMask.LayerToName(0)), QueryTriggerInteraction.Ignore);
             }
             else
             {
-                raycastResult = Physics.Raycast(raycastStart, raycastRay, out hitInfo, Vector3.Magnitude(raycastRay), LayerMask.GetMask(LayerMask.LayerToName(0)));
+                raycastResult = Physics.Raycast(raycastStart, raycastRay, out hitInfo, Vector3.Magnitude(raycastRay), LayerMask.GetMask(LayerMask.LayerToName(0)), QueryTriggerInteraction.Ignore);
             }
 
             if (raycastResult)

@@ -27,7 +27,7 @@ public class ThrowableItem : MonoBehaviour
 
     /// <summary>
     /// A method to be called when this item lands after being thrown.
-    /// This will create a sound, with parameters based on the values set in the inspector.
+    /// This will create a SoundManager sound, with parameters based on the values set in the inspector.
     /// It will also destroy this item if "Will Despawn" is checked.
     /// </summary>
     public void Land()
