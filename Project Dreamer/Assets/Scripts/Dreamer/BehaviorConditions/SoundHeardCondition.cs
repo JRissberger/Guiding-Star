@@ -18,6 +18,19 @@ public partial class SoundHeardCondition : Condition
     {
         List<Sound> soundList = SoundManager.Value.HeardSounds;
 
+        //If the last heard sound was loud, filter out soft sounds
+        if (LastHeardSound.Value.SoundType == SoundType.Loud)
+        {
+            //Loop backwards due to shifting indices
+            for (int i = soundList.Count - 1; i >= 0; i--)
+            {
+                if (soundList[i].SoundType == SoundType.Soft)
+                {
+                    soundList.RemoveAt(i);
+                }
+            }
+        }
+
         //Are there current sounds in hearing range?
         if (soundList.Count > 0)
         {
@@ -77,13 +90,5 @@ public partial class SoundHeardCondition : Condition
 
         //List is empty and no sound being tracked
         return false;
-    }
-
-    public override void OnStart()
-    {
-    }
-
-    public override void OnEnd()
-    {
     }
 }
