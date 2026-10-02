@@ -33,10 +33,7 @@ public class Sound : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Adjusts the audible range of the sound (modifying trigger radius)
-    /// </summary>
-    /// <param name="range">Radius of the hearing range collider</param>
+    //Adjusts the audible range of the sound (modifying trigger radius)
     public void UpdateAudibleRange(float range)
     {
         //Get spherecollider, update radius
@@ -68,9 +65,7 @@ public class Sound : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Update the sound's timer, if applicable. Destroy the sound when timer expires.
-    /// </summary>
+    //Update timer, destroy object when timer runs out
     private void UpdateTimer()
     {
         timer -= Time.deltaTime;
