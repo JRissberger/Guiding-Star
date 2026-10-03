@@ -10,7 +10,7 @@ using Unity.VisualScripting;
 public partial class ThrowItemAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> HeldItem;
-    [SerializeReference] public BlackboardVariable<GameObject> Sound;
+    [SerializeReference] public BlackboardVariable<LastHeardSound> Sound;
     [SerializeReference] public BlackboardVariable<GameObject> Star;
     [SerializeReference] public BlackboardVariable<Boolean> HoldingItem;
 
@@ -22,7 +22,7 @@ public partial class ThrowItemAction : Action
         if (throwing != null)
         {
             //NOTE: max range? move closer if out of range?
-            throwing.ThrowItemAtTry(Sound.Value.transform.position, Vector3.up);
+            throwing.ThrowItemAtTry(Sound.Value.Location, Vector3.up);
             HoldingItem.Value = false;
         }
         return Status.Running;
