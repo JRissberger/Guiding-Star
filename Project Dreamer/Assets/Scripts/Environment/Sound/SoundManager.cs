@@ -35,6 +35,7 @@ public class SoundManager : MonoBehaviour
             {
                 newSoundPos = hitResult.point;
                 SpawnSound(newSoundPos, SoundType.Loud, 5, 1f, false);
+                Debug.Log("Placed sound at "+ newSoundPos);
             }
         }
 
@@ -46,6 +47,7 @@ public class SoundManager : MonoBehaviour
             {
                 newSoundPos = hitResult.point;
                 SpawnSound(newSoundPos, SoundType.Soft, 5, 1f, false);
+                Debug.Log("Placed sound at " + newSoundPos);
             }
         }
     }

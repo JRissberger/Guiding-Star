@@ -16,8 +16,6 @@ public partial class SoundResolvedAction : Action
     protected override Status OnStart()
     {
         //Updates previous sound and nulls target sound
-
-        Debug.Log("resolving sounds");
         UnityEngine.Object.Destroy(TargetSound.Value);
         UnityEngine.Object.Destroy(NewTargetSound.Value);
         TargetSound.Value = null;

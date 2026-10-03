@@ -15,6 +15,7 @@ public partial class UpdateLastHeardSoundAction : Action
 
     protected override Status OnStart()
     {
+
         TargetSound.Value = NewTargetSound.Value;
         return Status.Success;
     }

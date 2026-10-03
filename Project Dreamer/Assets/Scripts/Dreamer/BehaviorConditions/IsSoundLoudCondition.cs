@@ -9,12 +9,9 @@ public partial class IsSoundLoudCondition : Condition
     [SerializeReference] public BlackboardVariable<LastHeardSound> Sound;
     [SerializeReference] public BlackboardVariable<Vector3> TargetPosition;
 
-    //Sound passed in as a gameobject by physical script
-    //Get the sound type and any other needed data.
 
     public override bool IsTrue()
     {
-        Debug.Log(Sound.Value);
         if (Sound.Value.SoundType == SoundType.Loud)
         {
             return true;
@@ -22,7 +19,6 @@ public partial class IsSoundLoudCondition : Condition
 
         //Update target sound location, used to navigate to
         TargetPosition.Value = Sound.Value.Location;
-
         return false;
     }
 

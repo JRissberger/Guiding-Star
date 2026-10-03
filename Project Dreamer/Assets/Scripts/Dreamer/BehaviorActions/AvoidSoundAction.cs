@@ -31,8 +31,9 @@ public partial class AvoidSoundAction : Action
             //Potentially a speed increase for Star to show they're running?
 
         //Update target location
-        Location.Value = runDir;
+        Location.Value = Star.Value.transform.position + runDir;
 
+        Debug.Log("Moving to " + runDir);
         return Status.Running;
     }
 
