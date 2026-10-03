@@ -22,6 +22,13 @@ public class Sound : MonoBehaviour
     [Tooltip("Audio clip to play if this is a soft sound")]
     [SerializeField] private AudioClip audioClipSoft;
 
+    [Tooltip("The visual effect that indicates this sound's range")]
+    [SerializeField] private GameObject effect;
+    [Tooltip("Material for the sound's visual effect (loud sound)")]
+    [SerializeField] private Material materialLoud;
+    [Tooltip("Material for the sound's visual effect (soft sound)")]
+    [SerializeField] private Material materialSoft;
+
     //Is the sound persistent
     private bool isPersistent = false;
     public bool IsPersistent { get { return isPersistent; } set { isPersistent = value; } }
@@ -34,6 +41,15 @@ public class Sound : MonoBehaviour
     {
         audioSource = GetComponent<AudioSource>();
         PlayAudio();
+
+        if (soundType == SoundType.Loud)
+        {
+            effect.GetComponent<MeshRenderer>().material = materialLoud;
+        }
+        else if (soundType == SoundType.Soft)
+        {
+            effect.GetComponent<MeshRenderer>().material = materialSoft;
+        }
     }
 
     void Update()
@@ -51,6 +67,9 @@ public class Sound : MonoBehaviour
         //Get spherecollider, update radius
         SphereCollider collider = this.GetComponent<SphereCollider>();
         collider.radius = range;
+
+        //Double range for the effect because its scale is based on diameter, not radius
+        effect.transform.localScale = new Vector3(range * 2, range * 2, range * 2);
     }
 
 
