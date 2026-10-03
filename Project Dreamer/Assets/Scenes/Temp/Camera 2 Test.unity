@@ -127,6 +127,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2035042555}
     m_Modifications:
+    - target: {fileID: 4888876239120139472, guid: d255d8e3888d4254d9f82472d84b88d3, type: 3}
+      propertyPath: timeToMove
+      value: -1
+      objectReference: {fileID: 0}
     - target: {fileID: 5645673446433295538, guid: d255d8e3888d4254d9f82472d84b88d3, type: 3}
       propertyPath: m_LocalScale.z
       value: 1.8846507
@@ -234,12 +238,12 @@ Camera:
   m_ShutterSpeed: 0.005
   m_Aperture: 16
   m_FocusDistance: 10
-  m_FocalLength: 50
+  m_FocalLength: 10.427107
   m_BladeCount: 5
   m_Curvature: {x: 2, y: 11}
   m_BarrelClipping: 0.25
   m_Anamorphism: 0
-  m_SensorSize: {x: 36, y: 24}
+  m_SensorSize: {x: 21.946, y: 16.002}
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
@@ -444,7 +448,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d85623b4a95b2e4a83b482e1aae850a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrialPlayerMovement
-  moveType: 0
+  moveType: 2
   maxSpeed: 6
   rotationSpeed: 8
   bobDistance: 0.2
@@ -2207,6 +2211,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrialCamera
   cam3Displacement: {x: 11, y: 9, z: 0}
   transitioning: 0
+  halfTrans: 0
+  goal: 0
+  startPos: 0
 --- !u!114 &2083722789
 MonoBehaviour:
   m_ObjectHideFlags: 0
