@@ -14,8 +14,10 @@ public partial class IsSoundLoudCondition : Condition
 
     public override bool IsTrue()
     {
-        if (Sound.Value.SoundType == SoundType.Loud) { 
-            return true; 
+        Debug.Log(Sound.Value);
+        if (Sound.Value.SoundType == SoundType.Loud)
+        {
+            return true;
         }
 
         //Update target sound location, used to navigate to

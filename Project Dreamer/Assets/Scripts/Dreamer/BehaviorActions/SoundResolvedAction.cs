@@ -5,19 +5,25 @@ using Action = Unity.Behavior.Action;
 using Unity.Properties;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "Sound Resolved", story: "[Sound] investigation resolved", category: "Action", id: "2c6edb1725cfc7fbbcfb75afedc8ce92")]
+[NodeDescription(name: "Sound Resolved", story: "[TargetSound] investigation resolved", category: "Action", id: "2c6edb1725cfc7fbbcfb75afedc8ce92")]
 public partial class SoundResolvedAction : Action
 {
 
     [SerializeReference] public BlackboardVariable<LastHeardSound> TargetSound;
-    [SerializeReference] public BlackboardVariable<LastHeardSound> PrevTargetSound;
+    [SerializeReference] public BlackboardVariable<LastHeardSound> NewTargetSound;
+    [SerializeReference] public BlackboardVariable<Boolean> IsInvestigating;
 
     protected override Status OnStart()
     {
         //Updates previous sound and nulls target sound
-        PrevTargetSound.Value = TargetSound.Value;
-        TargetSound.Value = null;
 
+        Debug.Log("resolving sounds");
+        UnityEngine.Object.Destroy(TargetSound.Value);
+        UnityEngine.Object.Destroy(NewTargetSound.Value);
+        TargetSound.Value = null;
+        NewTargetSound.Value = null;
+        IsInvestigating.Value = false;
+        
         return Status.Running;
     }
 
