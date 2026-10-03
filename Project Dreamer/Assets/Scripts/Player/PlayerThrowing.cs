@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 /// <summary>
@@ -52,6 +53,7 @@ public class PlayerThrowing : BaseThrowing
 
     private void Update()
     {
+
         if (_aimAction.IsPressed())
         {
             RaycastHit? clickedInfo = GetClickedRaycast(Mouse.current.position.ReadValue(), LayerMask.GetMask(LayerMask.LayerToName(0)));
@@ -110,7 +112,7 @@ public class PlayerThrowing : BaseThrowing
             ResetThrow();
         }
 
-        if (_debugPickupAction.WasPressedThisFrame())
+        if (_debugPickupAction.WasPressedThisFrame() || Keyboard.current.digit1Key.wasPressedThisFrame) //DEBUG override
         {
             SetHeldItem(_debugItem);
         }
