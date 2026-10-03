@@ -38,16 +38,6 @@ public partial class NewSoundFoundCondition : Condition
                         soundList.RemoveAt(i);
                     }
                 }
-
-                ////DEBUG: check which condition triggered filter
-                //if (TargetSound.Value.SoundType == SoundType.Loud)
-                //{
-                //    Debug.Log("Current sound is loud, filtered");
-                //}
-                //if (TargetSound.Value.SoundType == SoundType.Soft && soundList.Exists(sound => sound.SoundType == SoundType.Loud))
-                //{
-                //    Debug.Log("Current sound is soft and there's a loud sound, filtered");
-                //}
             }
 
 
@@ -79,7 +69,6 @@ public partial class NewSoundFoundCondition : Condition
                 {
                     /* IMPORTANT: Scriptable objects aren't gotten by the garbage collector.
                     * They need to be deleted manually otherwise it'll eventually cause a memory leak.
-                    * Current solution is if there's an existing one that doesn't match the data, destroy the old one
                     * If there's a memory issue with the project, it probably is from here.
                     */
 
@@ -90,10 +79,21 @@ public partial class NewSoundFoundCondition : Condition
                     }
 
 
-                    //Create object for new target
-                    NewTargetSound.Value = ScriptableObject.CreateInstance<LastHeardSound>();
-                    NewTargetSound.Value.Location = closestSound.gameObject.transform.position;
-                    NewTargetSound.Value.SoundType = closestSound.SoundType;
+                    //If NewTargetSound is null, create the object
+                    if (!NewTargetSound.Value)
+                    {
+                        NewTargetSound.Value = ScriptableObject.CreateInstance<LastHeardSound>();
+                        NewTargetSound.Value.Location = closestSound.gameObject.transform.position;
+                        NewTargetSound.Value.SoundType = closestSound.SoundType;
+                    }
+
+                    //Otherwise, update it
+                    //Reusing the same objects if this interrupts an existing sound investigation
+                    else
+                    {
+                        NewTargetSound.Value.Location = closestSound.gameObject.transform.position;
+                        NewTargetSound.Value.SoundType = closestSound.SoundType;
+                    }
 
                     return true;
                 }
