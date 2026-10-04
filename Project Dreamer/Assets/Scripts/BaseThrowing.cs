@@ -80,6 +80,14 @@ public class BaseThrowing : MonoBehaviour
         else
         {
             Debug.LogWarning("Tried to call SetHeldItem on an item without the ThrowableItem script! This item will be ignored.");
+            if (GetHeldItem())
+            {
+                DropItem();
+            }
+
+            _heldItem = item;
+            _heldItem.transform.position = transform.position + _handOffset;
+            _heldItem.transform.SetParent(transform, true);
         }
     }
 
@@ -238,7 +246,7 @@ public class BaseThrowing : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         item.transform.position = (Vector3)throwCurve.P3;
-        item.GetComponent<ThrowableItem>().Land();
+        //item.GetComponent<ThrowableItem>().Land();
         _throwLandEvent.Invoke();
     }
 }
