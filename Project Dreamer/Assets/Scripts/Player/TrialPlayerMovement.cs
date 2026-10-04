@@ -15,7 +15,7 @@ public class TrialPlayerMovement : MonoBehaviour
     // Player Vars
     PlayerInput playerInput;
     InputAction moveAction;
-    [Tooltip("0 makes y-axis dynamic with player, 1 keeps it consistent with cardinal directions relative to camera (this becomes potentially confusing when camera is at quarter angles)")]
+    [Tooltip("Dynamically assigned, disregard this")]
     [SerializeField] int moveType = 0;
     [SerializeField] float maxSpeed = 6f;
     [SerializeField] float rotationSpeed = 10f;

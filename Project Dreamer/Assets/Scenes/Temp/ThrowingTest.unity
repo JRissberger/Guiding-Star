@@ -1005,6 +1005,7 @@ GameObject:
   - component: {fileID: 1256042590}
   - component: {fileID: 1256042589}
   - component: {fileID: 1256042588}
+  - component: {fileID: 1256042592}
   m_Layer: 0
   m_Name: Player Capsule
   m_TagString: Throwable
@@ -1107,6 +1108,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1256042592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1256042587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f72a09eb0e201ff46b577b3d0151140d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ThrowableItem
+  _soundType: 2
+  _soundRadius: 1
+  _soundDuration: 1
+  _willDespawn: 0
 --- !u!1 &1306588236
 GameObject:
   m_ObjectHideFlags: 0
