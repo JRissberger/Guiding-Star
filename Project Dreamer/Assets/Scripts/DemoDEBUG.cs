@@ -22,7 +22,16 @@ public class DemoDEBUG : MonoBehaviour
 
     public void LoadCamera()
     {
-        SceneManager.LoadScene("Camera 2 Test");
+        SceneManager.LoadScene("Camera Dolly Test");
+    }
+
+    public void LoadCamera2()
+    {
+        SceneManager.LoadScene("Camera ForwardLook");
+    }
+    public void LoadCamera3()
+    {
+        SceneManager.LoadScene("Camera FollowLook");
     }
 
     public void LoadThrow()
