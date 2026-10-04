@@ -54,7 +54,7 @@ public class PlayerThrowing : BaseThrowing
     private void Update()
     {
 
-        if (Mouse.current.rightButton.isPressed)//_aimAction.IsPressed())
+        if (_aimAction.IsPressed())
         {
             RaycastHit? clickedInfo = GetClickedRaycast(Mouse.current.position.ReadValue(), LayerMask.GetMask(LayerMask.LayerToName(0)));
             if (clickedInfo.HasValue)
@@ -90,7 +90,7 @@ public class PlayerThrowing : BaseThrowing
 
                         SetThrowMarker(clickedPoint, clickedNormal, validCurve);
 
-                        if (validCurve && Mouse.current.leftButton.wasPressedThisFrame)//_throwAction.WasPressedThisFrame())
+                        if (validCurve && _throwAction.WasPressedThisFrame())
                         {
                             ThrowItem();
                         }
@@ -116,7 +116,7 @@ public class PlayerThrowing : BaseThrowing
             ResetThrow();
         }
 
-        if (Keyboard.current.digit1Key.wasPressedThisFrame) //_debugPickupAction.WasPressedThisFrame() || Keyboard.current.digit1Key.wasPressedThisFrame) //DEBUG override
+        if (_debugPickupAction.WasPressedThisFrame() || Keyboard.current.digit1Key.wasPressedThisFrame) //DEBUG override
         {
             SetHeldItem(_debugItem);
         }
