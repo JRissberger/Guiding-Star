@@ -24,27 +24,36 @@ public class TrialPlayerMovement : MonoBehaviour
     Vector3 moveDirection;
     Vector2 prevInput = Vector2.zero;
 
+    LayerMask corporealMask;
+    public bool corporeal;
+
     // Y-axis movement
     [SerializeField] float bobDistance = 0.2f;
     [SerializeField] float bobSpeed = 2f;
     float baseHeight;
 
     // Camera
-    public CinemachineCamera cam;
+    CinemachineCamera cam;
     [Tooltip("this should be dynamic, to do later")]
     public Transform[] lookAts;
     Vector3 lookAt;
     Vector3 transPos;
     int checkKeyUp = 0;
-    bool transedAxis = false;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        cam = FindFirstObjectByType<CinemachineCamera>();
+        if (cam.gameObject.name == "Follow Cam")
+            moveType = 3;
+        else
+            moveType = 1;
         playerInput = GetComponent<PlayerInput>();
+        playerInput.camera = Camera.main;
         moveAction = playerInput.actions.FindAction("Move");
         baseHeight = this.transform.position.y;
+        corporealMask = LayerMask.GetMask("Barriers", "Phaseable");
     }
 
     // Update is called once per frame
@@ -61,46 +70,62 @@ public class TrialPlayerMovement : MonoBehaviour
         // Get player input
         Vector2 direction = moveAction.ReadValue<Vector2>();
 
+        // Only change axis if camera is halfway through transitioning
+        if (cam.GetComponent<TrialCamera>().halfTrans && checkKeyUp == 0)
+
+            checkKeyUp = 1;
+
+
         if (direction.magnitude > 0)
         {
-            // Only change axis if camera is halfway through transitioning
-            if (cam.GetComponent<TrialCamera>().halfTrans && checkKeyUp == 0)
-                checkKeyUp = 1;
-
+            Quaternion targetRotation;
             switch (moveType)
             {
                 case 0:
-                    //if (!cam.GetComponent<TrialCamera>().halfTrans)
                     lookAt = this.transform.position - cam.transform.position;
 
                     moveDirection = velocity = Movement0(direction, Vector3.zero, lookAt);
+
+                    targetRotation = Quaternion.LookRotation(moveDirection);
+                    // Smoothly rotate from current to target rotation
+                    this.transform.rotation = Quaternion.Slerp(this.transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
                     break;
 
                 case 1:
                     moveDirection = velocity = Movement1(direction, Vector3.zero);
+
+                    targetRotation = Quaternion.LookRotation(moveDirection);
+                    this.transform.rotation = Quaternion.Slerp(this.transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                    break;
+
+                case 2:
+                    moveDirection = velocity = new Vector3(direction.x, 0, direction.y);
+
+                    targetRotation = Quaternion.LookRotation(moveDirection);
+                    this.transform.rotation = Quaternion.Slerp(this.transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                    break;
+
+                case 3:
+                    moveDirection = velocity = Movement3(direction);
+
                     break;
 
                 default:
-                    Debug.Log("There is no movement system #" + moveType + ". Try 0 or 1");
+                    Debug.Log("There is no movement system #" + moveType + ". Try 1 or 3");
                     break;
             }
 
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-            // Smoothly rotate from current to target rotation
-            this.transform.rotation = Quaternion.Slerp(this.transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-
-
         }
 
-        //if (!CollisionCheck(velocity))
-        //{
-        float targetSpeed = moveDirection.magnitude * maxSpeed;                                     // Calculate target speed from input
-        float speedDif = targetSpeed - speed;                                                       // How far we are from target speed
-        float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? 5f : 7f;                               // Use acceleration or deceleration
-        float movement = Mathf.Pow(Mathf.Abs(speedDif) * accelRate, 0.9f) * Mathf.Sign(speedDif);   // Non-linear acceleration
-        speed += movement * Time.deltaTime;                                                         // Apply to current speed
-        this.transform.position += velocity * speed * Time.deltaTime;
-        //}
+        if (!CollisionCheck(velocity))
+        {
+            float targetSpeed = moveDirection.magnitude * maxSpeed;                                     // Calculate target speed from input
+            float speedDif = targetSpeed - speed;                                                       // How far we are from target speed
+            float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? 5f : 7f;                               // Use acceleration or deceleration
+            float movement = Mathf.Pow(Mathf.Abs(speedDif) * accelRate, 0.9f) * Mathf.Sign(speedDif);   // Non-linear acceleration
+            speed += movement * Time.deltaTime;                                                         // Apply to current speed
+            this.transform.position += velocity * speed * Time.deltaTime;
+        }
         prevInput = direction;
     }
 
@@ -114,21 +139,21 @@ public class TrialPlayerMovement : MonoBehaviour
         if (direction.y < 0)
             vel -= look;
         if (direction.x > 0)
-            vel += Vector3.Cross(cam.transform.position - lookAts[(int)cam.GetComponent<CinemachineSplineDolly>().CameraPosition].position, Vector3.up).normalized;
+            vel += Vector3.Cross(cam.transform.forward, Vector3.up).normalized;
         if (direction.x < 0)
-            vel -= Vector3.Cross(cam.transform.position - lookAts[(int)cam.GetComponent<CinemachineSplineDolly>().CameraPosition].position, Vector3.up).normalized;
+            vel -= Vector3.Cross(cam.transform.forward, Vector3.up).normalized;
 
         return vel.normalized;
     }
 
     public Vector3 Movement1(Vector2 direction, Vector3 vel)
     {
-        int splineDirection = Math.Sign(cam.GetComponent<TrialCamera>().startPos - cam.GetComponent<TrialCamera>().goal);
+        int splineDirection = Math.Sign(cam.GetComponent<TrialCamera>().goal - cam.GetComponent<TrialCamera>().startPos);
         if (splineDirection < 0) splineDirection = 0;
 
         int pos;
         // On key down after halfway
-        if (checkKeyUp > 0 && prevInput.magnitude < direction.magnitude)
+        if (checkKeyUp == 1 && (Math.Abs(prevInput.y) < Math.Abs(direction.y) || Math.Abs(prevInput.x) < Math.Abs(direction.x)))
         {
             checkKeyUp = 0;
             pos = (int)cam.GetComponent<CinemachineSplineDolly>().CameraPosition;
@@ -136,25 +161,19 @@ public class TrialPlayerMovement : MonoBehaviour
             if (cam.GetComponent<TrialCamera>().transitioning)
             {
                 checkKeyUp = -1;
-                transedAxis = true;
                 pos += splineDirection;
             }
 
-            lookAt = transPos = lookAts[pos].position - (Vector3)cam.GetComponent<CinemachineSplineDolly>().Spline.Spline[pos].Position;
+            lookAt = transPos = cam.transform.forward;
         }
-        // past halfway transitioning but key has not changed or has changed movement axis but camera is still transitioning, do not change the set axis
-        else if (checkKeyUp > 0 || transedAxis && cam.GetComponent<TrialCamera>().transitioning)
+        else if (cam.GetComponent<TrialCamera>().transitioning || checkKeyUp == 1)
         {
             lookAt = transPos;
         }
         else
         {
             checkKeyUp = 0;
-            transedAxis = false;
-            pos = (int)cam.GetComponent<CinemachineSplineDolly>().CameraPosition;
-            if (cam.GetComponent<TrialCamera>().transitioning) pos += splineDirection;
-            lookAt = transPos = lookAts[pos].position - (Vector3)cam.GetComponent<CinemachineSplineDolly>().Spline.Spline[pos].Position;
-            Debug.Log((Vector3)cam.GetComponent<CinemachineSplineDolly>().Spline.Spline[pos].Position);
+            lookAt = transPos = cam.transform.forward;
         }
 
         lookAt.y = 0;
@@ -186,9 +205,35 @@ public class TrialPlayerMovement : MonoBehaviour
         return vel.normalized;
     }
 
-    /*public bool CollisionCheck(Vector3 direction)
+    public Vector3 Movement3(Vector2 direction)
     {
-        Physics.SphereCast(transform.position, 3f, direction, out RaycastHit hitInfo, 10f, this.layer);
-        return;
-    }*/
+        lookAt = cam.transform.forward;
+        lookAt.y = 0;
+        lookAt = lookAt.normalized;
+
+        Vector3 vel = Vector3.zero;
+
+        if (direction.y > 0)
+            vel += lookAt;
+        if (direction.y < 0)
+            vel -= lookAt;
+        if (direction.x > 0)
+            vel -= Vector3.Cross(lookAt, Vector3.up).normalized;
+        if (direction.x < 0)
+            vel += Vector3.Cross(lookAt, Vector3.up).normalized;
+
+        if (direction.y >= -0.5)
+            this.transform.rotation = Quaternion.Slerp(this.transform.rotation, Quaternion.LookRotation(vel.normalized), rotationSpeed * Time.deltaTime);
+
+        return vel.normalized;
+    }
+
+    public bool CollisionCheck(Vector3 direction)
+    {
+        RaycastHit hit;
+        if (corporeal)
+            return Physics.SphereCast(transform.position, 1f, direction, out hit, 0.8f, corporealMask);
+        else
+            return Physics.SphereCast(transform.position, 1f, direction, out hit, 0.8f, LayerMask.GetMask("Barriers"));
+    }
 }
