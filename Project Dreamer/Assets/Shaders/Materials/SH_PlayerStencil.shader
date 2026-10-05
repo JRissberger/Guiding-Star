@@ -10,6 +10,7 @@ Shader "Custom/PlayerStencil"
     }
     SubShader
     {
+        // render directly after geometry queue, before effect that checks stencil
         Tags { "RenderType"="Opaque" "Queue"="Geometry+1"}
         LOD 100
 
@@ -39,7 +40,6 @@ Shader "Custom/PlayerStencil"
             {
                 float2 uv : TEXCOORD0;
                 float2 viewuv: TEXCOORD1;
-                // UNITY_FOG_COORDS(1)
                 float4 vertex : SV_POSITION;
             };
 

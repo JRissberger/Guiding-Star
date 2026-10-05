@@ -6,10 +6,11 @@ Shader "Custom/DefaultSkipStenciled"
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
-        // _StencilAvoid ("Stencil Avoid", Integer) = 1
     }
     SubShader
     {
+        // render 2 priorities after geometry, which is directly after the stencil
+        // has been draw.
         Tags { "RenderType"="Opaque" "Queue"="Geometry+2"}
         LOD 200
         Stencil
