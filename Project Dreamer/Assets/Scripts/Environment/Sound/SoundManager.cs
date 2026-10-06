@@ -24,7 +24,6 @@ public class SoundManager : MonoBehaviour
 
     void Update()
     {
-       
         //DEBUG -- Clicking to place sounds in scene, remove later
             //Bypasses inputsystem, will likely need to be commented out when merging
         if (mouse.leftButton.wasPressedThisFrame)

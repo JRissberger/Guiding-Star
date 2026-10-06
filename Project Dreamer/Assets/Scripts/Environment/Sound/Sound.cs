@@ -16,6 +16,19 @@ public class Sound : MonoBehaviour
     private SoundManager soundManager;
     public SoundManager SoundManager { set { soundManager = value; } }
 
+    private AudioSource audioSource;
+    [Tooltip("Audio clip to play if this is a loud sound")]
+    [SerializeField] private AudioClip audioClipLoud;
+    [Tooltip("Audio clip to play if this is a soft sound")]
+    [SerializeField] private AudioClip audioClipSoft;
+
+    [Tooltip("The visual effect that indicates this sound's range")]
+    [SerializeField] private GameObject effect;
+    [Tooltip("Material for the sound's visual effect (loud sound)")]
+    [SerializeField] private Material materialLoud;
+    [Tooltip("Material for the sound's visual effect (soft sound)")]
+    [SerializeField] private Material materialSoft;
+
     //Is the sound persistent
     private bool isPersistent = false;
     public bool IsPersistent { get { return isPersistent; } set { isPersistent = value; } }
@@ -23,6 +36,21 @@ public class Sound : MonoBehaviour
     //Timer for duration of how long it should be around
     private float timer = 0;
     public float Timer { get { return timer; } set { timer = value; } }
+
+    private void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+        PlayAudio();
+
+        if (soundType == SoundType.Loud)
+        {
+            effect.GetComponent<MeshRenderer>().material = materialLoud;
+        }
+        else if (soundType == SoundType.Soft)
+        {
+            effect.GetComponent<MeshRenderer>().material = materialSoft;
+        }
+    }
 
     void Update()
     {
@@ -39,6 +67,9 @@ public class Sound : MonoBehaviour
         //Get spherecollider, update radius
         SphereCollider collider = this.GetComponent<SphereCollider>();
         collider.radius = range;
+
+        //Double range for the effect because its scale is based on diameter, not radius
+        effect.transform.localScale = new Vector3(range * 2, range * 2, range * 2);
     }
 
 
@@ -78,6 +109,16 @@ public class Sound : MonoBehaviour
         }
     }
 
-    //Are we having the actual sound object play a noise?
-    //If so, method here for data surrounding playing said noise
+    //Play the audio for this sound (loud or soft)
+    private void PlayAudio()
+    {
+        if (soundType == SoundType.Loud)
+        {
+            audioSource.PlayOneShot(audioClipLoud);
+        }
+        else if (soundType == SoundType.Soft)
+        {
+            audioSource.PlayOneShot(audioClipSoft);
+        }
+    }
 }
