@@ -3,17 +3,25 @@ using Unity.Behavior;
 using UnityEngine;
 
 [Serializable, Unity.Properties.GeneratePropertyBag]
-[Condition(name: "ItemInLOS", story: "Item in LOS?", category: "Conditions", id: "b2f3bfcdb8213e2e252343e8acb031b0")]
+[Condition(name: "ItemInLOS", story: "Item in LOS? Update [DEBUGITEM] [HoldingItem]", category: "Conditions", id: "b2f3bfcdb8213e2e252343e8acb031b0")]
 public partial class ItemInLosCondition : Condition
 {
-    bool notComplete = true;
+    //Receive on blackboard: list of items in los. Should be passed in from external sight script...vision cone in front of star
+    //Modifying on blackboard: target item
+    [SerializeReference] public BlackboardVariable<GameObject> DEBUGITEM; //DEBUG: Manually passing in item
+    [SerializeReference] public BlackboardVariable<Boolean> HoldingItem; //Here for debug!
 
-    //Receive on blackboard: iteminlos bool, list of items in los. Should be passed in from external sight script.
-    //Modifying on blackboard: target item, target pos(?) 
 
     public override bool IsTrue()
     {
-        if (notComplete) { return false; } //Incomplete node. Always fail for rn.
+        //Determine closest item, set as target
+        //Make sure to discount current held item
+
+        //DEBUG PURPOSES DONT RUN BRANCH IF HOLDING AN ITEM SO STAR STOPS FALLING OVER UNTIL I FIX PHYSICS
+        if (HoldingItem.Value)
+        {
+            return false;
+        }
         return true;
 
         //If no iteminlos: return false, node doesn't go

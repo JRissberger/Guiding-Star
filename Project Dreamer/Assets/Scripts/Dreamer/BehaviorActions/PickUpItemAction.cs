@@ -10,11 +10,21 @@ public partial class PickUpItemAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Star;
     [SerializeReference] public BlackboardVariable<GameObject> Item;
-
+    [SerializeReference] public BlackboardVariable<Boolean> HoldingItem;
     //Should update blackboard variables: Is Holding Item, and Current Held Item
 
     protected override Status OnStart()
     {
+        //Access throwing script on Star
+        DreamerThrowing throwing = Star.Value.GetComponent<DreamerThrowing>();
+
+        if (throwing != null)
+        {
+            //Set held item as the item tied to blackboard
+            throwing.SetHeldItem(Item.Value);
+            HoldingItem.Value = true;
+        }
+
         return Status.Running;
     }
 
