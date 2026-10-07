@@ -272,7 +272,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -719,7 +719,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &1357463113
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -903,6 +903,33 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b88654e85e14a6446927ee3ef023f316, type: 3}
+--- !u!1 &1751506536 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3314137640993944689, guid: bb9934900d715764f8c802848abb3c09, type: 3}
+  m_PrefabInstance: {fileID: 7124472916958437635}
+  m_PrefabAsset: {fileID: 0}
+--- !u!195 &1751506545
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1751506536}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 1
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &1864252876
 GameObject:
   m_ObjectHideFlags: 0
@@ -1242,10 +1269,17 @@ PrefabInstance:
       propertyPath: _debugItem
       value: 
       objectReference: {fileID: 183683813}
+    - target: {fileID: 7596089313105828375, guid: bb9934900d715764f8c802848abb3c09, type: 3}
+      propertyPath: m_IsKinematic
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3314137640993944689, guid: bb9934900d715764f8c802848abb3c09, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1751506545}
   m_SourcePrefab: {fileID: 100100000, guid: bb9934900d715764f8c802848abb3c09, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
