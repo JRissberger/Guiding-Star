@@ -246,7 +246,7 @@ public class BaseThrowing : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         item.transform.position = (Vector3)throwCurve.P3;
-        //item.GetComponent<ThrowableItem>().Land();
+        item.GetComponent<ThrowableItem>().Land();
         _throwLandEvent.Invoke();
     }
 }

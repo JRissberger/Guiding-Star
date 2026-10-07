@@ -24,6 +24,7 @@ public partial class ThrowItemAction : Action
             //NOTE: max range? move closer if out of range?
             throwing.ThrowItemAtTry(Sound.Value.Location, Vector3.up);
             HoldingItem.Value = false;
+            HeldItem.Value = null;
         }
         return Status.Running;
     }
