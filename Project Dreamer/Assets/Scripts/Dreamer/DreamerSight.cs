@@ -28,18 +28,19 @@ public class DreamerSight : MonoBehaviour
             }
 
             //Linecast to check if it's an item in view since the collider can go through walls. ignores collider layer
-                //NOTE: Might be good to have a specific layer for obstacles, filter specifically for that. bring up with team?
+            //NOTE: Might be good to have a specific layer for obstacles, filter specifically for that. bring up with team?
             //Also checks if the item's already in the list, done since it could collide with multiple triggers at once
-            if (CheckIfVisible(other.gameObject) 
+            if (CheckIfVisible(other.gameObject)
                 && !VisibleItems.Contains(other.gameObject))
             {
                 //Adds to visible list
                 visibleItems.Add(other.gameObject);
-                Debug.Log(visibleItems.Count);
+                Debug.Log("Visible items: " + visibleItems.Count);
             }
 
-            
+           
         }
+
     }
 
     //Remove the object from the visible and trigger list
@@ -49,6 +50,7 @@ public class DreamerSight : MonoBehaviour
         {
             visibleItems.Remove(other.gameObject);
             triggeredItems.Remove(other.gameObject);
+            Debug.Log("Visible items: " + visibleItems.Count);
         }
     }
 

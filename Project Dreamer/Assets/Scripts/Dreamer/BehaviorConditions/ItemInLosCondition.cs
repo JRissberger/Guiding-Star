@@ -16,7 +16,7 @@ public partial class ItemInLosCondition : Condition
         //Determine closest item, set as target
         //Make sure to discount current held item
 
-        return true;
+        return false;
 
         //If no iteminlos: return false, node doesn't go
 
