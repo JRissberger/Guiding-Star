@@ -25,6 +25,8 @@ public partial class PickUpItemAction : Action
             throwing.SetHeldItem(Item.Value);
             HoldingItem.Value = true;
             HeldItem.Value = Item.Value;
+
+            //TODO: may remove item from held items list to avoid retargeting
         }
 
         return Status.Running;
