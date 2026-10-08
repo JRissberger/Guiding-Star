@@ -11,6 +11,7 @@ public partial class FindClosestItemAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> TargetItem;
     [SerializeReference] public BlackboardVariable<DreamerSight> DreamerSight;
     [SerializeReference] public BlackboardVariable<GameObject> Star;
+    [SerializeReference] public BlackboardVariable<GameObject> HeldItem;
 
     protected override Status OnStart()
     {
@@ -24,7 +25,7 @@ public partial class FindClosestItemAction : Action
             foreach (GameObject item in DreamerSight.Value.VisibleItems)
             {
                 float tempDist = Vector3.Distance(Star.Value.transform.position, item.transform.position);
-                if (tempDist < distance)
+                if (tempDist < distance && item != HeldItem.Value)
                 {
                     distance = tempDist;
                     currentItem = item;
