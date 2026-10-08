@@ -19,7 +19,7 @@ public partial class ItemInLosCondition : Condition
          */
         if (DreamerSight.Value.VisibleItems.Count == 1 && !SawItem.Value && DreamerSight.Value.VisibleItems[0] == HeldItem.Value)
         {
-            Debug.Log("Edge case hit, ignoring " + DreamerSight.Value.VisibleItems[0].gameObject);
+            //Debug.Log("Edge case hit, ignoring " + DreamerSight.Value.VisibleItems[0].gameObject);
             return false;
         }
 

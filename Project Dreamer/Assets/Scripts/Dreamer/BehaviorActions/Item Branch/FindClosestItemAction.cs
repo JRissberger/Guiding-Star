@@ -15,7 +15,7 @@ public partial class FindClosestItemAction : Action
 
     protected override Status OnStart()
     {
-        //TODO: need to handle current held item. might be removed from visible list already?
+        
         //Determine the closest item
         if (DreamerSight.Value.VisibleItems.Count > 0)
         {

@@ -35,7 +35,7 @@ public class DreamerSight : MonoBehaviour
             {
                 //Adds to visible list
                 visibleItems.Add(other.gameObject);
-                Debug.Log("Visible items: " + visibleItems.Count);
+                
             }
 
            
@@ -50,7 +50,7 @@ public class DreamerSight : MonoBehaviour
         {
             visibleItems.Remove(other.gameObject);
             triggeredItems.Remove(other.gameObject);
-            Debug.Log("Visible items: " + visibleItems.Count);
+            
         }
     }
 
