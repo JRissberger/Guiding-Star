@@ -10,6 +10,7 @@ public partial class PickUpItemAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Star;
     [SerializeReference] public BlackboardVariable<GameObject> Item;
+    [SerializeReference] public BlackboardVariable<GameObject> HeldItem;
     [SerializeReference] public BlackboardVariable<Boolean> HoldingItem;
     //Should update blackboard variables: Is Holding Item, and Current Held Item
 
@@ -23,6 +24,9 @@ public partial class PickUpItemAction : Action
             //Set held item as the item tied to blackboard
             throwing.SetHeldItem(Item.Value);
             HoldingItem.Value = true;
+            HeldItem.Value = Item.Value;
+
+            //TODO: may remove item from held items list to avoid retargeting
         }
 
         return Status.Running;
