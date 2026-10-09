@@ -38,7 +38,7 @@ public partial class ThrowItemAction : Action
             Quaternion rotation = Quaternion.LookRotation(turnDirection);
 
             //Lerp to face target
-            Star.Value.transform.rotation = Quaternion.RotateTowards(Star.Value.transform.rotation, rotation, 180 * Time.deltaTime);
+            Star.Value.transform.rotation = Quaternion.RotateTowards(Star.Value.transform.rotation, rotation,  180 * Time.deltaTime);
 
             //If rotation isn't done, return running status
             if (Quaternion.Angle(Star.Value.transform.rotation, rotation) > 1)
@@ -56,7 +56,7 @@ public partial class ThrowItemAction : Action
             {
                 HoldingItem.Value = false;
                 HeldItem.Value = null;
-                Debug.Log("Threw to target!");
+                
             }
 
             //Otherwise, determine a location in range and throw towards that location
@@ -65,27 +65,37 @@ public partial class ThrowItemAction : Action
                 //Normalize vector to get direction to sound
                 Vector3 direction = (Sound.Value.Location - Star.Value.transform.position).normalized;
 
-                //Find position on the vector within range
-                Vector3 throwTarget = Star.Value.transform.position + direction * ThrowRange.Value;
+                //Create a set of distances to try
+                float[] distances =
+                {
+                    ThrowRange.Value,
+                    ThrowRange.Value * 0.9f,
+                    ThrowRange.Value * 0.75f,
+                    ThrowRange.Value * 0.5f,
+                    ThrowRange.Value * 0.25f
+                };
 
-                //NOTE: may want handling for if there's an obstacle in the way?? but this probably would go under the throwing code
-                //If this throw succeeded, update
-                if (throwing.ThrowItemAtTry(throwTarget, Vector3.up, ThrowRange.Value))
+                //Loop through and try each until one allows for throwing
+                foreach (float distance in distances)
                 {
-                    HoldingItem.Value = false;
-                    HeldItem.Value = null;
-                    Debug.Log("Threw to closest reachable position towards target!");
+                    Vector3 throwTarget = Star.Value.transform.position + direction * distance;
+
+                    //Try throw
+                    if (throwing.ThrowItemAtTry(throwTarget, Vector3.up, ThrowRange.Value))
+                    {
+                        HoldingItem.Value = false;
+                        HeldItem.Value = null;
+                        return Status.Success;
+                    }
                 }
-                //DEBUG
-                else
-                {
-                    Debug.Log("Unable to throw item");
-                }
+
+                //Only reach here if item couldn't be thrown
+                Debug.Log("Couldn't throw item at any position");
 
             }
             
         }
-        return Status.Success;
+        return Status.Failure;
     }
 }
 
