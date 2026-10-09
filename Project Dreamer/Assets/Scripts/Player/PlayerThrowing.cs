@@ -28,9 +28,11 @@ public class PlayerThrowing : BaseThrowing
     [Tooltip("The camera, used for mouse position calculations. If unset, defaults to the main camera (Camera.main, determined on Start()).")]
     [SerializeField] private Camera _camera = null;
 
-    //For testing - assigns which object will be picked up when pressing the "1" key
-    [SerializeField] private GameObject _debugItem = null;
-    private InputAction _debugPickupAction;
+    //For testing - assigns which object will be picked up when pressing "1" or "2" respectively
+    [SerializeField] private GameObject _debugItem1 = null;
+    [SerializeField] private GameObject _debugItem2 = null;
+    private InputAction _debugPickupAction1;
+    private InputAction _debugPickupAction2;
 
     private GameObject _activeMarker = null;
     private InputAction _aimAction;
@@ -43,12 +45,15 @@ public class PlayerThrowing : BaseThrowing
         _aimAction = InputSystem.actions.FindAction("Aim");
         _throwAction = InputSystem.actions.FindAction("Throw");
 
-        _debugPickupAction = InputSystem.actions.FindAction("Debug 1");
+        _debugPickupAction1 = InputSystem.actions.FindAction("Debug 1");
+        _debugPickupAction2 = InputSystem.actions.FindAction("Debug 2");
 
         if (_camera == null)
         {
             _camera = Camera.main;
         }
+
+        _throwLandEvent.AddListener(SignalItemSound);
     }
 
     private void Update()
@@ -116,9 +121,13 @@ public class PlayerThrowing : BaseThrowing
             ResetThrow();
         }
 
-        if (_debugPickupAction.WasPressedThisFrame() || Keyboard.current.digit1Key.wasPressedThisFrame) //DEBUG override
+        if (_debugPickupAction1.WasPressedThisFrame())
         {
-            SetHeldItem(_debugItem);
+            SetHeldItem(_debugItem1);
+        }
+        else if (_debugPickupAction2.WasPressedThisFrame())
+        {
+            SetHeldItem(_debugItem2);
         }
     }
 
@@ -190,5 +199,15 @@ public class PlayerThrowing : BaseThrowing
     {
         base.ResetThrow();
         RemoveThrowMarker();
+    }
+
+    /// <summary>
+    /// Calls Land() on the given item.
+    /// Used with _throwLandEvent on the player so that player-thrown items make sounds.
+    /// </summary>
+    /// <param name="item">The item that is landing.</param>
+    private void SignalItemSound(GameObject item)
+    {
+        item.GetComponent<ThrowableItem>().Land();
     }
 }
