@@ -17,7 +17,7 @@ public class DemoDEBUG : MonoBehaviour
 
     public void LoadSound()
     {
-        SceneManager.LoadScene("AISoundTest");
+        SceneManager.LoadScene("AIItemTest");
     }
 
     public void LoadCamera()

@@ -15,19 +15,25 @@ public class SoundManager : MonoBehaviour
     //DEBUG
     Mouse mouse = null;
     Vector3 newSoundPos = Vector3.zero;
+    private InputAction debugInputHarsh;
+    private InputAction debugInputSoft;
+
 
     void Start()
     {
         //DEBUG
         mouse = Mouse.current;
+
+        debugInputHarsh = InputSystem.actions.FindAction("Debug 5");
+        debugInputSoft = InputSystem.actions.FindAction("Debug 6");
     }
 
-    /*
+    
     void Update()
     {
         //DEBUG -- Clicking to place sounds in scene, remove later
             //Bypasses inputsystem, will likely need to be commented out when merging
-        if (mouse.leftButton.wasPressedThisFrame)
+        if (debugInputHarsh.WasPressedThisFrame())
         {
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
 
@@ -39,7 +45,7 @@ public class SoundManager : MonoBehaviour
             }
         }
 
-        if (mouse.rightButton.wasPressedThisFrame)
+        if (debugInputSoft.WasPressedThisFrame())
         {
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
 
@@ -51,7 +57,7 @@ public class SoundManager : MonoBehaviour
             }
         }
     }
-    */
+    
 
     //Places a sound at a given location and assigns a type to it
     public void SpawnSound(Vector3 pos, SoundType type, float audibleRange, float duration, bool isPersistent)
