@@ -26,6 +26,7 @@ public class SoundManager : MonoBehaviour
 
         debugInputHarsh = InputSystem.actions.FindAction("Debug 5");
         debugInputSoft = InputSystem.actions.FindAction("Debug 6");
+        debugInputHarsh.actionMap.Enable();
     }
 
     

@@ -48,6 +48,9 @@ public class PlayerThrowing : BaseThrowing
         _debugPickupAction1 = InputSystem.actions.FindAction("Debug 1");
         _debugPickupAction2 = InputSystem.actions.FindAction("Debug 2");
 
+        //Make sure the action map is enabled
+        _debugPickupAction1.actionMap.Enable();
+
         if (_camera == null)
         {
             _camera = Camera.main;
