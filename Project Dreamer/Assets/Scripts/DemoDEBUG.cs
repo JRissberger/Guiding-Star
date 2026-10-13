@@ -39,6 +39,11 @@ public class DemoDEBUG : MonoBehaviour
         SceneManager.LoadScene("ThrowingTest");
     }
 
+    public void LoadDemo()
+    {
+        SceneManager.LoadScene("DemoScene");
+    }
+
     public void LoadMenu()
     {
         Debug.Log("Loading menu");

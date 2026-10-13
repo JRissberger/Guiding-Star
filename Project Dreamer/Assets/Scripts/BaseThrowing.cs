@@ -36,7 +36,8 @@ public class BaseThrowing : MonoBehaviour
     [SerializeField] private int _curveDisplaySegments = 50;
 
     //Called when an object is finished being thrown and lands on the ground (or another surface).
-    [System.NonSerialized] public UnityEvent _throwLandEvent = new UnityEvent();
+    //Passes the thrown object as an argument.
+    [System.NonSerialized] public UnityEvent<GameObject> _throwLandEvent = new UnityEvent<GameObject>();
 
     private BezierCurve? _throwCurve;
     protected GameObject _heldItem = null;
@@ -74,7 +75,7 @@ public class BaseThrowing : MonoBehaviour
             }
 
             _heldItem = item;
-            _heldItem.transform.position = transform.position + _handOffset;
+            _heldItem.transform.position = transform.position + transform.rotation * _handOffset;
             _heldItem.transform.SetParent(transform, true);
         }
         else
@@ -86,7 +87,7 @@ public class BaseThrowing : MonoBehaviour
             }
 
             _heldItem = item;
-            _heldItem.transform.position = transform.position + _handOffset;
+            _heldItem.transform.position = transform.position + transform.rotation * _handOffset;
             _heldItem.transform.SetParent(transform, true);
         }
     }
@@ -246,7 +247,6 @@ public class BaseThrowing : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         item.transform.position = (Vector3)throwCurve.P3;
-        //item.GetComponent<ThrowableItem>().Land();
-        _throwLandEvent.Invoke();
+        _throwLandEvent.Invoke(item);
     }
 }

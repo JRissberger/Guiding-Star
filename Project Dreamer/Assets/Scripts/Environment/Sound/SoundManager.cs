@@ -22,6 +22,7 @@ public class SoundManager : MonoBehaviour
         mouse = Mouse.current;
     }
 
+    /*
     void Update()
     {
         //DEBUG -- Clicking to place sounds in scene, remove later
@@ -50,6 +51,7 @@ public class SoundManager : MonoBehaviour
             }
         }
     }
+    */
 
     //Places a sound at a given location and assigns a type to it
     public void SpawnSound(Vector3 pos, SoundType type, float audibleRange, float duration, bool isPersistent)
