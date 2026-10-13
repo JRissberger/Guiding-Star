@@ -3,18 +3,6 @@ using UnityEngine.SceneManagement;
 
 public class DemoDEBUG : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void LoadSound()
     {
         SceneManager.LoadScene("AIItemTest");
@@ -48,5 +36,11 @@ public class DemoDEBUG : MonoBehaviour
     {
         Debug.Log("Loading menu");
         SceneManager.LoadScene("DemoMenu");
+    }
+
+    public void LoadArtMuseum()
+    {
+
+        SceneManager.LoadScene("ArtMuseumTest");
     }
 }
