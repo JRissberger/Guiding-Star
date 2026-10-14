@@ -1,14 +1,17 @@
-
-float3 fade(float3 t)
+inline float3 fade(float3 t)
 {
     return t * t * t * (t * (t * 6 - 15) + 10); // new curve
     // //
     // return t * t * (3 - 2 * t); // old curve
 }
-float perm(float x) { return (frac(frac(x * .2 * x * 3.1415926) / 3.1415926 + x * 2.1)); }
-float GradientVec(float x, float3 p) { return dot(x, p); }
+// HORRID noise function that isn't random but *looks* 
+// random enough that I'm not complaining
+inline float perm(float x) { 
+    return (frac(frac(x * .2 * x * 3.1415926) / 3.1415926 + x * 2.1)); 
+}
+inline float GradientVec(float x, float3 p) { return dot(x, p); }
 // 3D version
-float Perlin3Dl(float3 p)
+inline float Perlin3Dl(float3 p)
 {
     float3 P = fmod(floor(p), 256.0);
     p -= floor(p);
@@ -34,7 +37,7 @@ float Perlin3Dl(float3 p)
         f.z);
 }
 
-float3 Perlin3DVec(float3 samplePos){
+inline float3 Perlin3DVec(float3 samplePos){
     return float3(
         Perlin3Dl(samplePos),
         Perlin3Dl(samplePos - 20), 

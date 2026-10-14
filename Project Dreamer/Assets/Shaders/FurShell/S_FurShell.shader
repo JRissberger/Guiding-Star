@@ -26,44 +26,24 @@ Shader "Lit/Diffuse With Shadows"
             #pragma multi_compile_fwdbase nolightmap nodirlightmap nodynlightmap novertexlight
             // shadow helper functions and macros
             #include "AutoLight.cginc"
-            #include "Perlin3D.cginc"
+            #include "WindDistort.cginc"
 
             struct v2f
             {
                 float4 pos : SV_POSITION;
-                // float3 tangent: TANGENT;
                 float2 uv : TEXCOORD0;
                 SHADOW_COORDS(1) // put shadows data into TEXCOORD1
                 half3 diff : COLOR0;
                 half3 ambient : COLOR1;
             };
 
-            // inline float3 TransformToTangentSpace(float3 viewDir, float3 normal, float3 tangent)
-            // {
-            //     return float3(
-            //         dot(tangent, viewDir),
-            //         dot(cross(normal, tangent), viewDir),
-            //         dot(normal, viewDir)
-            //     );
-            // }
-
-            uniform float _TurbulanceDisplace;
-            uniform float _TurbulanceRate; 
-            uniform float3 _WindDir;
-            uniform float _WindPower;
             sampler2D _MainTex;
-            // sampler2D _DisplaceTex;
-
+            
             v2f vert (appdata_tan v)
             {
                 v2f o;
+                o.pos = ProjectWindDistortVertex(v.vertex.xyz, 1);
 
-                float4 worldPosition = mul (unity_ObjectToWorld, float4 (v.vertex.xyz, 1.0));
-                
-                float3 samplePos = worldPosition.xyz - _TurbulanceRate * _WindDir * _Time.y;
-                worldPosition.xyz += Perlin3DVec(samplePos) * _TurbulanceDisplace + _WindDir * _WindPower;
-
-                o.pos = mul(unity_MatrixVP, worldPosition);
                 o.uv = v.texcoord;
                 half3 worldNormal = UnityObjectToWorldNormal(v.normal);
                 half nl = max(0, dot(worldNormal, _WorldSpaceLightPos0.xyz));
@@ -73,16 +53,6 @@ Shader "Lit/Diffuse With Shadows"
                 TRANSFER_SHADOW(o);
                 return o;
             }
-
-            // uniform float2 _ImageSize;
-
-            // float noiseFunction(float3 position){
-            //     return position ; 
-            // // }
-
-            // float testSDF(float3 current){
-            //     return length(current) - 1.;//max(depth - dot(srcWS - current, normalWS), 0);
-            // }
 
             half4 frag (v2f i) : SV_Target
             {
@@ -99,7 +69,44 @@ Shader "Lit/Diffuse With Shadows"
             ENDHLSL
         }
 
-        // shadow casting support
-        UsePass "Legacy Shaders/VertexLit/SHADOWCASTER"
+        // shadow caster rendering pass, implemented manually to allow for
+        // deformation shadowcasting mesh's shape
+        // using macros from UnityCG.cginc
+        Pass
+        {
+            Tags {"LightMode"="ShadowCaster"}
+
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #pragma multi_compile_shadowcaster
+            #include "UnityCG.cginc"
+            #include "ManualShadows.cginc"
+            #include "WindDistort.cginc"
+
+            struct v2f { 
+                V2F_SHADOW_CASTER;
+            };
+
+            v2f vert(appdata_base v)
+            {
+                v2f o;
+                o.pos = ProjectWindDistortVertex(v.vertex.xyz, 1);
+
+		        float3 wNormal = UnityObjectToWorldNormal (v.normal);
+                // technically, this is wrong, since we are using model source normals
+                // to compute the normal bias, however, unless you have enough turbulance
+                // to kill a person, nobody else noticed.
+                o.pos = ApplyShadowNormalBias(o.pos,wNormal);
+                o.pos = UnityApplyLinearShadowBias(o.pos);
+                return o;
+            }
+
+            float4 frag(v2f i) : SV_Target
+            {
+                SHADOW_CASTER_FRAGMENT(i)
+            }
+            ENDHLSL
+        }
     }
 }
