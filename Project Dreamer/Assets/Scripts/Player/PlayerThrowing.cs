@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 /// <summary>
@@ -27,9 +28,11 @@ public class PlayerThrowing : BaseThrowing
     [Tooltip("The camera, used for mouse position calculations. If unset, defaults to the main camera (Camera.main, determined on Start()).")]
     [SerializeField] private Camera _camera = null;
 
-    //For testing - assigns which object will be picked up when pressing the "1" key
-    [SerializeField] private GameObject _debugItem = null;
-    private InputAction _debugPickupAction;
+    //For testing - assigns which object will be picked up when pressing "1" or "2" respectively
+    [SerializeField] private GameObject _debugItem1 = null;
+    [SerializeField] private GameObject _debugItem2 = null;
+    private InputAction _debugPickupAction1;
+    private InputAction _debugPickupAction2;
 
     private GameObject _activeMarker = null;
     private InputAction _aimAction;
@@ -42,16 +45,23 @@ public class PlayerThrowing : BaseThrowing
         _aimAction = InputSystem.actions.FindAction("Aim");
         _throwAction = InputSystem.actions.FindAction("Throw");
 
-        _debugPickupAction = InputSystem.actions.FindAction("Debug 1");
+        _debugPickupAction1 = InputSystem.actions.FindAction("Debug 1");
+        _debugPickupAction2 = InputSystem.actions.FindAction("Debug 2");
+
+        //Make sure the action map is enabled
+        _debugPickupAction1.actionMap.Enable();
 
         if (_camera == null)
         {
             _camera = Camera.main;
         }
+
+        _throwLandEvent.AddListener(SignalItemSound);
     }
 
     private void Update()
     {
+
         if (_aimAction.IsPressed())
         {
             RaycastHit? clickedInfo = GetClickedRaycast(Mouse.current.position.ReadValue(), LayerMask.GetMask(LayerMask.LayerToName(0)));
@@ -68,14 +78,18 @@ public class PlayerThrowing : BaseThrowing
                         //This is done by comparing the surface normal to the vector from the hand to the target point
                         //If these vectors are facing the same way, the dot product will be positive
                         bool validCurve;
+
                         Vector3 dotLeft = clickedPoint - (transform.position + _handOffset);
-                        Vector3 dotRight = clickedNormal;
-                        //Ignore upwards component - throwing to a higher floor is possible due to gravity
+                        //Ignore y component if positive (upwards) - throwing to a higher floor is possible due to gravity
                         dotLeft.y = Mathf.Min(dotLeft.y, 0);
-                        dotRight.y = Mathf.Min(dotRight.y, 0);
+
+                        Vector3 dotRight = clickedNormal;
+                        
+                        //dotRight.y = Mathf.Min(dotRight.y, 0);
                         if (Vector3.Dot(dotLeft, dotRight) > 0)
                         {
                             validCurve = false;
+                            ResetThrow();
                         }
                         else
                         {
@@ -110,9 +124,13 @@ public class PlayerThrowing : BaseThrowing
             ResetThrow();
         }
 
-        if (_debugPickupAction.WasPressedThisFrame())
+        if (_debugPickupAction1.WasPressedThisFrame())
         {
-            SetHeldItem(_debugItem);
+            SetHeldItem(_debugItem1);
+        }
+        else if (_debugPickupAction2.WasPressedThisFrame())
+        {
+            SetHeldItem(_debugItem2);
         }
     }
 
@@ -127,7 +145,7 @@ public class PlayerThrowing : BaseThrowing
     {
         Ray screenRay = Camera.main.ScreenPointToRay(mousePosition);
         RaycastHit hitInfo;
-        if (Physics.Raycast(screenRay, out hitInfo, Mathf.Infinity, clickableLayers))
+        if (Physics.Raycast(screenRay, out hitInfo, Mathf.Infinity, clickableLayers, QueryTriggerInteraction.Ignore))
         {
             return hitInfo;
         }
@@ -184,5 +202,15 @@ public class PlayerThrowing : BaseThrowing
     {
         base.ResetThrow();
         RemoveThrowMarker();
+    }
+
+    /// <summary>
+    /// Calls Land() on the given item.
+    /// Used with _throwLandEvent on the player so that player-thrown items make sounds.
+    /// </summary>
+    /// <param name="item">The item that is landing.</param>
+    private void SignalItemSound(GameObject item)
+    {
+        item.GetComponent<ThrowableItem>().Land();
     }
 }

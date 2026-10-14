@@ -8,8 +8,8 @@ public class DreamerThrowing : BaseThrowing
     {
         base.Start();
 
-        SetHeldItem(_debugItem);
-        ThrowItemAtTry(new Vector3(-4, 0, 4), Vector3.up); //throwing path is blocked in the test scene; this should not throw the item
+        //SetHeldItem(_debugItem);
+        //ThrowItemAtTry(new Vector3(-4, 0, 4), Vector3.up); //throwing path is blocked in the test scene; this should not throw the item
     }
 
     /// <summary>

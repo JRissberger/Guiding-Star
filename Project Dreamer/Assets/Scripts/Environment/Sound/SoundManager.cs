@@ -15,51 +15,59 @@ public class SoundManager : MonoBehaviour
     //DEBUG
     Mouse mouse = null;
     Vector3 newSoundPos = Vector3.zero;
+    private InputAction debugInputHarsh;
+    private InputAction debugInputSoft;
+
 
     void Start()
     {
         //DEBUG
         mouse = Mouse.current;
+
+        debugInputHarsh = InputSystem.actions.FindAction("Debug 5");
+        debugInputSoft = InputSystem.actions.FindAction("Debug 6");
+        debugInputHarsh.actionMap.Enable();
     }
 
+    
     void Update()
     {
-       
         //DEBUG -- Clicking to place sounds in scene, remove later
             //Bypasses inputsystem, will likely need to be commented out when merging
-        if (mouse.leftButton.wasPressedThisFrame)
+        if (debugInputHarsh.WasPressedThisFrame())
         {
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
 
             if (Physics.Raycast(ray, out RaycastHit hitResult, Mathf.Infinity))
             {
                 newSoundPos = hitResult.point;
-                SpawnSound(newSoundPos, SoundType.Loud, 5, 0.5f);
+                SpawnSound(newSoundPos, SoundType.Loud, 5, 1f, false);
+                Debug.Log("Placed sound at "+ newSoundPos);
             }
         }
 
-        if (mouse.rightButton.wasPressedThisFrame)
+        if (debugInputSoft.WasPressedThisFrame())
         {
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
 
             if (Physics.Raycast(ray, out RaycastHit hitResult, Mathf.Infinity))
             {
                 newSoundPos = hitResult.point;
-                SpawnSound(newSoundPos, SoundType.Soft, 5, 0.5f);
+                SpawnSound(newSoundPos, SoundType.Soft, 5, 1f, false);
+                Debug.Log("Placed sound at " + newSoundPos);
             }
         }
     }
+    
 
     //Places a sound at a given location and assigns a type to it
-    void SpawnSound(Vector3 pos, SoundType type, float audibleRange, float duration)
+    public void SpawnSound(Vector3 pos, SoundType type, float audibleRange, float duration, bool isPersistent)
     {
         //Spawn sound prefab
         GameObject newSound = Instantiate(soundPrefab, pos, Quaternion.identity);
         Sound sound = newSound.GetComponent<Sound>();
 
         //Assign type
-            //IMPORTANT: As of right now this is separate since Sound still inherits from MonoBehavior
-            //Might change so type is part of the constructor--need to check if that impacts anything else though
         sound.SoundType = type;
 
         //Assign manager reference
@@ -71,6 +79,7 @@ public class SoundManager : MonoBehaviour
         //Set timer
         sound.Timer = duration;
 
-        //TODO: persistent or not
+        //Is the sound persistent
+        sound.IsPersistent = isPersistent;
     }
 }
