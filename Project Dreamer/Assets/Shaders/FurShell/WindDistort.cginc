@@ -4,6 +4,7 @@ uniform float _TurbulanceDisplace;
 uniform float _TurbulanceRate; 
 uniform float3 _WindDir;
 uniform float _WindPower;
+uniform float _FurLength;
 uniform float _InvTurbulanceNoiseScale;
 
 //todo: change normalization const based on 
@@ -16,20 +17,24 @@ inline half3 SafeNormalize(half3 inVec){
 // performs full transformation of a vertex based on wind
 inline float4 ProjectWindDistortVertex(float3 vertex, float height){
     float4 worldPosition = mul (unity_ObjectToWorld, float4 (vertex, 1.0));
-    float4 originWorldPos = mul (unity_ObjectToWorld, float4 (vertex - float3(0,height, 0), 1.0));
+    float3 worldNormal = UnityObjectToWorldNormal(float3(0,0,1));
     
-    float relaxedLength = length(worldPosition - originWorldPos);
+    float relaxedLength = _FurLength * height;
     float influence = max(height,0);
     influence *= influence;
+
+    float3 originWS = worldPosition.xyz;
+
+    worldPosition.xyz += worldNormal * relaxedLength;
 
     float3 samplePos = (worldPosition.xyz - _TurbulanceRate * _WindDir * _Time.y) * _InvTurbulanceNoiseScale;
     worldPosition.xyz += influence * (Perlin3DVec(samplePos) * _TurbulanceDisplace + _WindDir * _WindPower);
     
-    worldPosition.xyz -= originWorldPos.xyz;
+    worldPosition.xyz -= originWS;
     
     worldPosition.xyz = SafeNormalize(worldPosition.xyz); 
     worldPosition.xyz *= relaxedLength;
-    worldPosition.xyz += originWorldPos.xyz;
+    worldPosition.xyz += originWS;
 
     return mul(unity_MatrixVP, worldPosition);
 }

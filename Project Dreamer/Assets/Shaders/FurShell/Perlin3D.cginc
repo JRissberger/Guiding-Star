@@ -42,5 +42,5 @@ inline float3 Perlin3DVec(float3 samplePos){
         Perlin3Dl(samplePos),
         Perlin3Dl(samplePos - 20), 
         Perlin3Dl(samplePos + 20)
-    );
+    ) * 2. - 1.;
 }
