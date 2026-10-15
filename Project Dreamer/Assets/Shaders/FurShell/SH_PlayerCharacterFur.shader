@@ -114,81 +114,81 @@ Shader "Lit/Diffuse With Shadows"
         // shadow caster rendering pass, implemented manually to allow for
         // deformation shadowcasting mesh's shape
         // using macros from UnityCG.cginc
-        Pass
-        {
-            Tags {"LightMode"="ShadowCaster"}
-            Cull Off
+        // Pass
+        // {
+        //     Tags {"LightMode"="ShadowCaster"}
+        //     Cull Off
 
-            HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #pragma multi_compile_shadowcaster
-            #pragma multi_compile_instancing
-            #include "UnityCG.cginc"
-            #include "ManualShadows.cginc"
-            #include "WindDistort.cginc"
+        //     HLSLPROGRAM
+        //     #pragma vertex vert
+        //     #pragma fragment frag
+        //     #pragma multi_compile_shadowcaster
+        //     #pragma multi_compile_instancing
+        //     #include "UnityCG.cginc"
+        //     #include "ManualShadows.cginc"
+        //     #include "WindDistort.cginc"
         
-            UNITY_INSTANCING_BUFFER_START(Props)
-                // put more per-instance properties here
-            UNITY_INSTANCING_BUFFER_END(Props)
+        //     UNITY_INSTANCING_BUFFER_START(Props)
+        //         // put more per-instance properties here
+        //     UNITY_INSTANCING_BUFFER_END(Props)
             
-            struct appdata {
-                float4 vertex : POSITION;
-                // float4 tangent : TANGENT;
-                float3 normal : NORMAL;
-                float4 texcoord : TEXCOORD0;
-                UNITY_VERTEX_INPUT_INSTANCE_ID
-            };
+        //     struct appdata {
+        //         float4 vertex : POSITION;
+        //         // float4 tangent : TANGENT;
+        //         float3 normal : NORMAL;
+        //         float4 texcoord : TEXCOORD0;
+        //         UNITY_VERTEX_INPUT_INSTANCE_ID
+        //     };
 
-            struct v2f { 
-                float2 uv: TEXCOORD0;
-                V2F_SHADOW_CASTER;
-                UNITY_VERTEX_INPUT_INSTANCE_ID
-            };
+        //     struct v2f { 
+        //         float2 uv: TEXCOORD0;
+        //         V2F_SHADOW_CASTER;
+        //         UNITY_VERTEX_INPUT_INSTANCE_ID
+        //     };
 
-            sampler2D _MainTex;
-            uniform float _ScrollVelocity;
+        //     sampler2D _MainTex;
+        //     uniform float _ScrollVelocity;
 
-            v2f vert(appdata v)
-            {
-                v2f o;
-                UNITY_SETUP_INSTANCE_ID(v);
-                UNITY_TRANSFER_INSTANCE_ID(v, o);
-                o.pos = ProjectWindDistortVertex(v.vertex.xyz, v.texcoord.y);
-                o.uv = v.texcoord;
+        //     v2f vert(appdata v)
+        //     {
+        //         v2f o;
+        //         UNITY_SETUP_INSTANCE_ID(v);
+        //         UNITY_TRANSFER_INSTANCE_ID(v, o);
+        //         o.pos = ProjectWindDistortVertex(v.vertex.xyz, v.texcoord.y);
+        //         o.uv = v.texcoord;
 
-		        float3 wNormal = UnityObjectToWorldNormal (v.normal);
-                // technically, this is wrong, since we are using model source normals
-                // to compute the normal bias, however, unless you have enough turbulance
-                // to kill a person, nobody else noticed.
-                o.pos = ApplyShadowNormalBias(o.pos,wNormal);
-                o.pos = UnityApplyLinearShadowBias(o.pos);
-                return o;
-            }
+		//         float3 wNormal = UnityObjectToWorldNormal (v.normal);
+        //         // technically, this is wrong, since we are using model source normals
+        //         // to compute the normal bias, however, unless you have enough turbulance
+        //         // to kill a person, nobody else noticed.
+        //         o.pos = ApplyShadowNormalBias(o.pos,wNormal);
+        //         o.pos = UnityApplyLinearShadowBias(o.pos);
+        //         return o;
+        //     }
 
-            float4 frag(v2f i) : SV_Target
-            {
-                UNITY_SETUP_INSTANCE_ID(i);
-                float2 scrolledUV;
-                half value;
-                scrolledUV = i.uv.xy * 2.;
-                scrolledUV.y += frac(_ScrollVelocity * -_Time.y);
-                value = tex2D(_MainTex, scrolledUV).x;
+        //     float4 frag(v2f i) : SV_Target
+        //     {
+        //         UNITY_SETUP_INSTANCE_ID(i);
+        //         float2 scrolledUV;
+        //         half value;
+        //         scrolledUV = i.uv.xy * 2.;
+        //         scrolledUV.y += frac(_ScrollVelocity * -_Time.y);
+        //         value = tex2D(_MainTex, scrolledUV).x;
                 
-                scrolledUV = i.uv.xy;
-                scrolledUV.x += .2;
-                scrolledUV.y += frac(_ScrollVelocity * -_Time.y);
-                value -= tex2D(_MainTex, scrolledUV).x;
+        //         scrolledUV = i.uv.xy;
+        //         scrolledUV.x += .2;
+        //         scrolledUV.y += frac(_ScrollVelocity * -_Time.y);
+        //         value -= tex2D(_MainTex, scrolledUV).x;
 
-                value = value * .8 + .5;
-                value -= i.uv.y;
-                // value +=
-                if(value < 0.){
-                    discard;
-                }
-                SHADOW_CASTER_FRAGMENT(i)
-            }
-            ENDHLSL
-        }
+        //         value = value * .8 + .5;
+        //         value -= i.uv.y;
+        //         // value +=
+        //         if(value < 0.){
+        //             discard;
+        //         }
+        //         SHADOW_CASTER_FRAGMENT(i)
+        //     }
+        //     ENDHLSL
+        // }
     }
 }
