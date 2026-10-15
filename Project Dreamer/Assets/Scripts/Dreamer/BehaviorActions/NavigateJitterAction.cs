@@ -15,12 +15,12 @@ public partial class NavigateJitterAction : Action
 
     //"Binonmial distribution sample which provides the jitter, normally near 0 but with 
         //decreasing probability get closer to + or - maxrotation"
-    private float rotationVar = 0.1f; //May adjust, eyeballed for testing
-    private float maxRotation = 5; //May adjust, pulled from Justus' code
+    private float rotationVar = 1f; //May adjust, eyeballed for testing
+    private float maxRotation = 5f; //May adjust, pulled from Justus' code
 
     //Min/Max distance a new location can be set for
-    private float minDistance = 1f;
-    private float maxDistance = 2f;
+    private float minDistance = 0.2f;
+    private float maxDistance = 1f;
 
     //Used for the partial destinations on the way to main target
     private Vector3 jitterTarget;
@@ -34,7 +34,7 @@ public partial class NavigateJitterAction : Action
 
         FindNextDestination();
         UpdateRotateVar();
-        navAgent.SetDestination(jitterTarget); //TODO: Speed?
+        navAgent.SetDestination(jitterTarget);
 
         return Status.Running;
     }
@@ -68,6 +68,7 @@ public partial class NavigateJitterAction : Action
     /// <returns>Angle value to add on to the current rotation</returns>
     private float Rotate(float rotation)
     {
+        Debug.Log("Rotate: " + (rotationVar - rotation) / 100f);
         if (Mathf.Abs(rotationVar - rotation) < 180)
         {
             return ((rotationVar - rotation) / 100f);
@@ -85,6 +86,23 @@ public partial class NavigateJitterAction : Action
     private void UpdateRotateVar()
     {
         rotationVar += ((Random.Range(0f, 100f) / 100f) - (Random.Range(0f, 100f)) * maxRotation);
+        ClampRotation();
+        Debug.Log("New Rotate Var " + rotationVar);
+    }
+
+    /// <summary>
+    /// Caps rotation within 360 degrees
+    /// </summary>
+    private void ClampRotation()
+    {
+        if (rotationVar > 360)
+        {
+            rotationVar -= 360;
+        }
+        else if (rotationVar < 0)
+        {
+            rotationVar += 360;
+        }
     }
 
     /// <summary>
@@ -93,7 +111,7 @@ public partial class NavigateJitterAction : Action
     private void FindNextDestination()
     {
         //Calculate angle the new target is on
-        float newAngle = Star.Value.transform.eulerAngles.y + Rotate(rotationVar);
+        float newAngle = Star.Value.transform.eulerAngles.y + Rotate(Star.Value.transform.eulerAngles.y);
 
         //Direction vector from new angle
         Vector3 direction = Quaternion.Euler(0f, newAngle, 0f) * Vector3.forward;
