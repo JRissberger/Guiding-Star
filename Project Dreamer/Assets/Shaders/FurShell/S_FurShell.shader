@@ -6,9 +6,10 @@ Shader "Lit/Diffuse With Shadows"
         // _DisplaceAmount ("Displacement Amount", Float) = .5
         _TurbulanceDisplace ("Turbulance", Float) = .5
         _TurbulanceRate ("Turbulance Rate", Float) = 2
-        _WindDir ("WindDirection", Vector, 3) = (0,0,0,0)
-        _WindPower ("WindAmount", Float) = 2
-        [NoScaleOffset] _DisplaceTex ("Displace", 2D) = "white" {}
+        _WindDir ("Wind Direction", Vector, 3) = (0,0,0,0)
+        _WindPower ("Wind Amount", Float) = 2
+        _InvTurbulanceNoiseScale ("Turbulance Scale", Float) = .2
+        // [NoScaleOffset] _DisplaceTex ("Displace", 2D) = "white" {}
     }
     SubShader
     {
@@ -42,7 +43,9 @@ Shader "Lit/Diffuse With Shadows"
             v2f vert (appdata_tan v)
             {
                 v2f o;
-                o.pos = ProjectWindDistortVertex(v.vertex.xyz, 1);
+                //FIXME: replace this with another piece of input data.
+                // float r = max(v.vertex.y, 0);
+                o.pos = ProjectWindDistortVertex(v.vertex.xyz, v.vertex.y);
 
                 o.uv = v.texcoord;
                 half3 worldNormal = UnityObjectToWorldNormal(v.normal);
@@ -91,7 +94,7 @@ Shader "Lit/Diffuse With Shadows"
             v2f vert(appdata_base v)
             {
                 v2f o;
-                o.pos = ProjectWindDistortVertex(v.vertex.xyz, 1);
+                o.pos = ProjectWindDistortVertex(v.vertex.xyz, v.vertex.y);
 
 		        float3 wNormal = UnityObjectToWorldNormal (v.normal);
                 // technically, this is wrong, since we are using model source normals

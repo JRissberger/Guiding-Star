@@ -1,3 +1,5 @@
+// copied section from unity's builtin shader include, but without the 
+// initial object to world space transform.
 inline float4 ApplyShadowNormalBias(float4 vertexWS, float3 normalWS){
 	if (unity_LightShadowBias . z != 0.0)
 	{
