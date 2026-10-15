@@ -1,9 +1,10 @@
-Shader "Lit/Diffuse With Shadows"
+Shader "Custom/PlayerCharacterFur"
 {
     Properties
     {
         [NoScaleOffset] _MainTex ("Texture", 2D) = "white" {}
         // _DisplaceAmount ("Displacement Amount", Float) = .5
+        _SwayFactors ("Sway factor (tangent, bitangent)", Vector, 2) = (1,1,0,0)
         _TurbulanceDisplace ("Turbulance", Float) = .5
         _TurbulanceRate ("Turbulance Rate", Float) = 2
         _WindDir ("Wind Direction", Vector, 3) = (0,0,0,0)
