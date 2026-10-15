@@ -85,11 +85,11 @@ Shader "Custom/PlayerCharacterFur"
                 UNITY_SETUP_INSTANCE_ID(i);
                 float2 scrolledUV;
                 half value;
-                scrolledUV = i.uv.xy * 2.;
+                scrolledUV = i.uv.xy * .5;
                 scrolledUV.y += frac(_ScrollVelocity * -_Time.y);
                 value = tex2D(_MainTex, scrolledUV).x;
                 
-                scrolledUV = i.uv.xy;
+                scrolledUV = i.uv.xy * .4;
                 scrolledUV.x += .2;
                 scrolledUV.y += frac(_ScrollVelocity * -_Time.y);
                 value -= tex2D(_MainTex, scrolledUV).x;
@@ -101,7 +101,7 @@ Shader "Custom/PlayerCharacterFur"
                     discard;
                 }
                 
-                half4 col = half4(0,0,0,0);
+                half4 col = (1. - smoothstep(.0,.5,tex2D(_MainTex, scrolledUV).x)) * half4(0,0,.05,0);//(half4(1,1,1,0), half4(0,0,0,0),);
                 // compute shadow attenuation (1.0 = fully lit, 0.0 = fully shadowed)
                 half shadow = SHADOW_ATTENUATION(i);
                 // darken light's illumination with shadow, keep ambient intact
