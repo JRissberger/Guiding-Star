@@ -7,6 +7,7 @@ uniform float2 _SwayFactors;
 uniform float _WindPower;
 uniform float _FurLength;
 uniform float _InvTurbulanceNoiseScale;
+uniform float2 _DefaultTangentDisplace;
 
 //todo: change normalization const based on 
 // #pragma multi_compile QUALITY_LOW QUALITY_MED QUALITY_HIGH
@@ -34,13 +35,15 @@ inline float4 ProjectWindDistortVertex(float3 vertex, float height, float3 normO
     float3 samplePos = ((worldPosition.xyz + worldNormal * relaxedLength) - _TurbulanceRate * _WindDir * _Time.y) * _InvTurbulanceNoiseScale;
     float3 offsetPos = influence * (Perlin3DVec(samplePos) * _TurbulanceDisplace + _WindDir * _WindPower);
 
+    float tangentDisplace = dot(offsetPos, worldTangent) / dot(worldTangent, worldTangent);
+    float bitangentDisplace = dot(offsetPos, worldBiTangent) / dot(worldBiTangent, worldBiTangent);
+
     offsetPos = 
-        _FurLength * worldNormal * height +
-        _SwayFactors.x * worldTangent * dot(offsetPos, worldTangent) / dot(worldTangent, worldTangent) + 
-        _SwayFactors.y * worldBiTangent * dot(offsetPos, worldBiTangent) / dot(worldBiTangent, worldBiTangent);
+        worldNormal * relaxedLength +
+        worldTangent * (_DefaultTangentDisplace.x + _SwayFactors.x * tangentDisplace) + 
+        worldBiTangent * (_DefaultTangentDisplace.y + _SwayFactors.y * bitangentDisplace);
     
     worldPosition.xyz += SafeNormalize(offsetPos) * relaxedLength; 
-    // worldPosition.xyz ;
 
     return mul(unity_MatrixVP, worldPosition);
 }

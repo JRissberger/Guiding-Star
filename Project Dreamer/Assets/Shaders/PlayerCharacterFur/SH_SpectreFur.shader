@@ -11,6 +11,7 @@ Shader "Custom/Spectre Fur"
         _ScrollVelocity ("Scroll Velocity", Float) = 2
         _InvTurbulanceNoiseScale ("Turbulance Scale", Float) = .2
         _FurLength ("Fur length", Float) = 2
+        _DefaultTangentDisplace ("Default Tangent Displace", Vector, 2) = (1,0,0,0)
     }
     SubShader
     {
