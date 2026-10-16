@@ -43,7 +43,6 @@ public partial class ThrowItemAction : Action
             //If rotation isn't done, return running status
             if (Quaternion.Angle(Star.Value.transform.rotation, rotation) > 1)
             {
-                Debug.Log("Turning");
                 return Status.Running;
             }
         }

@@ -28,19 +28,26 @@ public partial class NavigateJitterAction : Action
     //Navmesh agent for navigation
     private NavMeshAgent navAgent;
 
+    //Used for handling manual turning
+    private Quaternion manualRotate;
+
     protected override Status OnStart()
     {
+        manualRotate = Quaternion.identity;
         navAgent = Star.Value.GetComponent<NavMeshAgent>();
 
         FindNextDestination();
         UpdateRotateVar();
         navAgent.SetDestination(jitterTarget);
+        navAgent.autoBraking = false; //Disabled to make movement smoother
 
         return Status.Running;
     }
 
     protected override Status OnUpdate()
     {
+        //TODO: breakout clause for if Star is stuck--off navmesh or abyss in all directions, return fail
+
         //Check distance to target, return running if not close enough
         if (!CloseToTarget(jitterTarget))
         {
@@ -50,15 +57,79 @@ public partial class NavigateJitterAction : Action
         //If near target, check if target is close to final target
         if (CloseToTarget(Target.Value))
         {
+            //Turn auto braking back on??
             return Status.Success;
         }
 
+
         //if not, reroll for new target
-        //DEBUG: perpetually rerolling (unless randomly hits target), this is full random right now
+        //Always reroll at least once, but redo until a valid spot is found if needed
+        //do {
+        //    if (CheckForceTurn()) { return Status.Running; }
+        //    FindNextDestination();
+
+        //} while (!NavMesh.SamplePosition(new Vector3(jitterTarget.x, jitterTarget.y - Star.Value.transform.position.y, jitterTarget.z), out NavMeshHit hit, 0.1f, NavMesh.AllAreas));
+
+        //DEBUG, do/while still results in infinite loop
+        if (CheckForceTurn()) { return Status.Running; }
         FindNextDestination();
+        //Finish movement update
         UpdateRotateVar();
         navAgent.SetDestination(jitterTarget);
+
         return Status.Running;
+    }
+
+    //TODO: weight turn towards overall target
+    /// <summary>
+    /// Forcibly turns Star if they're too close to a boundary
+    /// </summary>
+    /// <returns>if Star is currently rotating</returns>
+    private bool CheckForceTurn()
+    {
+        //Find the closest edge to Star
+        navAgent.FindClosestEdge(out NavMeshHit hit);
+
+        //If edge is in range
+        if (hit.distance < 0.5)
+        {
+            Debug.Log("Close to edge");
+            //Calculating direction between Star and edge
+            Vector3 direction = hit.position - Star.Value.transform.position;
+            if (direction.sqrMagnitude > 0)
+            {
+                direction.Normalize();
+
+                //Get dot to determine if Star's facing edge (closer to 1 means more perpendicular to edge)
+                float dotFacing = Vector3.Dot(Star.Value.transform.forward, direction);
+
+                //Roughly facing edge, need to turn
+                if (dotFacing > 0.5f)
+                {
+                    //Set the target turn if there is none
+                    if (manualRotate == Quaternion.identity)
+                    {
+                        manualRotate = Quaternion.Euler(0, 90f, 0) * Star.Value.transform.rotation;
+                    }
+
+                    //Rotate Star away           
+                    Star.Value.transform.rotation = Quaternion.RotateTowards(Star.Value.transform.rotation, manualRotate, 180 * Time.deltaTime);
+                    Debug.Log("turning");
+
+                    //If Star has completed the turn, end
+                    if (Quaternion.Angle(Star.Value.transform.rotation, manualRotate) < 1)
+                    {
+                        //Reset manual rotation
+                        manualRotate = Quaternion.identity;
+                    }
+
+                    return true;
+                }
+            }
+            
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -87,7 +158,7 @@ public partial class NavigateJitterAction : Action
     {
         rotationVar += ((Random.Range(0f, 100f) / 100f) - (Random.Range(0f, 100f)) * maxRotation);
         ClampRotation();
-        Debug.Log("New Rotate Var " + rotationVar);
+        //Debug.Log("New Rotate Var " + rotationVar);
     }
 
     /// <summary>
