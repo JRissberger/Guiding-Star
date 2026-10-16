@@ -12,14 +12,16 @@ Shader "Custom/Spectre Fur"
         _InvTurbulanceNoiseScale ("Turbulance Scale", Float) = .2
         _FurLength ("Fur length", Float) = 2
         _DefaultTangentDisplace ("Default Tangent Displace", Vector, 2) = (1,0,0,0)
+        _GlimmerColor("Glimmer Color", Color) = (0,0,1,0)
     }
     SubShader
     {
+        Tags {"LightMode"="ForwardBase" "RenderType"="Transparent" "Queue" ="Transparent"}
         Pass
         {
-            Tags {"LightMode"="ForwardBase"}
+            LOD 200
             Cull Off
-            //Blend One OneMinusSrcAlpha
+            Blend One OneMinusSrcAlpha
             
             HLSLPROGRAM
             #pragma vertex vert
@@ -55,6 +57,7 @@ Shader "Custom/Spectre Fur"
 
             sampler2D _MainTex;
             uniform float _ScrollVelocity;
+            uniform fixed4 _GlimmerColor;
 
             UNITY_INSTANCING_BUFFER_START(Props)
                 // put more per-instance properties here
@@ -83,30 +86,29 @@ Shader "Custom/Spectre Fur"
             {
                 UNITY_SETUP_INSTANCE_ID(i);
                 float2 scrolledUV;
-                half value;
                 scrolledUV = i.uv.xy * .5;
                 scrolledUV.y += frac(_ScrollVelocity * -_Time.y);
-                value = tex2D(_MainTex, scrolledUV).x;
+                fixed noise1 = tex2D(_MainTex, scrolledUV).x;
                 
                 scrolledUV = i.uv.xy * .4;
                 scrolledUV.x += .2;
                 scrolledUV.y += frac(_ScrollVelocity * -_Time.y);
-                value -= tex2D(_MainTex, scrolledUV).x;
+                fixed noise2 = tex2D(_MainTex, scrolledUV).x;
 
-                value = value * .8 + .5;
+                fixed value = (noise1 - noise2) * .8 + .5;
                 value -= i.uv.y;
-                // value +=
+                
                 if(value < 0.){
                     discard;
                 }
                 
-                half4 col = (1. - smoothstep(.0,.5,tex2D(_MainTex, scrolledUV).x)) * half4(0,0,.5,0);//(half4(1,1,1,0), half4(0,0,0,0),);
+                fixed3 col = (1. - smoothstep(.0,.5,noise1)) * _GlimmerColor.xyz;
                 // compute shadow attenuation (1.0 = fully lit, 0.0 = fully shadowed)
                 half shadow = SHADOW_ATTENUATION(i);
                 // darken light's illumination with shadow, keep ambient intact
-                half3 lighting = i.diff * shadow + i.ambient;
+                fixed3 lighting = i.diff * shadow + i.ambient;
                 col.rgb *= lighting;
-                return col;
+                return fixed4(col, 1.) * smoothstep(.0,.3,value);
             }
             ENDHLSL
         }
