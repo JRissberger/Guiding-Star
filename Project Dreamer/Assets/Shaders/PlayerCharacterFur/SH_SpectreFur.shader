@@ -3,7 +3,6 @@ Shader "Custom/Spectre Fur"
     Properties
     {
         [NoScaleOffset] _MainTex ("Texture", 2D) = "white" {}
-        // _DisplaceAmount ("Displacement Amount", Float) = .5
         _SwayFactors ("Sway factor (tangent, bitangent)", Vector, 2) = (1,1,0,0)
         _TurbulanceDisplace ("Turbulance", Float) = .5
         _TurbulanceRate ("Turbulance Rate", Float) = 2
@@ -12,7 +11,6 @@ Shader "Custom/Spectre Fur"
         _ScrollVelocity ("Scroll Velocity", Float) = 2
         _InvTurbulanceNoiseScale ("Turbulance Scale", Float) = .2
         _FurLength ("Fur length", Float) = 2
-        // [NoScaleOffset] _DisplaceTex ("Displace", 2D) = "white" {}
     }
     SubShader
     {
