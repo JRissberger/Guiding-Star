@@ -1,4 +1,4 @@
-Shader "Custom/PlayerCharacterFur"
+Shader "Custom/Spectre Fur"
 {
     Properties
     {
@@ -38,7 +38,7 @@ Shader "Custom/PlayerCharacterFur"
 
             struct appdata {
                 float4 vertex : POSITION;
-                // float4 tangent : TANGENT;
+                float4 tangent : TANGENT;
                 float3 normal : NORMAL;
                 float4 texcoord : TEXCOORD0;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -69,7 +69,7 @@ Shader "Custom/PlayerCharacterFur"
                 o.uv = v.texcoord;
                 //FIXME: replace this with another piece of input data.
                 // float r = max(v.vertex.y, 0);
-                o.pos = ProjectWindDistortVertex(v.vertex.xyz, v.texcoord.y);
+                o.pos = ProjectWindDistortVertex(v.vertex.xyz, v.texcoord.y, v.normal, v.tangent);
 
                 half3 worldNormal = UnityObjectToWorldNormal(v.normal);
                 half nl = max(0, dot(worldNormal, _WorldSpaceLightPos0.xyz));
@@ -101,7 +101,7 @@ Shader "Custom/PlayerCharacterFur"
                     discard;
                 }
                 
-                half4 col = (1. - smoothstep(.0,.5,tex2D(_MainTex, scrolledUV).x)) * half4(0,0,.05,0);//(half4(1,1,1,0), half4(0,0,0,0),);
+                half4 col = (1. - smoothstep(.0,.5,tex2D(_MainTex, scrolledUV).x)) * half4(0,0,.5,0);//(half4(1,1,1,0), half4(0,0,0,0),);
                 // compute shadow attenuation (1.0 = fully lit, 0.0 = fully shadowed)
                 half shadow = SHADOW_ATTENUATION(i);
                 // darken light's illumination with shadow, keep ambient intact

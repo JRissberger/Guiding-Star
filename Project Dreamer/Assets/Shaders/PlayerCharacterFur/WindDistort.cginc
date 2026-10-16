@@ -16,14 +16,14 @@ inline half3 SafeNormalize(half3 inVec){
 }
 
 // performs full transformation of a vertex based on wind
-inline float4 ProjectWindDistortVertex(float3 vertex, float height){
+inline float4 ProjectWindDistortVertex(float3 vertex, float height, float3 normOS, float3 tangentOS){
     float4 worldPosition = mul (unity_ObjectToWorld, float4 (vertex, 1.0));
 
-    float3 worldNormal = unity_WorldToObject._m20_m21_m22;
-    float3 worldTangent = unity_WorldToObject._m00_m01_m02;
+    float3 worldNormal = SafeNormalize(mul((float3x3) unity_ObjectToWorld, normOS));
+    float3 worldTangent = SafeNormalize(mul((float3x3) unity_ObjectToWorld, tangentOS));
     //pride flag, wait no I'm getting distracted by something that I thought was
     //funnier than it was, guess you could say I went on a *tangent* haha ._.
-    float3 worldBiTangent = unity_WorldToObject._m10_m11_m12;
+    float3 worldBiTangent = cross(worldNormal, worldTangent);
 
     float relaxedLength = _FurLength * height;
     float influence = max(height,0);
