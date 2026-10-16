@@ -15,7 +15,7 @@ public partial class NavigateJitterAction : Action
 
     //"Binonmial distribution sample which provides the jitter, normally near 0 but with 
         //decreasing probability get closer to + or - maxrotation"
-    private float rotationVar = 1f; //May adjust, eyeballed for testing
+    private float rotationVar = 0.1f; //May adjust, eyeballed for testing
     private float maxRotation = 5f; //May adjust, pulled from Justus' code
 
     //Min/Max distance a new location can be set for
@@ -28,12 +28,9 @@ public partial class NavigateJitterAction : Action
     //Navmesh agent for navigation
     private NavMeshAgent navAgent;
 
-    //Used for handling manual turning
-    private Quaternion manualRotate;
 
     protected override Status OnStart()
     {
-        manualRotate = Quaternion.identity;
         navAgent = Star.Value.GetComponent<NavMeshAgent>();
 
         FindNextDestination();
@@ -71,12 +68,12 @@ public partial class NavigateJitterAction : Action
         //} while (!NavMesh.SamplePosition(new Vector3(jitterTarget.x, jitterTarget.y - Star.Value.transform.position.y, jitterTarget.z), out NavMeshHit hit, 0.1f, NavMesh.AllAreas));
 
         //DEBUG, do/while still results in infinite loop
-        if (CheckForceTurn()) { return Status.Running; }
+        
         FindNextDestination();
         //Finish movement update
         UpdateRotateVar();
         navAgent.SetDestination(jitterTarget);
-
+        Debug.Log("???");
         return Status.Running;
     }
 
@@ -91,11 +88,12 @@ public partial class NavigateJitterAction : Action
         navAgent.FindClosestEdge(out NavMeshHit hit);
 
         //If edge is in range
-        if (hit.distance < 0.5)
+        if (hit.distance < 1)
         {
-            Debug.Log("Close to edge");
             //Calculating direction between Star and edge
             Vector3 direction = hit.position - Star.Value.transform.position;
+            direction.y = 0;
+            
             if (direction.sqrMagnitude > 0)
             {
                 direction.Normalize();
@@ -106,23 +104,19 @@ public partial class NavigateJitterAction : Action
                 //Roughly facing edge, need to turn
                 if (dotFacing > 0.5f)
                 {
-                    //Set the target turn if there is none
-                    if (manualRotate == Quaternion.identity)
-                    {
-                        manualRotate = Quaternion.Euler(0, 90f, 0) * Star.Value.transform.rotation;
-                    }
+                    //Get direction away from edge
+                    Vector3 away = -direction;
+                    Debug.Log("Away: " + away);
 
-                    //Rotate Star away           
-                    Star.Value.transform.rotation = Quaternion.RotateTowards(Star.Value.transform.rotation, manualRotate, 180 * Time.deltaTime);
-                    Debug.Log("turning");
+                    //Get random angle in range for turning to pick new direction
+                        //TODO: this should be weighted towards the eventual target
+                    float angle = Random.Range(-60, 60);
+                    Vector3 randomDir = Quaternion.Euler(0, angle, 0) * away;
 
-                    //If Star has completed the turn, end
-                    if (Quaternion.Angle(Star.Value.transform.rotation, manualRotate) < 1)
-                    {
-                        //Reset manual rotation
-                        manualRotate = Quaternion.identity;
-                    }
-
+                    //Pick position to target 
+                    //TODO: viability checking
+                    Vector3 spot = Star.Value.transform.position + randomDir * 2;
+                    jitterTarget = spot;
                     return true;
                 }
             }
@@ -181,6 +175,9 @@ public partial class NavigateJitterAction : Action
     /// </summary>
     private void FindNextDestination()
     {
+        //Force move away from edge if needed 
+        if (CheckForceTurn()) { return; }
+
         //Calculate angle the new target is on
         float newAngle = Star.Value.transform.eulerAngles.y + Rotate(Star.Value.transform.eulerAngles.y);
 
@@ -189,9 +186,6 @@ public partial class NavigateJitterAction : Action
 
         //Update target location with random distance within max range
         jitterTarget = Star.Value.transform.position + direction * (Random.Range(minDistance, maxDistance));
-        Debug.Log(jitterTarget);
-
-        //TODO: use sampleposition to check if it's reachable and redo if not
     }
 
     /// <summary>
