@@ -38,7 +38,6 @@ public partial class NavigateJitterAction : Action
         navAgent = Star.Value.GetComponent<NavMeshAgent>();
 
         FindNextDestination();
-        UpdateRotateVar();
         navAgent.SetDestination(jitterTarget);
         navAgent.autoBraking = false; //Disabled to make movement smoother
 
@@ -66,9 +65,10 @@ public partial class NavigateJitterAction : Action
         
         FindNextDestination();
 
-        //Finish movement update
-        UpdateRotateVar();
         navAgent.SetDestination(jitterTarget);
+        Debug.Log("Jitter target" + jitterTarget);
+        NavMesh.SamplePosition(jitterTarget, out NavMeshHit hit, 1.5f, NavMesh.AllAreas);
+        Debug.Log("Sample pos: " + hit.position);
         Debug.Log(rotationVar);
         return Status.Running;
     }
@@ -144,10 +144,10 @@ public partial class NavigateJitterAction : Action
     /// </summary>
     private void UpdateRotateVar()
     {
-        rotationVar += ((Random.Range(0f, 100f) / rotationDivisor) - (Random.Range(0f, 100f) / rotationDivisor)) * maxRotation;
+        rotationVar += ((Random.Range(0f, 100f) / 100f) - (Random.Range(0f, 100f) / 100f)) * maxRotation;
 
         //Keeps rotation within 360 degrees, rolls over
-        Mathf.Repeat(rotationVar, 360); 
+        rotationVar = Mathf.Repeat(rotationVar, 360); 
 
         Debug.Log("Rotation offset: " +  rotationVar);
     }
@@ -157,14 +157,19 @@ public partial class NavigateJitterAction : Action
     /// </summary>
     private void FindNextDestination()
     {
-        //Force move away from edge if needed 
-        if (CheckForceTurn()) { return; }
+        //If there's not a force turn, update rotatevar, otherwise update happens in force turn
+        if (!CheckForceTurn())
+        {
+            UpdateRotateVar();
+        }
 
         //Calculate angle the new target is on
         float newAngle = Star.Value.transform.eulerAngles.y + Rotate(Star.Value.transform.eulerAngles.y);
 
         //Direction vector from new angle
         Vector3 direction = Quaternion.Euler(0f, newAngle, 0f) * Vector3.forward;
+
+        //Weighting note--slerp? look into
 
         //Update target location with random distance within max range
         jitterTarget = Star.Value.transform.position + direction * (Random.Range(minDistance, maxDistance));
