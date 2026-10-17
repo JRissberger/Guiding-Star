@@ -13,9 +13,8 @@ public partial class NavigateJitterAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Star;
     [SerializeReference] public BlackboardVariable<Vector3> Target;
 
-    //"Binonmial distribution sample which provides the jitter, normally near 0 but with 
-        //decreasing probability get closer to + or - maxrotation"
-    private float rotationVar = 0.1f; //May adjust, eyeballed for testing
+    //Amount used to offset Star's rotation by
+    private float rotationVar = 0f; //May adjust, eyeballed for testing
     private float maxRotation = 5f; //May adjust, pulled from Justus' code
 
     //Min/Max distance a new location can be set for
@@ -28,9 +27,14 @@ public partial class NavigateJitterAction : Action
     //Navmesh agent for navigation
     private NavMeshAgent navAgent;
 
+    //Used when calculating the rotation to make the move change more gradual. Lower number is faster turn
+    float rotationDivisor = 10f;
+
 
     protected override Status OnStart()
     {
+        //Starts equal to Star's rotation
+        rotationVar = Star.Value.transform.eulerAngles.y;
         navAgent = Star.Value.GetComponent<NavMeshAgent>();
 
         FindNextDestination();
@@ -58,26 +62,19 @@ public partial class NavigateJitterAction : Action
             return Status.Success;
         }
 
-
-        //if not, reroll for new target
-        //Always reroll at least once, but redo until a valid spot is found if needed
-        //do {
-        //    if (CheckForceTurn()) { return Status.Running; }
-        //    FindNextDestination();
-
-        //} while (!NavMesh.SamplePosition(new Vector3(jitterTarget.x, jitterTarget.y - Star.Value.transform.position.y, jitterTarget.z), out NavMeshHit hit, 0.1f, NavMesh.AllAreas));
-
         //DEBUG, do/while still results in infinite loop
         
         FindNextDestination();
+
         //Finish movement update
         UpdateRotateVar();
         navAgent.SetDestination(jitterTarget);
-        Debug.Log("???");
+        Debug.Log(rotationVar);
         return Status.Running;
     }
 
     //TODO: weight turn towards overall target
+        //Might temporarily update turn rate? Set a timer and put it back when done
     /// <summary>
     /// Forcibly turns Star if they're too close to a boundary
     /// </summary>
@@ -99,24 +96,26 @@ public partial class NavigateJitterAction : Action
                 direction.Normalize();
 
                 //Get dot to determine if Star's facing edge (closer to 1 means more perpendicular to edge)
-                float dotFacing = Vector3.Dot(Star.Value.transform.forward, direction);
+                Vector3 facing = Star.Value.transform.forward;
+                facing.y = 0; //NOTE: set to 0 for now, will update if Star can move vertically in levels
+                facing.Normalize();
+                float dotFacing = Vector3.Dot(facing, direction);
 
                 //Roughly facing edge, need to turn
                 if (dotFacing > 0.5f)
                 {
                     //Get direction away from edge
                     Vector3 away = -direction;
-                    Debug.Log("Away: " + away);
 
                     //Get random angle in range for turning to pick new direction
                         //TODO: this should be weighted towards the eventual target
                     float angle = Random.Range(-60, 60);
                     Vector3 randomDir = Quaternion.Euler(0, angle, 0) * away;
 
-                    //Pick position to target 
-                    //TODO: viability checking
-                    Vector3 spot = Star.Value.transform.position + randomDir * 2;
-                    jitterTarget = spot;
+                    //Update rotate var to make Star move away
+                    rotationVar = Mathf.Repeat(Quaternion.LookRotation(randomDir).eulerAngles.y, 360f);
+
+                    Debug.Log("Move away from edge! New rotation: " + rotationVar);
                     return true;
                 }
             }
@@ -133,15 +132,10 @@ public partial class NavigateJitterAction : Action
     /// <returns>Angle value to add on to the current rotation</returns>
     private float Rotate(float rotation)
     {
-        Debug.Log("Rotate: " + (rotationVar - rotation) / 100f);
-        if (Mathf.Abs(rotationVar - rotation) < 180)
-        {
-            return ((rotationVar - rotation) / 100f);
-        }
-        else
-        {
-            return -((rotationVar - rotation) / 100f);
-        }
+        //Using deltaangle to find shortest diff instead of calculating manually
+        float diff = (Mathf.DeltaAngle(rotation, rotationVar)) / rotationDivisor;
+        Debug.Log("Rotate amount: " + diff);
+        return diff;
     }
 
     //TODO: likely to be adjusted to weight towards a destination
@@ -150,24 +144,12 @@ public partial class NavigateJitterAction : Action
     /// </summary>
     private void UpdateRotateVar()
     {
-        rotationVar += ((Random.Range(0f, 100f) / 100f) - (Random.Range(0f, 100f)) * maxRotation);
-        ClampRotation();
-        //Debug.Log("New Rotate Var " + rotationVar);
-    }
+        rotationVar += ((Random.Range(0f, 100f) / rotationDivisor) - (Random.Range(0f, 100f) / rotationDivisor)) * maxRotation;
 
-    /// <summary>
-    /// Caps rotation within 360 degrees
-    /// </summary>
-    private void ClampRotation()
-    {
-        if (rotationVar > 360)
-        {
-            rotationVar -= 360;
-        }
-        else if (rotationVar < 0)
-        {
-            rotationVar += 360;
-        }
+        //Keeps rotation within 360 degrees, rolls over
+        Mathf.Repeat(rotationVar, 360); 
+
+        Debug.Log("Rotation offset: " +  rotationVar);
     }
 
     /// <summary>
