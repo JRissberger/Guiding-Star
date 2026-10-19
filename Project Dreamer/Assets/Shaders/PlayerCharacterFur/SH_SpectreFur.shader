@@ -19,7 +19,7 @@ Shader "Custom/Spectre Fur"
         Tags {"LightMode"="ForwardBase" "RenderType"="Transparent" "Queue" ="Transparent"}
         Pass
         {
-            LOD 200
+            LOD 100
             Cull Off
             Blend One OneMinusSrcAlpha
             

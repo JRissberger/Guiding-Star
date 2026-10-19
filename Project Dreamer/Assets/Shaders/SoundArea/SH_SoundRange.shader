@@ -2,7 +2,6 @@ Shader "Custom/SoundRange"
 {
     Properties
     {
-        // _MainTex ("Texture", 2D) = "white" {}
         _WaveColor ("Wave Color", Color) = (1,1,1,.8)
         _WaveHeight ("Wave Height", Float) = 10
         _FresnelColor ("Fresnel Color", Color) = (1,1,1,.25)
@@ -21,8 +20,6 @@ Shader "Custom/SoundRange"
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            // make fog work
-            #pragma multi_compile_fog
 
             #include "UnityCG.cginc"
 
@@ -30,7 +27,6 @@ Shader "Custom/SoundRange"
             {
                 float4 vertex : POSITION;
                 half4 normal : NORMAL;
-                // float2 uv : TEXCOORD0;
             };
 
             struct v2f
@@ -38,8 +34,6 @@ Shader "Custom/SoundRange"
                 float4 pos : SV_POSITION;
                 fixed3 norm : NORMAL;
                 fixed3 view : COLOR0;
-                // UNITY_FOG_COORDS(1)
-                // float2 uv : TEXCOORD0;
             };
 
             sampler2D _CameraDepthTexture;
@@ -55,11 +49,6 @@ Shader "Custom/SoundRange"
                 o.norm = normalize(mul((float3x3) unity_ObjectToWorld, v.normal));
                 float4 worldPosition = mul (unity_ObjectToWorld, v.vertex);
                 o.view = normalize(_WorldSpaceCameraPos - worldPosition);
-                // // o.uv = v.uv;
-                // o.pos = UnityObjectToClipPos(v.vertex);
-                // o.norm = normalize(mul((float3x3)unity_MatrixMVP, v.normal));
-                // o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                // UNITY_TRANSFER_FOG(o,o.pos);
                 return o;
             }
 
@@ -70,6 +59,10 @@ Shader "Custom/SoundRange"
                 fixed aligned = abs(dot(normalize(i.norm), normalize(i.view)));
                 float depth_diff = aligned * (original_depth - new_depth);
                 
+                if (depth_diff < 0){
+                    discard;
+                }
+
                 float waveDepth = max((_WaveHeight - depth_diff) / _WaveHeight, 0);
 
                 fixed4 wave = _WaveColor * waveDepth;
