@@ -15,14 +15,15 @@ public partial class NavigateJitterAction : Action
 
     //Amount used to offset Star's rotation by
     private float rotationVar = 0f; 
-    private float maxRotation = 5f; 
+    private float maxRotation = 10f; 
 
     //Min/Max distance a new location can be set for
-    private float minDistance = 0.2f;
-    private float maxDistance = 1f;
+    private float minDistance = 0.1f;
+    private float maxDistance = 0.5f;
 
     //Distance to weight nav more heavily to target
     private float approachDistance = 2f;
+    private float directDistance = 1f;
 
     //Used for the partial destinations on the way to main target
     private Vector3 jitterTarget;
@@ -31,12 +32,11 @@ public partial class NavigateJitterAction : Action
     private NavMeshAgent navAgent;
 
     //Used when calculating the rotation to make the move change more gradual. Lower number is faster turn
-        //TODO: serializable?
-    float rotationDivisor = 7f;
+    [SerializeReference] public float rotationDivisor = 7f;
 
     //Weight to overall target
-        //TODO: serializable?
-    float targetNavWeight = 0.7f;
+    [SerializeReference] public float targetNavWeight = 0.65f;
+    float closingWeight = 0f; //Increased as Star approaches, reset at start each time to match og
 
 
     protected override Status OnStart()
@@ -44,6 +44,9 @@ public partial class NavigateJitterAction : Action
         //Starts equal to Star's rotation
         rotationVar = Star.Value.transform.eulerAngles.y;
         navAgent = Star.Value.GetComponent<NavMeshAgent>();
+
+        //Reset navweight
+        closingWeight = targetNavWeight;
 
         FindNextDestination();
         CheckDestinationValidity(jitterTarget);
@@ -170,8 +173,7 @@ public partial class NavigateJitterAction : Action
         
         
         //If true, close, set target directly
-            //Using maxDistance since otherwise they could overshoot the target
-        if (distToFinal.magnitude <= maxDistance)
+        if (distToFinal.magnitude <= directDistance)
         {
             //Turn auto braking back on for smoother stop
             navAgent.autoBraking = true;
@@ -193,16 +195,12 @@ public partial class NavigateJitterAction : Action
 
         //Overall target direction
         Vector3 targetDirection = Target.Value - Star.Value.transform.position;
-        //targetDirection.y = 0; //NOTE: keep an eye on this when handling vertical traversal
-        //targetDirection.Normalize();
 
         //Weight more heavily to target when close
-            //TODO: Adjust this--right now the adjusted weight is carrying over each time the node is called?
-        //if (distToFinal.magnitude < approachDistance)
-        //{
-        //    targetNavWeight = Mathf.Lerp(1f, targetNavWeight, distToFinal.magnitude/approachDistance);
-        //    Debug.Log("Updated weight: " + targetNavWeight);
-        //}
+        if (distToFinal.magnitude < approachDistance)
+        {
+            closingWeight = Mathf.Lerp(1f, closingWeight, distToFinal.magnitude / approachDistance);
+        }
 
         //Using lerp to blend the wander target and overall target
         Vector3 overallDirection = Vector3.Slerp(direction, targetDirection, targetNavWeight);
@@ -219,9 +217,10 @@ public partial class NavigateJitterAction : Action
     /// <param name="location">Location being checked</param>
     private void CheckDestinationValidity(Vector3 location)
     {
-        //NOTE: may be tweaked as needed for accuracy, especially with any vertical movement that might be added later
+        //NOTE: may be tweaked as needed for accuracy, especially with any vertical movement that might be added later        
         //TODO: check absolute pathing from agent pos?
-        if (NavMesh.SamplePosition(location, out NavMeshHit hit, 1.5f, NavMesh.AllAreas))
+        location.y = 0f; //NOTE: squashing y for the time being but similarly, may need to be tweaked for vertical traversal
+        if (NavMesh.SamplePosition(location, out NavMeshHit hit, 1f, NavMesh.AllAreas))
         {
             //Update target but keeps y value the same (should be the same value if the target is already on the mesh)
                 //NOTE: may need to check more if vertical traversal is added, but works for the time being
