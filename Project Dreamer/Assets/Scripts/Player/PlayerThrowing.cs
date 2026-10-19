@@ -74,16 +74,25 @@ public class PlayerThrowing : BaseThrowing
                 if (Vector3.Distance(transform.position, clickedPoint) > _throwRadius)
                 {
                     Vector3 throwDisplacement = clickedPoint - transform.position;
-                    Vector3 proj = Vector3.Project(throwDisplacement, clickedNormal);
-                    Vector3 rej = throwDisplacement - proj;
-                    float newRejLengthSquared = Mathf.Pow(_throwRadius, 2) - proj.sqrMagnitude;
-                    if (newRejLengthSquared < 0)
+                    //We have a vector from the player character to the aimed-at point.
+                    //Using vector projection we split it into two parts:
+                    // 1. The component of the vector that is perpendicular to the surface
+                    // 2. The remaining component, which will be parallel to the surface
+                    Vector3 perp = Vector3.Project(throwDisplacement, clickedNormal);
+                    Vector3 para = throwDisplacement - perp;
+                    //We then calculate the "clamped" point with the Pythagorean Theorem (a^2 = c^2 - b^2).
+                    //We know the new vector to the clamped point (the hypotenuse) has a length of _throwRadius,
+                    //and the perpendicular component shouldn't change (we're only moving parallel to the surface).
+                    float newParaLengthSquared = Mathf.Pow(_throwRadius, 2) - perp.sqrMagnitude;
+                    //If the entire surface plane is out of range, this value (a^2) will be negative.
+                    if (newParaLengthSquared < 0)
                     {
                         //TODO: Handle what happens if the entire plane is out of range
                     }
                     else
                     {
-                        Vector3 clampedPoint = transform.position + proj + rej.normalized * Mathf.Sqrt(newRejLengthSquared);
+                        //Using the length value we calculated, we shrink the parallel component.
+                        Vector3 clampedPoint = transform.position + perp + para.normalized * Mathf.Sqrt(newParaLengthSquared);
                         
                         //TODO: Handle what happens if this clamped position isn't on a surface anymore
 
