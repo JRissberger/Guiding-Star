@@ -38,6 +38,10 @@ public partial class NavigateJitterAction : Action
     [SerializeReference] public float targetNavWeight = 0.65f;
     float closingWeight = 0f; //Increased as Star approaches, reset at start each time to match og
 
+    //Value to increase/decrease speed by
+    [SerializeReference] public float speedChange = 1f;
+    [SerializeReference] public float baseSpeed = 3.5f;
+
 
     protected override Status OnStart()
     {
@@ -45,6 +49,7 @@ public partial class NavigateJitterAction : Action
         rotationVar = Star.Value.transform.eulerAngles.y;
         navAgent = Star.Value.GetComponent<NavMeshAgent>();
 
+        Debug.Log(navAgent.speed);
         //Reset navweight
         closingWeight = targetNavWeight;
 
@@ -77,6 +82,9 @@ public partial class NavigateJitterAction : Action
         FindNextDestination();
         CheckDestinationValidity(jitterTarget);
         navAgent.SetDestination(jitterTarget);
+
+        //Slightly change speed
+        navAgent.speed = baseSpeed + Random.Range(-speedChange, speedChange);
 
         return Status.Running;
     }
@@ -180,8 +188,6 @@ public partial class NavigateJitterAction : Action
             jitterTarget = new Vector3(Target.Value.x, Star.Value.transform.position.y, Target.Value.z);
             return; 
         }
-
-
 
         //Otherwise continue wandering towards it
 
