@@ -70,49 +70,62 @@ public class PlayerThrowing : BaseThrowing
                 Vector3 clickedPoint = clickedInfo.Value.point;
                 Vector3 clickedNormal = clickedInfo.Value.normal;
 
-                if (Vector3.Distance(transform.position, clickedPoint) <= _throwRadius)
+                //Clamp the throwing target position to within the throwing range
+                if (Vector3.Distance(transform.position, clickedPoint) > _throwRadius)
                 {
-                    if (_heldItem)
+                    Vector3 throwDisplacement = clickedPoint - transform.position;
+                    Vector3 proj = Vector3.Project(throwDisplacement, clickedNormal);
+                    Vector3 rej = throwDisplacement - proj;
+                    float newRejLengthSquared = Mathf.Pow(_throwRadius, 2) - proj.sqrMagnitude;
+                    if (newRejLengthSquared < 0)
                     {
-                        //Prevent throwing at a wall that is facing away from the thrower
-                        //This is done by comparing the surface normal to the vector from the hand to the target point
-                        //If these vectors are facing the same way, the dot product will be positive
-                        bool validCurve;
-
-                        Vector3 dotLeft = clickedPoint - (transform.position + _handOffset);
-                        //Ignore y component if positive (upwards) - throwing to a higher floor is possible due to gravity
-                        dotLeft.y = Mathf.Min(dotLeft.y, 0);
-
-                        Vector3 dotRight = clickedNormal;
-                        
-                        //dotRight.y = Mathf.Min(dotRight.y, 0);
-                        if (Vector3.Dot(dotLeft, dotRight) > 0)
-                        {
-                            validCurve = false;
-                            ResetThrow();
-                        }
-                        else
-                        {
-                            validCurve = CreateThrowCurve(clickedPoint, clickedNormal);
-                        }
-
-                        SetThrowMarker(clickedPoint, clickedNormal, validCurve);
-
-                        if (validCurve && _throwAction.WasPressedThisFrame())
-                        {
-                            ThrowItem();
-                        }
+                        //TODO: Handle what happens if the entire plane is out of range
                     }
                     else
                     {
-                        SetThrowMarker(clickedPoint, clickedNormal, false);
+                        Vector3 clampedPoint = transform.position + proj + rej.normalized * Mathf.Sqrt(newRejLengthSquared);
+                        
+                        //TODO: Handle what happens if this clamped position isn't on a surface anymore
+
+                        clickedPoint = clampedPoint;
+                    }
+                }
+
+                if (_heldItem)
+                {
+                    //Prevent throwing at a wall that is facing away from the thrower
+                    //This is done by comparing the surface normal to the vector from the hand to the target point
+                    //If these vectors are facing the same way, the dot product will be positive
+                    bool validCurve;
+
+                    Vector3 dotLeft = clickedPoint - (transform.position + _handOffset);
+                    //Ignore y component if positive (upwards) - throwing to a higher floor is possible due to gravity
+                    dotLeft.y = Mathf.Min(dotLeft.y, 0);
+
+                    Vector3 dotRight = clickedNormal;
+                        
+                    //dotRight.y = Mathf.Min(dotRight.y, 0);
+                    if (Vector3.Dot(dotLeft, dotRight) > 0)
+                    {
+                        validCurve = false;
+                        ResetThrow();
+                    }
+                    else
+                    {
+                        validCurve = CreateThrowCurve(clickedPoint, clickedNormal);
+                    }
+
+                    SetThrowMarker(clickedPoint, clickedNormal, validCurve);
+
+                    if (validCurve && _throwAction.WasPressedThisFrame())
+                    {
+                        ThrowItem();
                     }
                 }
                 else
                 {
-                    ResetThrow();
-                }
-                
+                    SetThrowMarker(clickedPoint, clickedNormal, false);
+                }                
             }
             else
             {
