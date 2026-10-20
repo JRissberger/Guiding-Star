@@ -70,6 +70,17 @@ public partial class NavigateJitterAction : Action
             Target.Value = Item.Value.transform.position;
         }
 
+        //Ensure there's a valid way to get to the final target
+        NavMeshPath path = new NavMeshPath();
+        navAgent.CalculatePath(Target.Value, path);
+        if (path.status != NavMeshPathStatus.PathComplete)
+        {
+            Debug.LogWarning("Can't find valid path to final target");
+
+            //Node fails, shouldn't get caught in infinite failure as other precautions above navigation will move Star to a more default branch. 
+            return Status.Failure;
+        }
+
         return Status.Running;
     }
 
@@ -102,6 +113,7 @@ public partial class NavigateJitterAction : Action
 
     //TODO: weight turn towards overall target
         //NOTE: may rework for efficiency, weighting towards target. may also be unneeded due to target weighting
+        //Could do "whiskers" (volume on either side of Star) that handles edge--move until theyre further away
     /// <summary>
     /// Forcibly turns Star if they're too close to a boundary
     /// </summary>
