@@ -28,10 +28,13 @@ public partial class FindWanderPositionAction : Action
             //Find a random position in the current segment's boundaries
             position = currentSegment.CenterLoc + UnityEngine.Random.insideUnitSphere * currentSegment.Radius;
 
+
             //Is the position on the navmesh
             if (NavMesh.SamplePosition(position, out NavMeshHit hit, currentSegment.Radius, NavMesh.AllAreas))
             {
                 foundValidTarget = true;
+
+               
             }
         }
 
