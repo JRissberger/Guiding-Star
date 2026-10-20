@@ -8,8 +8,8 @@ Shader "Custom/SoundRange"
         _FresnelPower ("Fresnel Power", Float) = 10
     }
     SubShader
-    {
-        Tags { "RenderType"="Opaque" "Queue"="Geometry+20" }
+    { 
+        Tags { "RenderType"="Transparent" "Queue" ="Transparent+1" }
         LOD 100
         Cull Off
         Blend One OneMinusSrcAlpha
