@@ -7,11 +7,14 @@ using Random = UnityEngine.Random;
 using UnityEngine.AI;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "NavigateJitter", story: "[Star] navigates to [target]", category: "Action", id: "34dc46e5c47b5597418808e635ede7a8")]
+[NodeDescription(name: "NavigateJitter", story: "[Star] navigates to [target] or [item]", category: "Action", id: "34dc46e5c47b5597418808e635ede7a8")]
 public partial class NavigateJitterAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Star;
     [SerializeReference] public BlackboardVariable<Vector3> Target;
+
+    //Adding item here for if Star should target an item instead
+    [SerializeReference] public BlackboardVariable<GameObject> Item;
 
     //Amount used to offset Star's rotation by
     private float rotationVar = 0f; 
@@ -32,15 +35,15 @@ public partial class NavigateJitterAction : Action
     private NavMeshAgent navAgent;
 
     //Used when calculating the rotation to make the move change more gradual. Lower number is faster turn
-    [SerializeReference] public float rotationDivisor = 7f;
+    [SerializeReference] public BlackboardVariable<float> rotationDivisor;
 
     //Weight to overall target
-    [SerializeReference] public float targetNavWeight = 0.65f;
+    [SerializeReference] public BlackboardVariable<float> targetNavWeight;
     float closingWeight = 0f; //Increased as Star approaches, reset at start each time to match og
 
     //Value to increase/decrease speed by
-    [SerializeReference] public float speedChange = 1f;
-    [SerializeReference] public float baseSpeed = 3.5f;
+    private float speedChange = 0.5f;
+    [SerializeReference] public BlackboardVariable<float> baseSpeed;
 
 
     protected override Status OnStart()
@@ -49,7 +52,7 @@ public partial class NavigateJitterAction : Action
         rotationVar = Star.Value.transform.eulerAngles.y;
         navAgent = Star.Value.GetComponent<NavMeshAgent>();
 
-        Debug.Log(navAgent.speed);
+        
         //Reset navweight
         closingWeight = targetNavWeight;
 
@@ -58,6 +61,14 @@ public partial class NavigateJitterAction : Action
         navAgent.SetDestination(jitterTarget);
 
         navAgent.autoBraking = false; //Disabled to make movement smoother
+
+        //Should Star be targeting an item instead?
+            //If the target loc is default and there's an item added, use the item
+        if (Target.Value == Vector3.zero && Item.Value != null)
+        {
+            //Set the target location to be the item's location
+            Target.Value = Item.Value.transform.position;
+        }
 
         return Status.Running;
     }
