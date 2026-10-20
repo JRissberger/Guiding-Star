@@ -12,9 +12,6 @@ public class BaseThrowing : MonoBehaviour
 {
     [Header("Throwing Settings")]
 
-    [Tooltip("The position of the \"hand\" where the item is held and thrown from, relative to this object's transform.")]
-    [SerializeField] protected Vector3 _handOffset = Vector3.zero;
-
     [Tooltip("The number of segments to break the throwing path into when calculating if it is blocked. Higher numbers are more precise but may reduce performance.")]
     [SerializeField] private int _curveRaycastSegments = 10;
 
@@ -24,7 +21,13 @@ public class BaseThrowing : MonoBehaviour
     [Tooltip("How fast an object travels when thrown.")]
     [SerializeField] private float _throwSpeed = 1.0f;
 
-    [Header("Curve Display")]
+    [Tooltip("Layer mask defining which objects are solid to thrown objects.")]
+    [SerializeField] private LayerMask _solidToThrownMask = 1; //default to just layer 0
+
+    [Header("Visual Settings")]
+
+    [Tooltip("The position of the \"hand\" where the item is visually held, relative to this object's transform. Does not affect throwing calculations.")]
+    [SerializeField] protected Vector3 _handOffset = Vector3.zero;
 
     [Tooltip("Whether to display the curve that displays the path of a thrown item.")]
     [SerializeField] private bool _drawCurve = false;
@@ -115,7 +118,7 @@ public class BaseThrowing : MonoBehaviour
     protected bool CreateThrowCurve(Vector3 position, Vector3 normal)
     {
         //Create the Bezier curve
-        Vector3 startPos = transform.position + _handOffset;
+        Vector3 startPos = transform.position;
         Vector3 endPos = position;
 
         Collider heldCollider = _heldItem.GetComponent<Collider>();
@@ -161,11 +164,11 @@ public class BaseThrowing : MonoBehaviour
             
             if (heldCollider)
             {
-                raycastResult = Physics.BoxCast(raycastStart, heldExtents, raycastRay, out hitInfo, Quaternion.LookRotation(normal), Vector3.Magnitude(raycastRay), LayerMask.GetMask(LayerMask.LayerToName(0)), QueryTriggerInteraction.Ignore);
+                raycastResult = Physics.BoxCast(raycastStart, heldExtents, raycastRay, out hitInfo, Quaternion.LookRotation(normal), Vector3.Magnitude(raycastRay), _solidToThrownMask, QueryTriggerInteraction.Ignore);
             }
             else
             {
-                raycastResult = Physics.Raycast(raycastStart, raycastRay, out hitInfo, Vector3.Magnitude(raycastRay), LayerMask.GetMask(LayerMask.LayerToName(0)), QueryTriggerInteraction.Ignore);
+                raycastResult = Physics.Raycast(raycastStart, raycastRay, out hitInfo, Vector3.Magnitude(raycastRay), _solidToThrownMask, QueryTriggerInteraction.Ignore);
             }
 
             if (raycastResult)

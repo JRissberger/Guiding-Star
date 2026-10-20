@@ -989,14 +989,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2520dc0be6a3964bb3721cda275b172, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerThrowing
-  _handOffset: {x: 1, y: 0.5, z: 0.25}
   _curveRaycastSegments: 10
   _throwCurveHeight: 1
   _throwSpeed: 1
+  _solidToThrownMask:
+    serializedVersion: 2
+    m_Bits: 1
+  _handOffset: {x: 1, y: 0.5, z: 0.25}
   _drawCurve: 1
   _curveDisplayWidth: 0.01
   _curveDisplaySegments: 50
   _throwRadius: 3
+  _throwHeightUp: 3
+  _throwHeightDown: 3
+  _targetableSurfaceMask:
+    serializedVersion: 2
+    m_Bits: 1
   _validMarkerPrefab: {fileID: 8064065595831018745, guid: 3dda29aeb94888d4cb813a5dba347567, type: 3}
   _invalidMarkerPrefab: {fileID: 8064065595831018745, guid: b590a1bd34954e349906abf6025f4f9a, type: 3}
   _targetMarkerHover: 0.01
@@ -1252,10 +1260,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb83363ceabc3f643acc5d7e96de2c2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DreamerThrowing
-  _handOffset: {x: 1, y: 0.5, z: 0.25}
   _curveRaycastSegments: 10
   _throwCurveHeight: 1
   _throwSpeed: 1
+  _solidToThrownMask:
+    serializedVersion: 2
+    m_Bits: 0
+  _handOffset: {x: 1, y: 0.5, z: 0.25}
   _drawCurve: 0
   _curveDisplayWidth: 0.01
   _curveDisplaySegments: 50
