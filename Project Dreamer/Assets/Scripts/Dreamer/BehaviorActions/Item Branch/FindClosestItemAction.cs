@@ -26,7 +26,14 @@ public partial class FindClosestItemAction : Action
         if (DreamerSight.Value.VisibleItems.Count > 0)
         {
             float distance = Mathf.Infinity;
-            GameObject currentItem = null;            
+            GameObject currentItem = null;
+            
+            //If there's already a target item, have it be the default to check against
+            if (TargetItem != null)
+            {
+                currentItem = TargetItem.Value;
+                distance = Vector3.Distance(Star.Value.transform.position, TargetItem.Value.transform.position);
+            }
 
             //Loop through to find the best item to target
             foreach (GameObject item in DreamerSight.Value.VisibleItems)
@@ -34,8 +41,8 @@ public partial class FindClosestItemAction : Action
                 float tempDist = Vector3.Distance(Star.Value.transform.position, item.transform.position);
                 if (tempDist < distance && item != HeldItem.Value)
                 {                   
-                    //Check that a valid path exists
-                    if (CanReach(item))
+                    //Check that a valid path exists and it isn't held by the player 
+                    if (CanReach(item) && !HeldByPlayer(item))
                     {
                         //Path is valid, can make item the target
                         distance = tempDist;
@@ -83,5 +90,22 @@ public partial class FindClosestItemAction : Action
         }
     }
 
+    /// <summary>
+    /// Checks if an item is currently being held by the player. Ignore it if so.
+    /// This is checked here rather than sight since an item can still be "locked on" to after
+    /// </summary>
+    /// <param name="item"></param>     
+    private bool HeldByPlayer(GameObject item)
+    {
+        //Get player reference
+
+        //Find all children of the player gameobject
+
+        //Loop through, and if there's one that matches the item, check if it's got the throwable script
+
+        //If it does, return true
+
+        return false;
+    }
 }
 
