@@ -12,4 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf62c1cbd0b70964ab09dca298e73bd2, type: 3}
   m_Name: MapSegmentManager
   m_EditorClassIdentifier: Assembly-CSharp::MapSegmentManager
-  mapSegments: []
+  mapSegments:
+  - centerLoc: {x: 0, y: 0, z: 0}
+    radius: 0
+    isActive: 0
