@@ -40,6 +40,7 @@ public partial class FindWanderPositionAction : Action
 
         //Update blackboard variable
         WanderPosition.Value = position;
+        
         return Status.Success;
     }
 

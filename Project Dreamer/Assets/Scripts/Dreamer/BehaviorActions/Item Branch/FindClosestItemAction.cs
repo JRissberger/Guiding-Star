@@ -22,6 +22,9 @@ public partial class FindClosestItemAction : Action
     //Player reference for checking for held items
     private GameObject player;
 
+    //Will update here on failure to stop from getting caught in a loop
+    [SerializeReference] public BlackboardVariable<bool> SawItem;
+
     protected override Status OnStart()
     {
         //Getting player reference
@@ -61,8 +64,7 @@ public partial class FindClosestItemAction : Action
             //If item is still null, there's nothing that can be pathed to, end the node
             if (!currentItem)
             {
-                //TODO: seems to still be moving down the branch
-                Debug.LogWarning("Seeing items but none can be pathed to");
+                SawItem.Value = false;
                 return Status.Failure;
             }
 
@@ -70,8 +72,15 @@ public partial class FindClosestItemAction : Action
             TargetItem.Value = currentItem;
         }
 
-        
-        return Status.Success;
+
+        //No items in sight but there's a target
+        else if (TargetItem.Value != null)
+        {
+            return Status.Success;
+        }
+
+        SawItem.Value = false;
+        return Status.Failure;
     }
 
     /// <summary>
@@ -107,25 +116,25 @@ public partial class FindClosestItemAction : Action
     /// <param name="item"></param>     
     private bool HeldByPlayer(GameObject item)
     {
-        //if (player != null)
-        //{
-        //    //Find all children of the player gameobject
-        //    Transform[] children = player.GetComponentsInChildren<Transform>();
+        if (player != null)
+        {
+            //Find all children of the player gameobject
+            Transform[] children = player.GetComponentsInChildren<Transform>();
 
-           
-        //    //Loop through, and if there's one that matches the item, check if it's got the throwable script
-        //        //Technically has the player in the list too, but since player isn't an item, a filter would be redundant
-        //    foreach (Transform child in children)
-        //    {
-        //        if (child.gameObject == item)
-        //        {
-        //            Debug.Log("Ignore this object!");
-        //            //Objects match, Star should ignore this object
-        //            return true;
+
+            //Loop through, and if there's one that matches the item, check if it's got the throwable script
+            //Technically has the player in the list too, but since player isn't an item, a filter would be redundant
+            foreach (Transform child in children)
+            {
+                if (child.gameObject == item)
+                {
                     
-        //        }
-        //    }
-        //}
+                    //Objects match, Star should ignore this object
+                    return true;
+
+                }
+            }
+        }
 
         return false;
     }

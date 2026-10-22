@@ -16,6 +16,9 @@ public partial class NavigateJitterAction : Action
     //Adding item here for if Star should target an item instead
     [SerializeReference] public BlackboardVariable<GameObject> Item;
 
+    //Select this in editor to target item
+    [SerializeReference] public BlackboardVariable<bool> targetItem;
+
     //Amount used to offset Star's rotation by
     private float rotationVar = 0f; 
     private float maxRotation = 10f; 
@@ -48,40 +51,43 @@ public partial class NavigateJitterAction : Action
 
     protected override Status OnStart()
     {
+        
+
         //Starts equal to Star's rotation
         rotationVar = Star.Value.transform.eulerAngles.y;
         navAgent = Star.Value.GetComponent<NavMeshAgent>();
 
-        
         //Reset navweight
         closingWeight = targetNavWeight;
 
-        if (!FindNextDestination())
-        {
-            return Status.Failure;
-        }
-        EnsureLocationOnMesh(jitterTarget);
-        navAgent.SetDestination(jitterTarget);
-
-        navAgent.autoBraking = false; //Disabled to make movement smoother
-
         //Should Star be targeting an item instead?
-            //If the target loc is default and there's an item added, use the item
-        if (Target.Value == Vector3.zero && Item.Value != null)
+        //If the target loc is default and there's an item added, use the item
+        if (targetItem)
         {
             //Set the target location to be the item's location
             Target.Value = Item.Value.transform.position;
         }
 
+
+        if (!FindNextDestination())
+        {
+            return Status.Failure;
+        }
+
+        EnsureLocationOnMesh(jitterTarget);
+        navAgent.SetDestination(jitterTarget);
+
+        navAgent.autoBraking = false; //Disabled to make movement smoother
+
         //Ensure there's a valid way to get to the final target
         if (!ValidatePath(Target.Value))
         {
-            Debug.LogWarning("Can't find valid path to final target");
 
             //Node fails, shouldn't get caught in infinite failure as other precautions above navigation will move Star to a more default branch. 
             return Status.Failure;
         }
 
+       
         return Status.Running;
     }
 
