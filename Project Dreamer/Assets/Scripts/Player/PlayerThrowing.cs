@@ -9,8 +9,18 @@ using UnityEngine.InputSystem;
 public class PlayerThrowing : BaseThrowing
 {
     [Header("Player")]
-    [Tooltip("The maximum distance the player can throw items, in Unity units. Based on the attached object's position, not considering _handOffset.")]
+
+    [Tooltip("The maximum distance the player can throw items, in Unity units. Based on the a cylinder around the attached object's position, not considering _handOffset.")]
     [SerializeField] private float _throwRadius = 5.0f;
+
+    [Tooltip("How far above themselves the player can throw items, in Unity units, relative to the attached object's postiion.")]
+    [SerializeField] private float _throwHeightUp = 3.0f;
+
+    [Tooltip("How far below themselves the player can throw items, in Unity units, relative to the attached object's postiion.")]
+    [SerializeField] private float _throwHeightDown = 3.0f;
+
+    [Tooltip("Layer mask defining which surfaces can be aimed at.")]
+    [SerializeField] private LayerMask _targetableSurfaceMask = 1; //default to just layer 0
 
     [Header("Target Marker")]
 
@@ -55,8 +65,6 @@ public class PlayerThrowing : BaseThrowing
         {
             _camera = Camera.main;
         }
-
-        _throwLandEvent.AddListener(SignalItemSound);
     }
 
     private void Update()
@@ -64,55 +72,107 @@ public class PlayerThrowing : BaseThrowing
 
         if (_aimAction.IsPressed())
         {
-            RaycastHit? clickedInfo = GetClickedRaycast(Mouse.current.position.ReadValue(), LayerMask.GetMask(LayerMask.LayerToName(0)));
+            RaycastHit? clickedInfo = GetClickedRaycast(Mouse.current.position.ReadValue(), _targetableSurfaceMask);
             if (clickedInfo.HasValue)
             {
+                Vector3 targetPoint;
+                Vector3 targetNormal;
+
                 Vector3 clickedPoint = clickedInfo.Value.point;
-                Vector3 clickedNormal = clickedInfo.Value.normal;
 
-                if (Vector3.Distance(transform.position, clickedPoint) <= _throwRadius)
+                //Raycast to the clicked point to check for obstructions and range
+                RaycastHit targetInfo;
+                bool targetHit = Physics.Raycast(transform.position, clickedPoint - transform.position, out targetInfo, Mathf.Infinity, _targetableSurfaceMask);
+
+                Vector3 tryTarget;
+                if (targetHit)
                 {
-                    if (_heldItem)
+                    tryTarget = targetInfo.point;
+                }
+                else
+                {
+                    tryTarget = clickedPoint;
+                }
+
+                //Cylindrical range check
+                Vector2 displacementXZ = new Vector2(tryTarget.x, tryTarget.z) - new Vector2(transform.position.x, transform.position.z);
+                float distanceXZ = displacementXZ.magnitude;
+                float displacementY = tryTarget.y - transform.position.y;
+                if (targetHit && distanceXZ <= _throwRadius && displacementY <= _throwHeightUp && -displacementY <= _throwHeightDown)
+                {
+                    targetPoint = tryTarget;
+                    targetNormal = targetInfo.normal;
+                }
+                else
+                {
+                    //If the target is still out of range, clamp the range to a point within the cylinder,and raycast from there to the floor
+                    float targetAngle;
+                    if (distanceXZ == 0)
                     {
-                        //Prevent throwing at a wall that is facing away from the thrower
-                        //This is done by comparing the surface normal to the vector from the hand to the target point
-                        //If these vectors are facing the same way, the dot product will be positive
-                        bool validCurve;
-
-                        Vector3 dotLeft = clickedPoint - (transform.position + _handOffset);
-                        //Ignore y component if positive (upwards) - throwing to a higher floor is possible due to gravity
-                        dotLeft.y = Mathf.Min(dotLeft.y, 0);
-
-                        Vector3 dotRight = clickedNormal;
-                        
-                        //dotRight.y = Mathf.Min(dotRight.y, 0);
-                        if (Vector3.Dot(dotLeft, dotRight) > 0)
-                        {
-                            validCurve = false;
-                            ResetThrow();
-                        }
-                        else
-                        {
-                            validCurve = CreateThrowCurve(clickedPoint, clickedNormal);
-                        }
-
-                        SetThrowMarker(clickedPoint, clickedNormal, validCurve);
-
-                        if (validCurve && _throwAction.WasPressedThisFrame())
-                        {
-                            ThrowItem();
-                        }
+                        targetAngle = 90 * Mathf.Sign(displacementY);
                     }
                     else
                     {
-                        SetThrowMarker(clickedPoint, clickedNormal, false);
+                        targetAngle = Mathf.Atan2(displacementY, distanceXZ);
+                    }
+
+                    float tryDistance = (tryTarget - transform.position).magnitude;
+                    float clampedDistance;
+                    if (targetAngle > Mathf.Atan2(_throwHeightUp, _throwRadius)) //Breaches cylinder top
+                    {
+                        clampedDistance = tryDistance / displacementY * _throwHeightUp;
+                    }
+                    else if (targetAngle < Mathf.Atan2(-_throwHeightDown, _throwRadius)) //Breaches cylinder bottom
+                    {
+                        clampedDistance = tryDistance / -displacementY * _throwHeightDown;
+                    }
+                    else //Breaches cylinder side
+                    {
+                        clampedDistance = tryDistance / distanceXZ * _throwRadius;
+                    }
+                    Vector3 clampedPoint = transform.position + (tryTarget - transform.position).normalized * clampedDistance;
+                    RaycastHit floorInfo;
+                    bool floorHit = Physics.Raycast(clampedPoint, Vector3.down, out floorInfo, Mathf.Infinity, _targetableSurfaceMask);
+                    targetPoint = floorInfo.point;
+                    targetNormal = floorInfo.normal;
+                }
+
+
+                if (_heldItem)
+                {
+                    //Prevent throwing at a wall that is facing away from the thrower
+                    //This is done by comparing the surface normal to the vector from the hand to the target point
+                    //If these vectors are facing the same way, the dot product will be positive
+                    bool validCurve;
+
+                    Vector3 dotLeft = clickedPoint - (transform.position);
+                    //Ignore y component if positive (upwards) - throwing to a higher floor is possible due to gravity
+                    dotLeft.y = Mathf.Min(dotLeft.y, 0);
+
+                    Vector3 dotRight = targetNormal;
+
+                    //dotRight.y = Mathf.Min(dotRight.y, 0);
+                    if (Vector3.Dot(dotLeft, dotRight) > 0)
+                    {
+                        validCurve = false;
+                        ResetThrow();
+                    }
+                    else
+                    {
+                        validCurve = CreateThrowCurve(targetPoint, targetNormal);
+                    }
+
+                    SetThrowMarker(targetPoint, targetNormal, validCurve);
+
+                    if (validCurve && _throwAction.WasPressedThisFrame())
+                    {
+                        ThrowItem();
                     }
                 }
                 else
                 {
-                    ResetThrow();
-                }
-                
+                    SetThrowMarker(targetPoint, targetNormal, false);
+                }                
             }
             else
             {
@@ -179,11 +239,21 @@ public class PlayerThrowing : BaseThrowing
             _activeMarker = Instantiate(_invalidMarkerPrefab);
         }
 
-            Vector3 finalPosition = position + normal * _targetMarkerHover;
+        Vector3 finalPosition = position + normal * _targetMarkerHover;
         _activeMarker.transform.position = finalPosition;
         _activeMarker.transform.rotation = Quaternion.LookRotation(normal);
     }
 
+    protected override void ThrowItem()
+    {
+        ThrowableItem throwable = _heldItem.GetComponent<ThrowableItem>();
+        if (throwable != null)
+        {
+            throwable.QueueLandSound();
+        }
+
+        base.ThrowItem();
+    }
     /// <summary>
     /// Removes the throwing target marker if one exists.
     /// </summary>
@@ -202,15 +272,5 @@ public class PlayerThrowing : BaseThrowing
     {
         base.ResetThrow();
         RemoveThrowMarker();
-    }
-
-    /// <summary>
-    /// Calls Land() on the given item.
-    /// Used with _throwLandEvent on the player so that player-thrown items make sounds.
-    /// </summary>
-    /// <param name="item">The item that is landing.</param>
-    private void SignalItemSound(GameObject item)
-    {
-        item.GetComponent<ThrowableItem>().Land();
     }
 }
