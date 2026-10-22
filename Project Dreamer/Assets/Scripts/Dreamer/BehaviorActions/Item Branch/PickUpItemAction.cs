@@ -25,6 +25,12 @@ public partial class PickUpItemAction : Action
         //Only pick up if item is in range.
         if (throwing != null && distance < PickupRange.Value)
         {
+            //Null out any velocity on the rigidbody so the item doesn't move oddly during pickup
+                //This is mostly for accounting for if an item is picked up when it's still falling, letting Star "catch" items if they're close enough
+            Rigidbody rigidbody = Item.Value.GetComponent<Rigidbody>();
+            rigidbody.angularVelocity = Vector3.zero;
+            rigidbody.linearVelocity = Vector3.zero;
+
             //Set held item as the item tied to blackboard
             throwing.SetHeldItem(Item.Value);
             HoldingItem.Value = true;
