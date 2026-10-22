@@ -65,8 +65,6 @@ public class PlayerThrowing : BaseThrowing
         {
             _camera = Camera.main;
         }
-
-        _throwLandEvent.AddListener(SignalItemSound);
     }
 
     private void Update()
@@ -246,6 +244,16 @@ public class PlayerThrowing : BaseThrowing
         _activeMarker.transform.rotation = Quaternion.LookRotation(normal);
     }
 
+    protected override void ThrowItem()
+    {
+        ThrowableItem throwable = _heldItem.GetComponent<ThrowableItem>();
+        if (throwable != null)
+        {
+            throwable.QueueLandSound();
+        }
+
+        base.ThrowItem();
+    }
     /// <summary>
     /// Removes the throwing target marker if one exists.
     /// </summary>
@@ -264,15 +272,5 @@ public class PlayerThrowing : BaseThrowing
     {
         base.ResetThrow();
         RemoveThrowMarker();
-    }
-
-    /// <summary>
-    /// Calls Land() on the given item.
-    /// Used with _throwLandEvent on the player so that player-thrown items make sounds.
-    /// </summary>
-    /// <param name="item">The item that is landing.</param>
-    private void SignalItemSound(GameObject item)
-    {
-        item.GetComponent<ThrowableItem>().Land();
     }
 }

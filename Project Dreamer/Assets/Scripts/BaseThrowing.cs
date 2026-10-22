@@ -18,10 +18,7 @@ public class BaseThrowing : MonoBehaviour
     [Tooltip("Controls the height of the curve that a thrown object travels along. Not 1-to-1 with Unity units; this controls a specific point defining a Bezier curve, and the final height of the parabola will be lower than this.")]
     [SerializeField] private float _throwCurveHeight = 1.0f;
 
-    [Tooltip("How fast an object travels when thrown.")]
-    [SerializeField] private float _throwSpeed = 1.0f;
-
-    [Tooltip("Layer mask defining which objects are solid to thrown objects.")]
+    [Tooltip("Layer mask defining which objects should be considered solid to thrown objects. Affects the throwing validity calculation; does not affect physical collision.")]
     [SerializeField] private LayerMask _solidToThrownMask = 1; //default to just layer 0
 
     [Header("Visual Settings")]
@@ -37,10 +34,6 @@ public class BaseThrowing : MonoBehaviour
 
     [Tooltip("The number of segments to draw for the curved line that is optionally displayed when throwing. Higher numbers look better but may reduce performance.")]
     [SerializeField] private int _curveDisplaySegments = 50;
-
-    //Called when an object is finished being thrown and lands on the ground (or another surface).
-    //Passes the thrown object as an argument.
-    [System.NonSerialized] public UnityEvent<GameObject> _throwLandEvent = new UnityEvent<GameObject>();
 
     private BezierCurve? _throwCurve;
     protected GameObject _heldItem = null;
@@ -64,34 +57,29 @@ public class BaseThrowing : MonoBehaviour
 
     /// <summary>
     /// Sets the currently held item, parenting it to this object's Transform.
-    /// This item must have the ThrowableItem script attached to it.
     /// If an item is already being held, it will be dropped in favor of the new one.
     /// </summary>
     /// <param name="item">The GameObject to set as the held item.</param>
     public void SetHeldItem(GameObject item)
     {
-        if (item.GetComponent<ThrowableItem>())
+        if (GetHeldItem())
         {
-            if (GetHeldItem())
-            {
-                DropItem();
-            }
+            DropItem();
+        }
 
-            _heldItem = item;
-            _heldItem.transform.position = transform.position + transform.rotation * _handOffset;
-            _heldItem.transform.SetParent(transform, true);
+        _heldItem = item;
+        _heldItem.transform.position = transform.position + transform.rotation * _handOffset;
+        _heldItem.transform.rotation = Quaternion.identity;
+        _heldItem.transform.SetParent(transform, true);
+        Rigidbody heldrb = _heldItem.GetComponent<Rigidbody>();
+        if (heldrb == null)
+        {
+            Debug.LogWarning("The item picked up with SetHeldItem() (" + _heldItem + ") does not have a Rigidbody attached! Throwing this object will not work.");
         }
         else
         {
-            Debug.LogWarning("Tried to call SetHeldItem on an item without the ThrowableItem script! This item will be ignored.");
-            if (GetHeldItem())
-            {
-                DropItem();
-            }
-
-            _heldItem = item;
-            _heldItem.transform.position = transform.position + transform.rotation * _handOffset;
-            _heldItem.transform.SetParent(transform, true);
+            heldrb.linearVelocity = Vector3.zero;
+            heldrb.isKinematic = true;
         }
     }
 
@@ -139,7 +127,7 @@ public class BaseThrowing : MonoBehaviour
         _throwCurve = new BezierCurve(startPos, midPos, endPos);
 
         bool isBlocked = false;
-        //These two variables are used when drawing the line if it is blocked
+        //This variable is used when drawing the line if it is blocked
         float blockedAtProgress = 0;
 
         //Check if the curve is blocked by raycasting (or boxcasting, for an object with collision) between points on the curve
@@ -152,16 +140,13 @@ public class BaseThrowing : MonoBehaviour
 
             Vector3 raycastStart = CurveUtility.EvaluatePosition(_throwCurve.Value, progressStart);
             Vector3 raycastEnd = CurveUtility.EvaluatePosition(_throwCurve.Value, progressEnd);
-            //Curve is in local space; raycast uses world space
-            //raycastStart += transform.position;
-            //raycastEnd += transform.position;
 
             Vector3 raycastRay = raycastEnd - raycastStart;
 
             RaycastHit hitInfo;
 
             bool raycastResult = false;
-            
+
             if (heldCollider)
             {
                 raycastResult = Physics.BoxCast(raycastStart, heldExtents, raycastRay, out hitInfo, Quaternion.LookRotation(normal), Vector3.Magnitude(raycastRay), _solidToThrownMask, QueryTriggerInteraction.Ignore);
@@ -198,18 +183,8 @@ public class BaseThrowing : MonoBehaviour
                 }
             }
         }
-        
 
         return !isBlocked;
-    }
-
-    /// <summary>
-    /// Clears the throwing curve and hides its associated line renderer.
-    /// </summary>
-    protected virtual void ResetThrow()
-    {
-        _throwCurve = null;
-        _lineRenderer.enabled = false;
     }
 
     /// <summary>
@@ -217,13 +192,26 @@ public class BaseThrowing : MonoBehaviour
     /// Does not check for the path being blocked (this is handled by CreateThrowCurve()).
     /// Does nothing and logs a warning if there is no held item or no current throwing curve.
     /// </summary>
-    protected void ThrowItem()
+    protected virtual void ThrowItem()
     {
         if (_heldItem && _throwCurve.HasValue)
         {
             GameObject throwItem = _heldItem;
             DropItem();
-            StartCoroutine(ThrowItemCoroutine(throwItem, _throwCurve.Value));
+            throwItem.transform.position = transform.position;
+
+            ThrowableItem throwable = throwItem.GetComponent<ThrowableItem>();
+            if (throwable != null)
+            {
+                throwable.SetThrown();
+            }
+
+            Rigidbody heldrb = throwItem.GetComponent<Rigidbody>();
+            if (heldrb != null)
+            {
+                heldrb.isKinematic = false;
+                heldrb.linearVelocity = _throwCurve.Value.Tangent0 * Physics.gravity.magnitude / 2.0f;
+            }
             ResetThrow();
         }
         else if (!_heldItem)
@@ -237,19 +225,11 @@ public class BaseThrowing : MonoBehaviour
     }
 
     /// <summary>
-    /// Coroutine for moving the thrown item along a path.
+    /// Clears the throwing curve and hides its associated line renderer.
     /// </summary>
-    /// <param name="item">The item to throw.</param>
-    /// <param name="throwCurve">The curve to throw the item along.</param>
-    /// <returns></returns>
-    private IEnumerator ThrowItemCoroutine(GameObject item, BezierCurve throwCurve)
+    protected virtual void ResetThrow()
     {
-        for (float i = 0; i < 1; i += Time.deltaTime * _throwSpeed)
-        {
-            item.transform.position = (Vector3)CurveUtility.EvaluatePosition(throwCurve, i);
-            yield return new WaitForEndOfFrame();
-        }
-        item.transform.position = (Vector3)throwCurve.P3;
-        _throwLandEvent.Invoke(item);
+        _throwCurve = null;
+        _lineRenderer.enabled = false;
     }
 }

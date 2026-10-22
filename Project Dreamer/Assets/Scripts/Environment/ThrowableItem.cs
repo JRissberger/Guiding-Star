@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class ThrowableItem : MonoBehaviour
 {
@@ -18,6 +19,13 @@ public class ThrowableItem : MonoBehaviour
     [Tooltip("Whether this item disappears after being thrown.")]
     [SerializeField] private bool _willDespawn = false;
 
+    //Called when an object is finished being thrown and lands on a surface.
+    //Only fires on the first impact after being thrown.
+    //As arguments, passes the thrown object, and whether this throw created a sound (true) or not (false).
+    [System.NonSerialized] public UnityEvent<GameObject, bool> _throwLandEvent = new UnityEvent<GameObject, bool>();
+
+    private bool _isMidThrow = false;
+    private bool _makeLandingSound = false;
     private SoundManager _soundManager;
 
     private void Start()
@@ -26,18 +34,36 @@ public class ThrowableItem : MonoBehaviour
     }
 
     /// <summary>
-    /// A method to be called when this item lands after being thrown.
-    /// This will create a SoundManager sound, with parameters based on the values set in the inspector.
-    /// It will also destroy this item if "Will Despawn" is checked.
+    /// A method to be called when this item is thrown.
+    /// The next time the item collides with a surface, it will run landing-related code.
+    /// </summary>
+    public void SetThrown()
+    {
+        _isMidThrow = true;
+    }
+
+    /// <summary>
+    /// When called, the next time this item lands, it will create its associated landing sound (determined in the inspector).
+    /// Make sure to also call SetThrown() to run the normal landing code! The landing sound is also dependent on that being run.
+    /// </summary>
+    public void QueueLandSound()
+    {
+        _makeLandingSound = true;
+    }
+
+    /// <summary>
+    /// A method to be called when this item lands, regardless of the thrower.
+    /// This will destroy this item if "Will Despawn" is checked.
+    /// If the player threw this item, it will also create a SoundManager sound, with parameters based on the values set in the inspector.
     /// </summary>
     public void Land()
     {
-        if (_soundType != SoundType.None)
+        if (_makeLandingSound && _soundType != SoundType.None)
         {
             _soundManager.SpawnSound(transform.position, _soundType, _soundRadius, _soundDuration, false);
         }
 
-        LandCustom();
+        _throwLandEvent.Invoke(gameObject, _makeLandingSound);
 
         if (_willDespawn)
         {
@@ -45,12 +71,12 @@ public class ThrowableItem : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// An empty method that subclasses classes can override to implement custom landing behavior for an item.
-    /// Called near the end of Land(), after the object has made its sound.
-    /// </summary>
-    protected virtual void LandCustom()
+    private void OnCollisionEnter(Collision collision)
     {
-        //Do nothing
+        if (_isMidThrow)
+        {
+            Land();
+            _isMidThrow = false;
+        }
     }
 }
