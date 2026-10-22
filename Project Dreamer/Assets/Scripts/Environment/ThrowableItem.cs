@@ -36,6 +36,7 @@ public class ThrowableItem : MonoBehaviour
     /// <summary>
     /// A method to be called when this item is thrown.
     /// The next time the item collides with a surface, it will run landing-related code.
+    /// To get the object to make a sound, use QueueLandSound() in combination with this.
     /// </summary>
     public void SetThrown()
     {
@@ -56,7 +57,7 @@ public class ThrowableItem : MonoBehaviour
     /// This will destroy this item if "Will Despawn" is checked.
     /// If the player threw this item, it will also create a SoundManager sound, with parameters based on the values set in the inspector.
     /// </summary>
-    public void Land()
+    private void Land()
     {
         if (_makeLandingSound && _soundType != SoundType.None)
         {
