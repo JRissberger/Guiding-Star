@@ -72,6 +72,16 @@ public class ThrowableItem : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Gets whether the item has just been thrown.
+    /// This variable is set to true when an object is thrown, and false when it collides with a surface.
+    /// </summary>
+    /// <returns>True if the item is mid-throw, false otherwise</returns>
+    public bool IsMidThrow()
+    {
+        return _isMidThrow;
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (_isMidThrow)
