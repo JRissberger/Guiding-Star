@@ -5,6 +5,7 @@ using Action = Unity.Behavior.Action;
 using Unity.Properties;
 using UnityEngine.AI;
 using Unity.VisualScripting;
+using System.Runtime.CompilerServices;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "FindClosestItem", story: "Finds the closest [TargetItem] in [DreamerSight]", category: "Action", id: "4c590a6bf51ed4a1323f07158278e6b0")]
@@ -18,8 +19,14 @@ public partial class FindClosestItemAction : Action
     //Used to check for valid paths
     private NavMeshAgent navAgent;
 
+    //Player reference for checking for held items
+    private GameObject player;
+
     protected override Status OnStart()
     {
+        //Getting player reference
+        player = GameObject.Find("Player");
+
         navAgent = Star.Value.GetComponent<NavMeshAgent>();
         
         //Determine the closest item
@@ -29,8 +36,8 @@ public partial class FindClosestItemAction : Action
             GameObject currentItem = null;
             
             //If there's already a target item, have it be the default to check against
-            if (TargetItem != null)
-            {
+            if (TargetItem.Value != null)
+            { 
                 currentItem = TargetItem.Value;
                 distance = Vector3.Distance(Star.Value.transform.position, TargetItem.Value.transform.position);
             }
@@ -58,10 +65,12 @@ public partial class FindClosestItemAction : Action
                 return Status.Failure;
             }
 
+            Debug.Log("checking");
             //Update target item
             TargetItem.Value = currentItem;
         }
 
+        
         return Status.Success;
     }
 
@@ -97,13 +106,25 @@ public partial class FindClosestItemAction : Action
     /// <param name="item"></param>     
     private bool HeldByPlayer(GameObject item)
     {
-        //Get player reference
+        if (player != null)
+        {
+            //Find all children of the player gameobject
+            Transform[] children = player.GetComponentsInChildren<Transform>();
 
-        //Find all children of the player gameobject
-
-        //Loop through, and if there's one that matches the item, check if it's got the throwable script
-
-        //If it does, return true
+           
+            //Loop through, and if there's one that matches the item, check if it's got the throwable script
+                //Technically has the player in the list too, but since player isn't an item, a filter would be redundant
+            foreach (Transform child in children)
+            {
+                if (child.gameObject == item)
+                {
+                    Debug.Log("Ignore this object!");
+                    //Objects match, Star should ignore this object
+                    return true;
+                    
+                }
+            }
+        }
 
         return false;
     }
