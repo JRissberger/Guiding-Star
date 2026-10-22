@@ -25,6 +25,9 @@ public partial class FindClosestItemAction : Action
     //Will update here on failure to stop from getting caught in a loop
     [SerializeReference] public BlackboardVariable<bool> SawItem;
 
+    //The range for Star to pick up an item, used here to check height
+    [SerializeReference] public BlackboardVariable<float> PickupRange;
+
     protected override Status OnStart()
     {
         //Getting player reference
@@ -51,8 +54,8 @@ public partial class FindClosestItemAction : Action
                 float tempDist = Vector3.Distance(Star.Value.transform.position, item.transform.position);
                 if (tempDist < distance && item != HeldItem.Value)
                 {                   
-                    //Check that a valid path exists and it isn't held by the player 
-                    if (CanReach(item) && !HeldByPlayer(item))
+                    //Check that a valid path exists, isn't held by the player, and isn't midair
+                    if (CanReach(item) && !HeldByPlayer(item) && !IsItemMidair(item))
                     {
                         //Path is valid, can make item the target
                         distance = tempDist;
@@ -133,6 +136,28 @@ public partial class FindClosestItemAction : Action
                     return true;
 
                 }
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Checks if an item is midair via the item midthrow bool and a height check.
+    /// Runs two checks as the bool only accounts for the mathematical throw, not any movement post first impact
+    /// </summary>
+    /// <param name="item">The item to check</param>
+    /// <returns>True if the item is determined to be midair via either check</returns>
+    private bool IsItemMidair(GameObject item)
+    {
+        ThrowableItem itemScript = item.GetComponent<ThrowableItem>();
+
+        if (itemScript)
+        {
+            //Check bool and height
+            if (itemScript.IsMidThrow() || item.transform.position.y > PickupRange.Value)
+            {
+                return true;
             }
         }
 
