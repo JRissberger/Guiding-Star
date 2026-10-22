@@ -34,7 +34,7 @@ public partial class FindClosestItemAction : Action
         player = GameObject.Find("Player");
 
         navAgent = Star.Value.GetComponent<NavMeshAgent>();
-        
+
         //Determine the closest item
         if (DreamerSight.Value.VisibleItems.Count > 0)
         {
@@ -60,19 +60,20 @@ public partial class FindClosestItemAction : Action
                         //Path is valid, can make item the target
                         distance = tempDist;
                         currentItem = item;
-                    }                   
+                    }
                 }
             }
 
             //If item is still null, there's nothing that can be pathed to, end the node
             if (!currentItem)
-            {
+            {               
                 SawItem.Value = false;
                 return Status.Failure;
             }
 
             //Update target item
             TargetItem.Value = currentItem;
+            return Status.Success;
         }
 
 
@@ -82,6 +83,7 @@ public partial class FindClosestItemAction : Action
             return Status.Success;
         }
 
+        Debug.Log("no item");
         SawItem.Value = false;
         return Status.Failure;
     }
@@ -155,12 +157,13 @@ public partial class FindClosestItemAction : Action
         if (itemScript)
         {
             //Check bool and height
-            if (itemScript.IsMidThrow() || item.transform.position.y > PickupRange.Value)
+            if (itemScript.IsMidThrow()) // || item.transform.position.y > PickupRange.Value)
             {
                 return true;
             }
         }
 
+        Debug.Log(itemScript.IsMidThrow());
         return false;
     }
 }
