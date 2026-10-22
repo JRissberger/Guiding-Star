@@ -61,11 +61,11 @@ public partial class FindClosestItemAction : Action
             //If item is still null, there's nothing that can be pathed to, end the node
             if (!currentItem)
             {
+                //TODO: seems to still be moving down the branch
                 Debug.LogWarning("Seeing items but none can be pathed to");
                 return Status.Failure;
             }
 
-            Debug.Log("checking");
             //Update target item
             TargetItem.Value = currentItem;
         }
@@ -99,6 +99,7 @@ public partial class FindClosestItemAction : Action
         }
     }
 
+    //TODO: might move to condition node?
     /// <summary>
     /// Checks if an item is currently being held by the player. Ignore it if so.
     /// This is checked here rather than sight since an item can still be "locked on" to after
@@ -106,25 +107,25 @@ public partial class FindClosestItemAction : Action
     /// <param name="item"></param>     
     private bool HeldByPlayer(GameObject item)
     {
-        if (player != null)
-        {
-            //Find all children of the player gameobject
-            Transform[] children = player.GetComponentsInChildren<Transform>();
+        //if (player != null)
+        //{
+        //    //Find all children of the player gameobject
+        //    Transform[] children = player.GetComponentsInChildren<Transform>();
 
            
-            //Loop through, and if there's one that matches the item, check if it's got the throwable script
-                //Technically has the player in the list too, but since player isn't an item, a filter would be redundant
-            foreach (Transform child in children)
-            {
-                if (child.gameObject == item)
-                {
-                    Debug.Log("Ignore this object!");
-                    //Objects match, Star should ignore this object
-                    return true;
+        //    //Loop through, and if there's one that matches the item, check if it's got the throwable script
+        //        //Technically has the player in the list too, but since player isn't an item, a filter would be redundant
+        //    foreach (Transform child in children)
+        //    {
+        //        if (child.gameObject == item)
+        //        {
+        //            Debug.Log("Ignore this object!");
+        //            //Objects match, Star should ignore this object
+        //            return true;
                     
-                }
-            }
-        }
+        //        }
+        //    }
+        //}
 
         return false;
     }
