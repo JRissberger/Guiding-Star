@@ -314,8 +314,8 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 2
+  m_Center: {x: 0, y: -1, z: 0}
 --- !u!1 &332059808
 GameObject:
   m_ObjectHideFlags: 0
@@ -476,7 +476,7 @@ GameObject:
   - component: {fileID: 347483348}
   - component: {fileID: 347483349}
   - component: {fileID: 347483350}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Throwable (Dreamer)
   m_TagString: Interactable
   m_Icon: {fileID: 0}
@@ -1396,7 +1396,7 @@ GameObject:
   - component: {fileID: 989361111}
   - component: {fileID: 989361116}
   - component: {fileID: 989361117}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Soft Throwable (Specter)
   m_TagString: Throwable
   m_Icon: {fileID: 0}
@@ -1555,7 +1555,7 @@ GameObject:
   - component: {fileID: 1320050681}
   - component: {fileID: 1320050682}
   - component: {fileID: 1320050683}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Harsh Throwable (Specter)
   m_TagString: Throwable
   m_Icon: {fileID: 0}
