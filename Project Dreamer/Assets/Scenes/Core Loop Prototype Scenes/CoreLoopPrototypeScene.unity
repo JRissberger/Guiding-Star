@@ -5224,6 +5224,24 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1364072707}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1379363692 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8549738924337189523, guid: 5b91d46efa112754ba5c98e6631ca9d3, type: 3}
+  m_PrefabInstance: {fileID: 7432163214960675166}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1379363695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1379363692}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 085c826ba5208014c81f951f84c4f19d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RespawnManager
+  _levelChunks: []
 --- !u!43 &1390122644
 Mesh:
   m_ObjectHideFlags: 0
@@ -10632,7 +10650,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8549738924337189523, guid: 5b91d46efa112754ba5c98e6631ca9d3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1379363695}
   m_SourcePrefab: {fileID: 100100000, guid: 5b91d46efa112754ba5c98e6631ca9d3, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
