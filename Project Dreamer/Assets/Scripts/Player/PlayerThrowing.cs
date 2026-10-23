@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -9,8 +11,21 @@ using UnityEngine.InputSystem;
 public class PlayerThrowing : BaseThrowing
 {
     [Header("Player")]
-    [Tooltip("The maximum distance the player can throw items, in Unity units. Based on the attached object's position, not considering _handOffset.")]
+
+    [Tooltip("The maximum distance the player can throw items, in Unity units. Based on the a cylinder around the attached object's position, not considering _handOffset.")]
     [SerializeField] private float _throwRadius = 5.0f;
+
+    [Tooltip("How far above themselves the player can throw items, in Unity units, relative to the attached object's postiion.")]
+    [SerializeField] private float _throwHeightUp = 3.0f;
+
+    [Tooltip("How far below themselves the player can throw items, in Unity units, relative to the attached object's postiion.")]
+    [SerializeField] private float _throwHeightDown = 3.0f;
+
+    [Tooltip("The material to add to an object to highlight it when it can be picked up.")]
+    [SerializeField] private Material _pickupHighlightMaterial = null;
+
+    [Tooltip("Layer mask defining which surfaces can be aimed at.")]
+    [SerializeField] private LayerMask _targetableSurfaceMask = 1; //default to just layer 0
 
     [Header("Target Marker")]
 
@@ -28,15 +43,14 @@ public class PlayerThrowing : BaseThrowing
     [Tooltip("The camera, used for mouse position calculations. If unset, defaults to the main camera (Camera.main, determined on Start()).")]
     [SerializeField] private Camera _camera = null;
 
-    //For testing - assigns which object will be picked up when pressing "1" or "2" respectively
-    [SerializeField] private GameObject _debugItem1 = null;
-    [SerializeField] private GameObject _debugItem2 = null;
-    private InputAction _debugPickupAction1;
-    private InputAction _debugPickupAction2;
+    private InputAction _pickupAction;
 
     private GameObject _activeMarker = null;
     private InputAction _aimAction;
     private InputAction _throwAction;
+
+    private List<GameObject> _pickupableItems = new List<GameObject>();
+    private GameObject _pickupTarget = null;
 
     protected override void Start()
     {
@@ -45,74 +59,123 @@ public class PlayerThrowing : BaseThrowing
         _aimAction = InputSystem.actions.FindAction("Aim");
         _throwAction = InputSystem.actions.FindAction("Throw");
 
-        _debugPickupAction1 = InputSystem.actions.FindAction("Debug 1");
-        _debugPickupAction2 = InputSystem.actions.FindAction("Debug 2");
+        _pickupAction = InputSystem.actions.FindAction("Pick Up");
 
         //Make sure the action map is enabled
-        _debugPickupAction1.actionMap.Enable();
+        _pickupAction.actionMap.Enable();
 
         if (_camera == null)
         {
             _camera = Camera.main;
         }
-
-        _throwLandEvent.AddListener(SignalItemSound);
     }
 
     private void Update()
     {
-
+        //Aiming and throwing logic
         if (_aimAction.IsPressed())
         {
-            RaycastHit? clickedInfo = GetClickedRaycast(Mouse.current.position.ReadValue(), LayerMask.GetMask(LayerMask.LayerToName(0)));
+            RaycastHit? clickedInfo = GetClickedRaycast(Mouse.current.position.ReadValue(), _targetableSurfaceMask);
             if (clickedInfo.HasValue)
             {
+                Vector3 targetPoint;
+                Vector3 targetNormal;
+
                 Vector3 clickedPoint = clickedInfo.Value.point;
-                Vector3 clickedNormal = clickedInfo.Value.normal;
 
-                if (Vector3.Distance(transform.position, clickedPoint) <= _throwRadius)
+                //Raycast to the clicked point to check for obstructions and range
+                RaycastHit targetInfo;
+                bool targetHit = Physics.Raycast(transform.position, clickedPoint - transform.position, out targetInfo, Mathf.Infinity, _targetableSurfaceMask);
+
+                Vector3 tryTarget;
+                if (targetHit)
                 {
-                    if (_heldItem)
+                    tryTarget = targetInfo.point;
+                }
+                else
+                {
+                    tryTarget = clickedPoint;
+                }
+
+                //Cylindrical range check
+                Vector2 displacementXZ = new Vector2(tryTarget.x, tryTarget.z) - new Vector2(transform.position.x, transform.position.z);
+                float distanceXZ = displacementXZ.magnitude;
+                float displacementY = tryTarget.y - transform.position.y;
+                if (targetHit && distanceXZ <= _throwRadius && displacementY <= _throwHeightUp && -displacementY <= _throwHeightDown)
+                {
+                    targetPoint = tryTarget;
+                    targetNormal = targetInfo.normal;
+                }
+                else
+                {
+                    //If the target is still out of range, clamp the range to a point within the cylinder,and raycast from there to the floor
+                    float targetAngle;
+                    if (distanceXZ == 0)
                     {
-                        //Prevent throwing at a wall that is facing away from the thrower
-                        //This is done by comparing the surface normal to the vector from the hand to the target point
-                        //If these vectors are facing the same way, the dot product will be positive
-                        bool validCurve;
-
-                        Vector3 dotLeft = clickedPoint - (transform.position + _handOffset);
-                        //Ignore y component if positive (upwards) - throwing to a higher floor is possible due to gravity
-                        dotLeft.y = Mathf.Min(dotLeft.y, 0);
-
-                        Vector3 dotRight = clickedNormal;
-                        
-                        //dotRight.y = Mathf.Min(dotRight.y, 0);
-                        if (Vector3.Dot(dotLeft, dotRight) > 0)
-                        {
-                            validCurve = false;
-                            ResetThrow();
-                        }
-                        else
-                        {
-                            validCurve = CreateThrowCurve(clickedPoint, clickedNormal);
-                        }
-
-                        SetThrowMarker(clickedPoint, clickedNormal, validCurve);
-
-                        if (validCurve && _throwAction.WasPressedThisFrame())
-                        {
-                            ThrowItem();
-                        }
+                        targetAngle = 90 * Mathf.Sign(displacementY);
                     }
                     else
                     {
-                        SetThrowMarker(clickedPoint, clickedNormal, false);
+                        targetAngle = Mathf.Atan2(displacementY, distanceXZ);
+                    }
+
+                    float tryDistance = (tryTarget - transform.position).magnitude;
+                    float clampedDistance;
+                    if (targetAngle > Mathf.Atan2(_throwHeightUp, _throwRadius)) //Breaches cylinder top
+                    {
+                        clampedDistance = tryDistance / displacementY * _throwHeightUp;
+                    }
+                    else if (targetAngle < Mathf.Atan2(-_throwHeightDown, _throwRadius)) //Breaches cylinder bottom
+                    {
+                        clampedDistance = tryDistance / -displacementY * _throwHeightDown;
+                    }
+                    else //Breaches cylinder side
+                    {
+                        clampedDistance = tryDistance / distanceXZ * _throwRadius;
+                    }
+                    Vector3 clampedPoint = transform.position + (tryTarget - transform.position).normalized * clampedDistance;
+                    RaycastHit floorInfo;
+                    bool floorHit = Physics.Raycast(clampedPoint, Vector3.down, out floorInfo, Mathf.Infinity, _targetableSurfaceMask);
+                    targetPoint = floorInfo.point;
+                    targetNormal = floorInfo.normal;
+                }
+
+
+                if (_heldItem)
+                {
+                    //Prevent throwing at a wall that is facing away from the thrower
+                    //This is done by comparing the surface normal to the vector from the hand to the target point
+                    //If these vectors are facing the same way, the dot product will be positive
+                    bool validCurve;
+
+                    Vector3 dotLeft = clickedPoint - (transform.position);
+                    //Ignore y component if positive (upwards) - throwing to a higher floor is possible due to gravity
+                    dotLeft.y = Mathf.Min(dotLeft.y, 0);
+
+                    Vector3 dotRight = targetNormal;
+
+                    //dotRight.y = Mathf.Min(dotRight.y, 0);
+                    if (Vector3.Dot(dotLeft, dotRight) > 0)
+                    {
+                        validCurve = false;
+                        ResetThrow();
+                    }
+                    else
+                    {
+                        validCurve = CreateThrowCurve(targetPoint, targetNormal);
+                    }
+
+                    SetThrowMarker(targetPoint, targetNormal, validCurve);
+
+                    if (validCurve && _throwAction.WasPressedThisFrame())
+                    {
+                        ThrowItem();
                     }
                 }
                 else
                 {
-                    ResetThrow();
-                }
-                
+                    SetThrowMarker(targetPoint, targetNormal, false);
+                }                
             }
             else
             {
@@ -124,14 +187,93 @@ public class PlayerThrowing : BaseThrowing
             ResetThrow();
         }
 
-        if (_debugPickupAction1.WasPressedThisFrame())
+        //Determining the nearest item, to highlight it
+        if (_pickupableItems.Count > 0)
         {
-            SetHeldItem(_debugItem1);
+            GameObject nearestItem = _pickupableItems[0];
+            float nearestDistance = (_pickupableItems[0].transform.position - transform.position).magnitude;
+
+            if (_pickupableItems.Count > 1)
+            {
+                for (int i = 1; i < _pickupableItems.Count; i++)
+                {
+                    GameObject checkItem = _pickupableItems[i];
+                    float checkDistance = (checkItem.transform.position - transform.position).magnitude;
+
+                    if (checkDistance < nearestDistance)
+                    {
+                        nearestItem = checkItem;
+                        nearestDistance = checkDistance;
+                    }
+                }
+            }
+
+            if (_pickupTarget != nearestItem)
+            {
+                SetPickupTarget(nearestItem);
+            }
         }
-        else if (_debugPickupAction2.WasPressedThisFrame())
+        else
         {
-            SetHeldItem(_debugItem2);
+            SetPickupTarget(null);
         }
+
+        //Picking up the highlighted item
+        if (_pickupAction.WasPressedThisFrame() && _pickupTarget != null)
+        {
+            SetHeldItem(_pickupTarget);
+        }
+    }
+
+    private void SetPickupTarget(GameObject target)
+    {
+        if (_pickupTarget != null)
+        {
+            Renderer oldPickupRenderer = _pickupTarget.GetComponent<Renderer>();
+            List<Material> oldPickupMaterials = new List<Material>();
+            oldPickupRenderer.GetSharedMaterials(oldPickupMaterials);
+            oldPickupMaterials.Remove(_pickupHighlightMaterial);
+            oldPickupRenderer.SetSharedMaterials(oldPickupMaterials);
+        }
+
+        _pickupTarget = target;
+
+        if (_pickupTarget != null)
+        {
+            Renderer pickupRenderer = _pickupTarget.GetComponent<Renderer>();
+            List<Material> pickupMaterials = new List<Material>();
+            pickupRenderer.GetSharedMaterials(pickupMaterials);
+            pickupMaterials.Add(_pickupHighlightMaterial);
+            pickupRenderer.SetSharedMaterials(pickupMaterials);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.GetComponent<ThrowableItem>() != null && other.gameObject != _heldItem)
+        {
+            _pickupableItems.Add(other.gameObject);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.GetComponent<ThrowableItem>() != null)
+        {
+            _pickupableItems.Remove(other.gameObject);
+        }
+    }
+
+    public override void SetHeldItem(GameObject item)
+    {
+        _pickupableItems.Remove(item);
+        base.SetHeldItem(item);
+    }
+
+    public override void DropItem()
+    {
+        _pickupableItems.Add(_heldItem);
+        base.DropItem();
     }
 
     /// <summary>
@@ -179,11 +321,21 @@ public class PlayerThrowing : BaseThrowing
             _activeMarker = Instantiate(_invalidMarkerPrefab);
         }
 
-            Vector3 finalPosition = position + normal * _targetMarkerHover;
+        Vector3 finalPosition = position + normal * _targetMarkerHover;
         _activeMarker.transform.position = finalPosition;
         _activeMarker.transform.rotation = Quaternion.LookRotation(normal);
     }
 
+    protected override void ThrowItem()
+    {
+        ThrowableItem throwable = _heldItem.GetComponent<ThrowableItem>();
+        if (throwable != null)
+        {
+            throwable.QueueLandSound();
+        }
+
+        base.ThrowItem();
+    }
     /// <summary>
     /// Removes the throwing target marker if one exists.
     /// </summary>
@@ -202,15 +354,5 @@ public class PlayerThrowing : BaseThrowing
     {
         base.ResetThrow();
         RemoveThrowMarker();
-    }
-
-    /// <summary>
-    /// Calls Land() on the given item.
-    /// Used with _throwLandEvent on the player so that player-thrown items make sounds.
-    /// </summary>
-    /// <param name="item">The item that is landing.</param>
-    private void SignalItemSound(GameObject item)
-    {
-        item.GetComponent<ThrowableItem>().Land();
     }
 }
