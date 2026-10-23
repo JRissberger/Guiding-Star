@@ -27,12 +27,21 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _FrenzelTexture:
+        m_Texture: {fileID: 2800000, guid: 1bb5725beeb47014ea9064720c807efa, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _WaveTexture:
+        m_Texture: {fileID: 2800000, guid: 1bb5725beeb47014ea9064720c807efa, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _CameraPositionResponse: 0.3
     - _FrenzelPower: 10
     - _FresnelPower: 2.81
     - _WaveHeight: 1.14

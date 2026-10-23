@@ -2322,6 +2322,7 @@ GameObject:
   - component: {fileID: 1496082716}
   - component: {fileID: 1496082715}
   - component: {fileID: 1496082714}
+  - component: {fileID: 1496082718}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -2416,12 +2417,27 @@ Transform:
   m_GameObject: {fileID: 1496082713}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -11.64, y: 3.18, z: -27.34}
-  m_LocalScale: {x: 29.7, y: 29.7, z: 29.7}
+  m_LocalPosition: {x: -14.1, y: 2.67, z: -28.4}
+  m_LocalScale: {x: 9.2, y: 9.2, z: 9.2}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1496082718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1496082713}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c40e82f2e4e110598a7e683a16756f04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SoundBubbleTest
+  minScale: 0.2
+  maxScale: 30
+  expandSpeed: 0.9
 --- !u!1 &1521613822
 GameObject:
   m_ObjectHideFlags: 0
