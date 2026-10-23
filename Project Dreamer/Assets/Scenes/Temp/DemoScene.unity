@@ -133,6 +133,7 @@ GameObject:
   - component: {fileID: 289606638}
   - component: {fileID: 289606639}
   - component: {fileID: 289606640}
+  - component: {fileID: 289606641}
   m_Layer: 0
   m_Name: Specter
   m_TagString: Untagged
@@ -286,6 +287,7 @@ MonoBehaviour:
   _throwRadius: 5
   _throwHeightUp: 3
   _throwHeightDown: 3
+  _pickupHighlightMaterial: {fileID: 2100000, guid: 7c40a973e67661f4bb8ff85b8cb57b91, type: 2}
   _targetableSurfaceMask:
     serializedVersion: 2
     m_Bits: 1
@@ -293,8 +295,27 @@ MonoBehaviour:
   _invalidMarkerPrefab: {fileID: 8064065595831018745, guid: b590a1bd34954e349906abf6025f4f9a, type: 3}
   _targetMarkerHover: 0.01
   _camera: {fileID: 1784188154}
-  _debugItem1: {fileID: 1320050676}
-  _debugItem2: {fileID: 989361110}
+--- !u!135 &289606641
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 289606633}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &332059808
 GameObject:
   m_ObjectHideFlags: 0
@@ -1377,7 +1398,7 @@ GameObject:
   - component: {fileID: 989361117}
   m_Layer: 0
   m_Name: Soft Throwable (Specter)
-  m_TagString: Untagged
+  m_TagString: Throwable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1536,7 +1557,7 @@ GameObject:
   - component: {fileID: 1320050683}
   m_Layer: 0
   m_Name: Harsh Throwable (Specter)
-  m_TagString: Untagged
+  m_TagString: Throwable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

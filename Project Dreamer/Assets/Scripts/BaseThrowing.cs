@@ -60,36 +60,44 @@ public class BaseThrowing : MonoBehaviour
     /// If an item is already being held, it will be dropped in favor of the new one.
     /// </summary>
     /// <param name="item">The GameObject to set as the held item.</param>
-    public void SetHeldItem(GameObject item)
+    public virtual void SetHeldItem(GameObject item)
     {
-        if (GetHeldItem())
+        if (item != GetHeldItem())
         {
-            DropItem();
-        }
+            if (GetHeldItem())
+            {
+                DropItem();
+            }
 
-        _heldItem = item;
-        _heldItem.transform.position = transform.position + transform.rotation * _handOffset;
-        _heldItem.transform.rotation = Quaternion.identity;
-        _heldItem.transform.SetParent(transform, true);
-        Rigidbody heldrb = _heldItem.GetComponent<Rigidbody>();
-        if (heldrb == null)
-        {
-            Debug.LogWarning("The item picked up with SetHeldItem() (" + _heldItem + ") does not have a Rigidbody attached! Throwing this object will not work.");
-        }
-        else
-        {
-            heldrb.linearVelocity = Vector3.zero;
-            heldrb.isKinematic = true;
+            _heldItem = item;
+            _heldItem.transform.position = transform.position + transform.rotation * _handOffset;
+            _heldItem.transform.rotation = Quaternion.identity;
+            _heldItem.transform.SetParent(transform, true);
+            Rigidbody heldrb = _heldItem.GetComponent<Rigidbody>();
+            if (heldrb == null)
+            {
+                Debug.LogWarning("The item picked up with SetHeldItem() (" + _heldItem + ") does not have a Rigidbody attached! Throwing this object will not work.");
+            }
+            else
+            {
+                heldrb.linearVelocity = Vector3.zero;
+                heldrb.isKinematic = true;
+            }
         }
     }
 
     /// <summary>
     /// Drops the currently held item, unparenting it from this object's Transform and putting it at the scene root.
     /// </summary>
-    public void DropItem()
+    public virtual void DropItem()
     {
         if (_heldItem)
         {
+            Rigidbody heldrb = _heldItem.GetComponent<Rigidbody>();
+            if (heldrb != null)
+            {
+                heldrb.isKinematic = false;
+            }
             _heldItem.transform.SetParent(null, true);
             _heldItem = null;
         }
@@ -198,6 +206,12 @@ public class BaseThrowing : MonoBehaviour
         {
             GameObject throwItem = _heldItem;
             DropItem();
+
+            Rigidbody thrownrb = throwItem.GetComponent<Rigidbody>();
+            if (thrownrb != null)
+            {
+                thrownrb.linearVelocity = _throwCurve.Value.Tangent0 * Physics.gravity.magnitude / 2.0f;
+            }
             throwItem.transform.position = transform.position;
 
             ThrowableItem throwable = throwItem.GetComponent<ThrowableItem>();
@@ -206,12 +220,6 @@ public class BaseThrowing : MonoBehaviour
                 throwable.SetThrown();
             }
 
-            Rigidbody heldrb = throwItem.GetComponent<Rigidbody>();
-            if (heldrb != null)
-            {
-                heldrb.isKinematic = false;
-                heldrb.linearVelocity = _throwCurve.Value.Tangent0 * Physics.gravity.magnitude / 2.0f;
-            }
             ResetThrow();
         }
         else if (!_heldItem)
