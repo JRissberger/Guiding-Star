@@ -21,9 +21,6 @@ public class PlayerThrowing : BaseThrowing
     [Tooltip("How far below themselves the player can throw items, in Unity units, relative to the attached object's postiion.")]
     [SerializeField] private float _throwHeightDown = 3.0f;
 
-    [Tooltip("")]
-    [SerializeField] private Collider _pickupRangeCollider = null;
-
     [Tooltip("The material to add to an object to highlight it when it can be picked up.")]
     [SerializeField] private Material _pickupHighlightMaterial = null;
 

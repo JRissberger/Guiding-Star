@@ -48,10 +48,10 @@ public class ChangeWanderStateTrigger : MonoBehaviour
                 LevelManager.Instance.DisableStarWander();
             }
 
-            //if oneShot is true, turn off this script.
+            //if oneShot is true, turn off this trigger.
             if (oneShot)
             {
-                this.enabled = false;
+                gameObject.GetComponent<Collider>().enabled = false;
             }
         }
     }
