@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -19,6 +21,9 @@ public class PlayerThrowing : BaseThrowing
     [Tooltip("How far below themselves the player can throw items, in Unity units, relative to the attached object's postiion.")]
     [SerializeField] private float _throwHeightDown = 3.0f;
 
+    [Tooltip("The material to add to an object to highlight it when it can be picked up.")]
+    [SerializeField] private Material _pickupHighlightMaterial = null;
+
     [Tooltip("Layer mask defining which surfaces can be aimed at.")]
     [SerializeField] private LayerMask _targetableSurfaceMask = 1; //default to just layer 0
 
@@ -38,15 +43,14 @@ public class PlayerThrowing : BaseThrowing
     [Tooltip("The camera, used for mouse position calculations. If unset, defaults to the main camera (Camera.main, determined on Start()).")]
     [SerializeField] private Camera _camera = null;
 
-    //For testing - assigns which object will be picked up when pressing "1" or "2" respectively
-    [SerializeField] private GameObject _debugItem1 = null;
-    [SerializeField] private GameObject _debugItem2 = null;
-    private InputAction _debugPickupAction1;
-    private InputAction _debugPickupAction2;
+    private InputAction _pickupAction;
 
     private GameObject _activeMarker = null;
     private InputAction _aimAction;
     private InputAction _throwAction;
+
+    private List<GameObject> _pickupableItems = new List<GameObject>();
+    private GameObject _pickupTarget = null;
 
     protected override void Start()
     {
@@ -55,11 +59,10 @@ public class PlayerThrowing : BaseThrowing
         _aimAction = InputSystem.actions.FindAction("Aim");
         _throwAction = InputSystem.actions.FindAction("Throw");
 
-        _debugPickupAction1 = InputSystem.actions.FindAction("Debug 1");
-        _debugPickupAction2 = InputSystem.actions.FindAction("Debug 2");
+        _pickupAction = InputSystem.actions.FindAction("Pick Up");
 
         //Make sure the action map is enabled
-        _debugPickupAction1.actionMap.Enable();
+        _pickupAction.actionMap.Enable();
 
         if (_camera == null)
         {
@@ -69,7 +72,7 @@ public class PlayerThrowing : BaseThrowing
 
     private void Update()
     {
-
+        //Aiming and throwing logic
         if (_aimAction.IsPressed())
         {
             RaycastHit? clickedInfo = GetClickedRaycast(Mouse.current.position.ReadValue(), _targetableSurfaceMask);
@@ -184,14 +187,93 @@ public class PlayerThrowing : BaseThrowing
             ResetThrow();
         }
 
-        if (_debugPickupAction1.WasPressedThisFrame())
+        //Determining the nearest item, to highlight it
+        if (_pickupableItems.Count > 0)
         {
-            SetHeldItem(_debugItem1);
+            GameObject nearestItem = _pickupableItems[0];
+            float nearestDistance = (_pickupableItems[0].transform.position - transform.position).magnitude;
+
+            if (_pickupableItems.Count > 1)
+            {
+                for (int i = 1; i < _pickupableItems.Count; i++)
+                {
+                    GameObject checkItem = _pickupableItems[i];
+                    float checkDistance = (checkItem.transform.position - transform.position).magnitude;
+
+                    if (checkDistance < nearestDistance)
+                    {
+                        nearestItem = checkItem;
+                        nearestDistance = checkDistance;
+                    }
+                }
+            }
+
+            if (_pickupTarget != nearestItem)
+            {
+                SetPickupTarget(nearestItem);
+            }
         }
-        else if (_debugPickupAction2.WasPressedThisFrame())
+        else
         {
-            SetHeldItem(_debugItem2);
+            SetPickupTarget(null);
         }
+
+        //Picking up the highlighted item
+        if (_pickupAction.WasPressedThisFrame() && _pickupTarget != null)
+        {
+            SetHeldItem(_pickupTarget);
+        }
+    }
+
+    private void SetPickupTarget(GameObject target)
+    {
+        if (_pickupTarget != null)
+        {
+            Renderer oldPickupRenderer = _pickupTarget.GetComponent<Renderer>();
+            List<Material> oldPickupMaterials = new List<Material>();
+            oldPickupRenderer.GetSharedMaterials(oldPickupMaterials);
+            oldPickupMaterials.Remove(_pickupHighlightMaterial);
+            oldPickupRenderer.SetSharedMaterials(oldPickupMaterials);
+        }
+
+        _pickupTarget = target;
+
+        if (_pickupTarget != null)
+        {
+            Renderer pickupRenderer = _pickupTarget.GetComponent<Renderer>();
+            List<Material> pickupMaterials = new List<Material>();
+            pickupRenderer.GetSharedMaterials(pickupMaterials);
+            pickupMaterials.Add(_pickupHighlightMaterial);
+            pickupRenderer.SetSharedMaterials(pickupMaterials);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.GetComponent<ThrowableItem>() != null && other.gameObject != _heldItem)
+        {
+            _pickupableItems.Add(other.gameObject);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.GetComponent<ThrowableItem>() != null)
+        {
+            _pickupableItems.Remove(other.gameObject);
+        }
+    }
+
+    public override void SetHeldItem(GameObject item)
+    {
+        _pickupableItems.Remove(item);
+        base.SetHeldItem(item);
+    }
+
+    public override void DropItem()
+    {
+        _pickupableItems.Add(_heldItem);
+        base.DropItem();
     }
 
     /// <summary>
