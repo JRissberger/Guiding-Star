@@ -16,7 +16,6 @@ public class Floorboard : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("wow");
         if (other.gameObject.tag == "Player")
         {
             _soundManager.SpawnSound(transform.position, SoundType.Loud, _soundRange, _soundDuration, false);

@@ -248,7 +248,7 @@ public class PlayerThrowing : BaseThrowing
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void AddPickupByCollider(Collider other)
     {
         if (other.gameObject.GetComponent<ThrowableItem>() != null && other.gameObject != _heldItem)
         {
@@ -256,12 +256,22 @@ public class PlayerThrowing : BaseThrowing
         }
     }
 
-    private void OnTriggerExit(Collider other)
+    public void RemovePickupByCollider(Collider other)
     {
         if (other.gameObject.GetComponent<ThrowableItem>() != null)
         {
             _pickupableItems.Remove(other.gameObject);
         }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        AddPickupByCollider(other);
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        RemovePickupByCollider(other);
     }
 
     public override void SetHeldItem(GameObject item)

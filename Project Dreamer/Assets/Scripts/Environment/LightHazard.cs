@@ -44,8 +44,7 @@ public class LightHazard : MonoBehaviour
     /// </summary>
     private void KillPlayer()
     {
-        Debug.Log("Player is dead");
-        _playerInLight = false; //temporary, to prevent debug log spam
+        RespawnManager.Instance.Respawn();
     }
 
     /// <summary>

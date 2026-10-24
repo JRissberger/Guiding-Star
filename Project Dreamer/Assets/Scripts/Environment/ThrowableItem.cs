@@ -84,7 +84,7 @@ public class ThrowableItem : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (_isMidThrow)
+        if (_isMidThrow && collision.gameObject.tag != "Player")
         {
             Land();
             _isMidThrow = false;
