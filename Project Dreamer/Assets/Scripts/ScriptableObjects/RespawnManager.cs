@@ -32,11 +32,11 @@ public class RespawnManager : MonoBehaviour
         _resetMapSegment = Instantiate(_mapSegmentManager);
 
         //THIS IS A PATCHWORK SOLUTION FOR NOW
-        foreach(var mapSegments in _resetMapSegment.MapSegments)
+        foreach(var mapSegments in _mapSegmentManager.MapSegments)
         {
             mapSegments.IsActive = false;
         }
-        _resetMapSegment.MapSegments[0].IsActive = true;
+        _mapSegmentManager.MapSegments[0].IsActive = true;
         print(_resetMapSegment);
     }
 
