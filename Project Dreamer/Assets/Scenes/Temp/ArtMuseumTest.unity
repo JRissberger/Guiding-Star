@@ -880,8 +880,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1193921549}
-        m_TargetAssemblyTypeName: DemoDEBUG, Assembly-CSharp
-        m_MethodName: LoadMenu
+        m_TargetAssemblyTypeName: CoreLoopMenu, Assembly-CSharp
+        m_MethodName: OpenCoreLoopMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4323,9 +4323,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1193921544}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3601e760493c75944944ffa6aa9965bf, type: 3}
+  m_Script: {fileID: 11500000, guid: ffd9af5386d17114aaaf192042add80b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DemoDEBUG
+  m_EditorClassIdentifier: Assembly-CSharp::CoreLoopMenu
 --- !u!1 &1235324147
 GameObject:
   m_ObjectHideFlags: 0
