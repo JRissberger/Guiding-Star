@@ -21,6 +21,9 @@ public class PlayerThrowing : BaseThrowing
     [Tooltip("How far below themselves the player can throw items, in Unity units, relative to the attached object's postiion.")]
     [SerializeField] private float _throwHeightDown = 3.0f;
 
+    [Tooltip("")]
+    [SerializeField] private Collider _pickupRangeCollider = null;
+
     [Tooltip("The material to add to an object to highlight it when it can be picked up.")]
     [SerializeField] private Material _pickupHighlightMaterial = null;
 
@@ -248,7 +251,7 @@ public class PlayerThrowing : BaseThrowing
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void AddPickupByCollider(Collider other)
     {
         if (other.gameObject.GetComponent<ThrowableItem>() != null && other.gameObject != _heldItem)
         {
@@ -256,12 +259,22 @@ public class PlayerThrowing : BaseThrowing
         }
     }
 
-    private void OnTriggerExit(Collider other)
+    public void RemovePickupByCollider(Collider other)
     {
         if (other.gameObject.GetComponent<ThrowableItem>() != null)
         {
             _pickupableItems.Remove(other.gameObject);
         }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        AddPickupByCollider(other);
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        RemovePickupByCollider(other);
     }
 
     public override void SetHeldItem(GameObject item)
