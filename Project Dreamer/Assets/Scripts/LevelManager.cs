@@ -23,7 +23,7 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    public void TestCanWanderOff()
+    public void DisableStarWander()
     {
         if (_starGraph.GetVariable("Can Wander", out BlackboardVariable<bool> CanWander))
         {

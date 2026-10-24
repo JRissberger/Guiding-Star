@@ -1,12 +1,15 @@
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class RespawnManager : MonoBehaviour
 {
     [SerializeField] private LevelChunk[] _levelChunks;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-
+    [SerializeField] private MapSegmentManager _mapSegmentManager;
     private GameObject currentChunk;
+
+    private MapSegmentManager _resetMapSegment;
 
     public static RespawnManager Instance { get; private set; }
 
@@ -26,7 +29,15 @@ public class RespawnManager : MonoBehaviour
 
     void Start()
     {
-        
+        _resetMapSegment = Instantiate(_mapSegmentManager);
+
+        //THIS IS A PATCHWORK SOLUTION FOR NOW
+        foreach(var mapSegments in _resetMapSegment.MapSegments)
+        {
+            mapSegments.IsActive = false;
+        }
+        _resetMapSegment.MapSegments[0].IsActive = true;
+        print(_resetMapSegment);
     }
 
     // Update is called once per frame
@@ -51,9 +62,12 @@ public class RespawnManager : MonoBehaviour
 
     public void Respawn()
     {
+        _mapSegmentManager = _resetMapSegment;
 
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentSceneIndex);
+        //_levelChunks.Initialize();
 
-        _levelChunks.Initialize();
         //reset the relevant area
         // may also handle fadein / fadeout?
     }

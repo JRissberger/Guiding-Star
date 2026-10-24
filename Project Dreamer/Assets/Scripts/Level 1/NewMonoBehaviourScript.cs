@@ -10,9 +10,7 @@ public class NewMonoBehaviourScript : MonoBehaviour
         Debug.Log("PLAYER ENTER");
         if (other.gameObject.name == "Player")
         {
-            int[] open = {4, 5};
-            int[] closed = { 1, 2 };
-            LevelManager.Instance.SetWanderPointsActive(open, closed);
+            RespawnManager.Instance.Respawn();
         }
     }
 
