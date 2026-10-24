@@ -381,19 +381,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2520dc0be6a3964bb3721cda275b172, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerThrowing
-  _handOffset: {x: 0, y: 1, z: 0}
   _curveRaycastSegments: 10
   _throwCurveHeight: 1
-  _throwSpeed: 1
+  _solidToThrownMask:
+    serializedVersion: 2
+    m_Bits: 1
+  _handOffset: {x: 0, y: 1, z: 0}
   _drawCurve: 1
   _curveDisplayWidth: 0.01
   _curveDisplaySegments: 50
   _throwRadius: 5
+  _throwHeightUp: 3
+  _throwHeightDown: 3
+  _targetableSurfaceMask:
+    serializedVersion: 2
+    m_Bits: 1
   _validMarkerPrefab: {fileID: 8064065595831018745, guid: 33cbea4f5a37b554ba609a6a27c5b2c1, type: 3}
   _invalidMarkerPrefab: {fileID: 8064065595831018745, guid: 6885662ee430ce444b12c720c5570ce8, type: 3}
   _targetMarkerHover: 0.01
   _camera: {fileID: 0}
-  _debugItem: {fileID: 1540716208}
 --- !u!136 &937066859
 CapsuleCollider:
   m_ObjectHideFlags: 0

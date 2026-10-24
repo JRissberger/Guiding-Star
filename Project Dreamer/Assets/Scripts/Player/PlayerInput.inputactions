@@ -37,6 +37,16 @@
                     "priority": 0
                 },
                 {
+                    "name": "Pick Up",
+                    "type": "Button",
+                    "id": "87beb2ab-2dc6-43d2-9362-6fc2d3c7eb1c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
                     "name": "Debug 1",
                     "type": "Button",
                     "id": "f64e8f80-e377-4732-82f4-c315c9d8956d",
@@ -234,6 +244,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Debug 1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7eea0403-4d0b-4f97-9d4b-ed570d6009d2",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pick Up",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
