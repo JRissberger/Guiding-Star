@@ -23,6 +23,9 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Turns off the CanWander variable for Star.
+    /// </summary>
     public void DisableStarWander()
     {
         if (_starGraph.GetVariable("Can Wander", out BlackboardVariable<bool> CanWander))
@@ -35,6 +38,26 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Turns on the CanWander variable for Star.
+    /// </summary>
+    public void EnableStarWander()
+    {
+        if (_starGraph.GetVariable("Can Wander", out BlackboardVariable<bool> CanWander))
+        {
+            bool setBool = _starGraph.SetVariableValue("Can Wander", true);
+        }
+        else
+        {
+            Debug.Log("Can Wander for Star has failed - please assign the reference in the level manager!");
+        }
+    }
+
+    /// <summary>
+    /// Turns on points in the newOpen array, and turns off points in the newClosed array. Any points not listed are not affected.
+    /// </summary>
+    /// <param name="newOpen">New open poitns</param>
+    /// <param name="newClosed">New closed points</param>
     public void SetWanderPointsActive(int[] newOpen, int[] newClosed)
     {
         if (_starGraph.GetVariable("Map Segments", out BlackboardVariable<MapSegmentManager> mapSegs))
@@ -52,6 +75,10 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Turns on all points listed in the parameter; all others are disabled
+    /// </summary>
+    /// <param name="onlyOpen">The points accessible to Star</param>
     public void SetWanderPointsAll(int[] onlyOpen)
     {
         if (_starGraph.GetVariable("Map Segments", out BlackboardVariable<MapSegmentManager> mapSegs))
