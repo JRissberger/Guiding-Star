@@ -7,11 +7,17 @@ using Random = UnityEngine.Random;
 using UnityEngine.AI;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "NavigateJitter", story: "[Star] navigates to [target]", category: "Action", id: "34dc46e5c47b5597418808e635ede7a8")]
+[NodeDescription(name: "NavigateJitter", story: "[Star] navigates to [target] or [item]", category: "Action", id: "34dc46e5c47b5597418808e635ede7a8")]
 public partial class NavigateJitterAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> Star;
     [SerializeReference] public BlackboardVariable<Vector3> Target;
+
+    //Adding item here for if Star should target an item instead
+    [SerializeReference] public BlackboardVariable<GameObject> Item;
+
+    //Select this in editor to target item
+    [SerializeReference] public BlackboardVariable<bool> targetItem;
 
     //Amount used to offset Star's rotation by
     private float rotationVar = 0f; 
@@ -32,33 +38,56 @@ public partial class NavigateJitterAction : Action
     private NavMeshAgent navAgent;
 
     //Used when calculating the rotation to make the move change more gradual. Lower number is faster turn
-    [SerializeReference] public float rotationDivisor = 7f;
+    [SerializeReference] public BlackboardVariable<float> rotationDivisor;
 
     //Weight to overall target
-    [SerializeReference] public float targetNavWeight = 0.65f;
+    [SerializeReference] public BlackboardVariable<float> targetNavWeight;
     float closingWeight = 0f; //Increased as Star approaches, reset at start each time to match og
 
     //Value to increase/decrease speed by
-    [SerializeReference] public float speedChange = 1f;
-    [SerializeReference] public float baseSpeed = 3.5f;
+    private float speedChange = 0.5f;
+    [SerializeReference] public BlackboardVariable<float> baseSpeed;
 
 
     protected override Status OnStart()
     {
+        
+
         //Starts equal to Star's rotation
         rotationVar = Star.Value.transform.eulerAngles.y;
         navAgent = Star.Value.GetComponent<NavMeshAgent>();
 
-        Debug.Log(navAgent.speed);
         //Reset navweight
         closingWeight = targetNavWeight;
 
-        FindNextDestination();
-        CheckDestinationValidity(jitterTarget);
+        //Should Star be targeting an item instead?
+        //If the target loc is default and there's an item added, use the item
+        if (targetItem)
+        {
+            //Set the target location to be the item's location
+            Target.Value = Item.Value.transform.position;
+        }
+
+
+        if (!FindNextDestination())
+        {
+            return Status.Failure;
+        }
+
+        EnsureLocationOnMesh(jitterTarget);
         navAgent.SetDestination(jitterTarget);
 
         navAgent.autoBraking = false; //Disabled to make movement smoother
 
+        //Ensure there's a valid way to get to the final target
+        if (!ValidatePath(Target.Value))
+        {
+
+            //Node fails, shouldn't get caught in infinite failure as other precautions above navigation will move Star to a more default branch. 
+            return Status.Failure;
+        }
+
+       
         return Status.Running;
     }
 
@@ -74,13 +103,26 @@ public partial class NavigateJitterAction : Action
 
         //Check distance to target, return running if not close enough
         if (!CloseToTarget(jitterTarget))
-        {
-            
+        {            
             return Status.Running;
         }
-        
-        FindNextDestination();
-        CheckDestinationValidity(jitterTarget);
+
+        //Finds the next jitter target. If no valid target can be found after multiple attempts, this node fails
+            //Used to prevent potential infinite loop situations
+        if (!FindNextDestination())
+        {
+            return Status.Failure;
+        }
+
+        EnsureLocationOnMesh(jitterTarget);
+
+        //If for some reason the final target is no longer accessible, end
+            //Done each update loop to account for items potentially moving, or paths being blocked
+        if (!ValidatePath(Target.Value))
+        {
+            return Status.Failure;
+        }
+
         navAgent.SetDestination(jitterTarget);
 
         //Slightly change speed
@@ -91,6 +133,7 @@ public partial class NavigateJitterAction : Action
 
     //TODO: weight turn towards overall target
         //NOTE: may rework for efficiency, weighting towards target. may also be unneeded due to target weighting
+        //Could do "whiskers" (volume on either side of Star) that handles edge--move until theyre further away
     /// <summary>
     /// Forcibly turns Star if they're too close to a boundary
     /// </summary>
@@ -173,55 +216,77 @@ public partial class NavigateJitterAction : Action
     /// <summary>
     /// Finds the next location for Star to move to on the way to the main target
     /// </summary>
-    private void FindNextDestination()
+    private bool FindNextDestination()
     {
         //Check if Star is very close to the final target
         Vector3 distToFinal = Target.Value - Star.Value.transform.position;
         distToFinal.y = 0;
-        
-        
-        //If true, close, set target directly
+               
+        //If true, close, set target directly and end method early
         if (distToFinal.magnitude <= directDistance)
         {
             //Turn auto braking back on for smoother stop
             navAgent.autoBraking = true;
             jitterTarget = new Vector3(Target.Value.x, Star.Value.transform.position.y, Target.Value.z);
-            return; 
+            return true; 
         }
 
-        //Otherwise continue wandering towards it
+        //Used to handle potential bad location rolls
+        bool validPosition = false;
+        int attemptCount = 0; //Used to avoid infinite loop with rerolling
 
-        UpdateRotateVar();
-
-        //Calculate angle the new target is on
-        float newAngle = Star.Value.transform.eulerAngles.y + Rotate(Star.Value.transform.eulerAngles.y);
-
-        //Direction vector from new angle
-        Vector3 direction = Quaternion.Euler(0f, newAngle, 0f) * Vector3.forward;
-
-        //Overall target direction
-        Vector3 targetDirection = Target.Value - Star.Value.transform.position;
-
-        //Weight more heavily to target when close
-        if (distToFinal.magnitude < approachDistance)
+        while (!validPosition)
         {
-            closingWeight = Mathf.Lerp(1f, closingWeight, distToFinal.magnitude / approachDistance);
+            //Continue wandering, with new rotation
+            UpdateRotateVar();
+
+            //Calculate angle the new target is on
+            float newAngle = Star.Value.transform.eulerAngles.y + Rotate(Star.Value.transform.eulerAngles.y);
+
+            //Direction vector from new angle
+            Vector3 direction = Quaternion.Euler(0f, newAngle, 0f) * Vector3.forward;
+
+            //Overall target direction
+            Vector3 targetDirection = Target.Value - Star.Value.transform.position;
+
+            //Weight more heavily to target when close
+            if (distToFinal.magnitude < approachDistance)
+            {
+                closingWeight = Mathf.Lerp(1f, closingWeight, distToFinal.magnitude / approachDistance);
+            }
+
+            //Using lerp to blend the wander target and overall target
+            Vector3 overallDirection = Vector3.Slerp(direction, targetDirection, targetNavWeight);
+            Vector3 overallDirNormalized = overallDirection.normalized;
+
+            //Update target location with random distance within max range
+            jitterTarget = Star.Value.transform.position + overallDirNormalized * (Random.Range(minDistance, maxDistance));
+
+            //Check for validity, reroll otherwise
+                //NOTE: might need to keep an eye out for potential race conditions with checking loc validity and path, if loc gets updated
+            if (EnsureLocationOnMesh(jitterTarget) && ValidatePath(jitterTarget))
+            {
+                validPosition = true;
+            }
+            
+            //Increments attempts. If Star keeps failing to path, end the method with false.
+                //Realistically shouldn't happen as targets are validated ahead of time
+            attemptCount++;
+            if (attemptCount >= 10)
+            {
+                return false;
+            }
         }
 
-        //Using lerp to blend the wander target and overall target
-        Vector3 overallDirection = Vector3.Slerp(direction, targetDirection, targetNavWeight);
-        Vector3 overallDirNormalized = overallDirection.normalized;
-
-        //Update target location with random distance within max range
-        jitterTarget = Star.Value.transform.position + overallDirNormalized * (Random.Range(minDistance, maxDistance));
-        
+        return true;
     }
 
     /// <summary>
     /// Checks that target is on mesh and updates to nearest point on mesh if needed
+    /// Important: Separate from ValidatePath. Only checks that location is on mesh, not that it can be pathed to
     /// </summary>
     /// <param name="location">Location being checked</param>
-    private void CheckDestinationValidity(Vector3 location)
+    private bool EnsureLocationOnMesh(Vector3 location)
     {
         //NOTE: may be tweaked as needed for accuracy, especially with any vertical movement that might be added later        
         //TODO: check absolute pathing from agent pos?
@@ -231,13 +296,14 @@ public partial class NavigateJitterAction : Action
             //Update target but keeps y value the same (should be the same value if the target is already on the mesh)
                 //NOTE: may need to check more if vertical traversal is added, but works for the time being
             jitterTarget = new Vector3(hit.position.x, Star.Value.transform.position.y, hit.position.z);
-            
+            return true;
         }
 
-        //DEBUG out, if this is hit, more precautions are needed
+        //Will only be hit if the position is nowhere near the navmesh, which realistically shouldn't occur
         else
         {
             Debug.LogWarning("No targets found near position " + location);
+            return false;
         }
     }
 
@@ -255,6 +321,23 @@ public partial class NavigateJitterAction : Action
         distance.y = 0;
         
         if (distance.sqrMagnitude < 0.01f)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Checks that the current targeted location can be pathed to on the mesh
+    /// </summary>
+    /// <param name="target">Location to check</param>
+    /// <returns>True if it can be pathed to</returns>
+    private bool ValidatePath(Vector3 target)
+    {
+        NavMeshPath path = new NavMeshPath();
+        navAgent.CalculatePath(target, path);
+        if (path.status == NavMeshPathStatus.PathComplete)
         {
             return true;
         }
