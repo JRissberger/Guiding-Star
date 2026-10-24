@@ -14,7 +14,7 @@ public class MapGizmoRenderer : MonoBehaviour
         //Drawing non wireframe stuff requires using handles which is editor only
         //This check makes sure the code doesn't compile when building (although ideally we pull this out before that)
 #if UNITY_EDITOR
-        UnityEditor.Handles.color = Color.green;
+        
 
         //Loop through the class list
         for (int i = 0; i < segmentManager.MapSegments.Count; i++)
@@ -32,6 +32,21 @@ public class MapGizmoRenderer : MonoBehaviour
             //Only draw if the segment is currently active
             if (segment.IsActive)
             {
+                //Color
+                UnityEditor.Handles.color = Color.green;
+
+                //Show radius
+                UnityEditor.Handles.DrawSolidDisc(segment.CenterLoc, Vector3.up, segment.Radius);
+
+                //Number in list
+                number = new GUIContent($"{i}");
+                UnityEditor.Handles.Label(segment.CenterLoc, number, style);
+            }
+            else
+            {
+                //Color
+                UnityEditor.Handles.color = Color.red;
+
                 //Show radius
                 UnityEditor.Handles.DrawSolidDisc(segment.CenterLoc, Vector3.up, segment.Radius);
 
