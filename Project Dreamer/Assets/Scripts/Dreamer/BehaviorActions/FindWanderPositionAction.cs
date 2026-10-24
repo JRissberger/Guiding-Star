@@ -69,14 +69,14 @@ public partial class FindWanderPositionAction : Action
 
                 //Check to make sure it's not in any inactive lights
                 //TODO: again, change script name
-                //foreach (Collider light in inactiveLights)
-                //{
-                //    if (IsInsideLight(position, light))
-                //    {
-                //        inInactiveLight = true;
-                //        break;
-                //    }
-                //}
+                foreach (Collider light in inactiveLights)
+                {
+                    if (IsInsideLight(position, light))
+                    {
+                        inInactiveLight = true;
+                        break;
+                    }
+                }
 
                 //If there's any active lights, the position should be in one
                 foreach (Collider light in activeLights)
@@ -92,6 +92,7 @@ public partial class FindWanderPositionAction : Action
                 //Final check for valid position
                 if (!inInactiveLight && (inActiveLight || activeLights.Count == 0)) //Account for there being no lights
                 {
+                    Debug.Log("Valid target: " + position);
                     foundValidTarget = true;
                 }
             }
