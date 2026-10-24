@@ -133,6 +133,7 @@ GameObject:
   - component: {fileID: 289606638}
   - component: {fileID: 289606639}
   - component: {fileID: 289606640}
+  - component: {fileID: 289606641}
   m_Layer: 0
   m_Name: Specter
   m_TagString: Untagged
@@ -274,20 +275,47 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2520dc0be6a3964bb3721cda275b172, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerThrowing
-  _handOffset: {x: 0.5, y: 0, z: 0.5}
   _curveRaycastSegments: 10
   _throwCurveHeight: 1
-  _throwSpeed: 1
+  _solidToThrownMask:
+    serializedVersion: 2
+    m_Bits: 1
+  _handOffset: {x: 0.5, y: 0, z: 0.5}
   _drawCurve: 1
   _curveDisplayWidth: 0.01
   _curveDisplaySegments: 50
   _throwRadius: 5
-  _validMarkerPrefab: {fileID: 8064065595831018745, guid: 33cbea4f5a37b554ba609a6a27c5b2c1, type: 3}
-  _invalidMarkerPrefab: {fileID: 8064065595831018745, guid: 6885662ee430ce444b12c720c5570ce8, type: 3}
+  _throwHeightUp: 3
+  _throwHeightDown: 3
+  _pickupHighlightMaterial: {fileID: 2100000, guid: 7c40a973e67661f4bb8ff85b8cb57b91, type: 2}
+  _targetableSurfaceMask:
+    serializedVersion: 2
+    m_Bits: 1
+  _validMarkerPrefab: {fileID: 8064065595831018745, guid: 3dda29aeb94888d4cb813a5dba347567, type: 3}
+  _invalidMarkerPrefab: {fileID: 8064065595831018745, guid: b590a1bd34954e349906abf6025f4f9a, type: 3}
   _targetMarkerHover: 0.01
-  _camera: {fileID: 0}
-  _debugItem1: {fileID: 1320050676}
-  _debugItem2: {fileID: 989361110}
+  _camera: {fileID: 1784188154}
+--- !u!135 &289606641
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 289606633}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 2
+  m_Center: {x: 0, y: -1, z: 0}
 --- !u!1 &332059808
 GameObject:
   m_ObjectHideFlags: 0
@@ -447,7 +475,8 @@ GameObject:
   - component: {fileID: 347483345}
   - component: {fileID: 347483348}
   - component: {fileID: 347483349}
-  m_Layer: 0
+  - component: {fileID: 347483350}
+  m_Layer: 9
   m_Name: Throwable (Dreamer)
   m_TagString: Interactable
   m_Icon: {fileID: 0}
@@ -565,6 +594,33 @@ MonoBehaviour:
   _soundRadius: 1
   _soundDuration: 1
   _willDespawn: 0
+--- !u!54 &347483350
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 347483343}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &437227488
 GameObject:
   m_ObjectHideFlags: 0
@@ -1336,9 +1392,10 @@ GameObject:
   - component: {fileID: 989361113}
   - component: {fileID: 989361111}
   - component: {fileID: 989361116}
-  m_Layer: 0
+  - component: {fileID: 989361117}
+  m_Layer: 9
   m_Name: Soft Throwable (Specter)
-  m_TagString: Untagged
+  m_TagString: Throwable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1454,6 +1511,33 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &989361117
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 989361110}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1320050676
 GameObject:
   m_ObjectHideFlags: 0
@@ -1467,9 +1551,10 @@ GameObject:
   - component: {fileID: 1320050678}
   - component: {fileID: 1320050681}
   - component: {fileID: 1320050682}
-  m_Layer: 0
+  - component: {fileID: 1320050683}
+  m_Layer: 9
   m_Name: Harsh Throwable (Specter)
-  m_TagString: Untagged
+  m_TagString: Throwable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1585,6 +1670,33 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &1320050683
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1320050676}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1421344093
 GameObject:
   m_ObjectHideFlags: 0
