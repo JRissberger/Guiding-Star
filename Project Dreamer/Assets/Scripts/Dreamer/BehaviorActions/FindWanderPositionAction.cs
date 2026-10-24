@@ -83,7 +83,6 @@ public partial class FindWanderPositionAction : Action
                 {
                     if (IsInsideLight(position, light))
                     {
-                        Debug.Log("Position inside light!");
                         inActiveLight = true;
                         break;
                     }
@@ -92,7 +91,6 @@ public partial class FindWanderPositionAction : Action
                 //Final check for valid position
                 if (!inInactiveLight && (inActiveLight || activeLights.Count == 0)) //Account for there being no lights
                 {
-                    Debug.Log("Valid target: " + position);
                     foundValidTarget = true;
                 }
             }
