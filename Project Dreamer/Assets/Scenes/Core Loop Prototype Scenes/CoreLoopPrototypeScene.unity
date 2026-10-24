@@ -7119,23 +7119,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Behavior::Unity.Behavior.BehaviorGraphAgent
---- !u!1 &1635012180 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6190663834106767270, guid: 4a16f3de9299de045a4af336bb7ffd31, type: 3}
-  m_PrefabInstance: {fileID: 1752388305}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1635012186
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1635012180}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ebd805057ae4a8245979e3bd027c0bbc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NewMonoBehaviourScript
 --- !u!43 &1691008251
 Mesh:
   m_ObjectHideFlags: 0
@@ -8911,10 +8894,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3459870674647878181, guid: 4a16f3de9299de045a4af336bb7ffd31, type: 3}
       insertIndex: 14
       addedObject: {fileID: 1364072708}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6190663834106767270, guid: 4a16f3de9299de045a4af336bb7ffd31, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1635012186}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4a16f3de9299de045a4af336bb7ffd31, type: 3}
 --- !u!1 &1759989922
 GameObject:
