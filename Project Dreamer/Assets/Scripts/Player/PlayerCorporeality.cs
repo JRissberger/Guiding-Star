@@ -159,12 +159,12 @@ public class PlayerCorporeality : MonoBehaviour
         if (isHiding == true && hiding == false) //Entering a shadow
         {
             rend.material = hideMaterial;
-            GetComponent<TrialPlayerMovement>().enabled = false;
+            GetComponent<PlayerMovement>().enabled = false;
         }
         else if (isHiding == false && hiding == true) //Leaving a shadow
         {
             rend.material = defaultMaterial;
-            GetComponent<TrialPlayerMovement>().enabled = true;
+            GetComponent<PlayerMovement>().enabled = true;
             SetIncorporeal(shadowDistance);
         }
 
