@@ -12,33 +12,34 @@ public partial class PickUpItemAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Item;
     [SerializeReference] public BlackboardVariable<GameObject> HeldItem;
     [SerializeReference] public BlackboardVariable<Boolean> HoldingItem;
-    //Should update blackboard variables: Is Holding Item, and Current Held Item
+    [SerializeReference] public BlackboardVariable<float> PickupRange;
 
     protected override Status OnStart()
     {
         //Access throwing script on Star
         DreamerThrowing throwing = Star.Value.GetComponent<DreamerThrowing>();
 
-        if (throwing != null)
+        //Distance between Star and item
+        float distance = Vector3.Distance(Star.Value.transform.position, Item.Value.transform.position);
+
+        //Only pick up if item is in range.
+        if (throwing != null && distance < PickupRange.Value)
         {
+            //Null out any velocity on the rigidbody so the item doesn't move oddly during pickup
+                //This is mostly for accounting for if an item is picked up when it's still falling, letting Star "catch" items if they're close enough
+            Rigidbody rigidbody = Item.Value.GetComponent<Rigidbody>();
+            rigidbody.angularVelocity = Vector3.zero;
+            rigidbody.linearVelocity = Vector3.zero;
+
             //Set held item as the item tied to blackboard
             throwing.SetHeldItem(Item.Value);
             HoldingItem.Value = true;
             HeldItem.Value = Item.Value;
-
-            //TODO: may remove item from held items list to avoid retargeting
+            return Status.Success;
         }
 
-        return Status.Running;
+        return Status.Failure;
     }
 
-    protected override Status OnUpdate()
-    {
-        return Status.Success;
-    }
-
-    protected override void OnEnd()
-    {
-    }
 }
 

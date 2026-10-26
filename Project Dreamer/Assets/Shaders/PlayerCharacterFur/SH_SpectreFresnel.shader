@@ -30,10 +30,10 @@ Shader "Unlit/Spectre Fresnel"
 
             struct v2f
             {
-                float2 uv : TEXCOORD0;
-                float3 normal : NORMAL;
-                float3 view: COLOR0;
                 float4 vertex : SV_POSITION;
+                float2 uv : TEXCOORD0;
+                half3 normal : NORMAL;
+                half3 view: COLOR0;
             };
 
             sampler2D _MainTex;
