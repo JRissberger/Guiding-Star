@@ -38,9 +38,9 @@ public class Trigger : MonoBehaviour
     /// When the player leaves a trigger volume, move to the trigger knot that the player is in
     private void OnTriggerExit(Collider other)
     {
-        if (other.TryGetComponent<PlayerMovement>(out PlayerMovement p))
+        if (other.gameObject.name == "Player")
         {
-            List<Trigger> triggers = p.triggers;
+            List<Trigger> triggers = other.GetComponent<PlayerMovement>().triggers;
 
             foreach (Trigger t in triggers)
             {
