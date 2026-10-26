@@ -1,44 +1,57 @@
 using Unity.Cinemachine;
 using UnityEngine;
+using System.Collections.Generic;
 using UnityEngine.Splines;
+using Unity.VisualScripting;
 
 public class Trigger : MonoBehaviour
 {
-    [Tooltip("The box collider it's paired with")]
-    [SerializeField] Trigger pair;
-    TrialCamera camera;
-    [HideInInspector] public bool colliding = false;
-    [Tooltip("This should be -1 if it is toward the lower end of the spline position as compared to its pair and 1 if it's higher")]
-    [SerializeField]  int nextPos;
-    [Tooltip("If the lerp to the next position should take longer or shorter than the default (2s), write how long in seconds. If not, keep it at -1")]
-    [SerializeField]  float timeToMove = -1;
-    bool transable = true;
+    CameraController camera;
+    [Tooltip("This should be equal to the camera knot that frames its volume, should be dynamically handled so long as it's under a Knot # in the hierarchy")]
+    public int knot;
+    [Tooltip("How long it will take to lerp to the next knot on the spline. -1 keeps it at the default (4s)")]
+    [SerializeField]  float timeToMoveForward = -1; 
+    [SerializeField] float timeToMoveBack= -1;
+    public Vector3 forwardMovement = Vector3.zero;
 
     void Start()
     {
-        camera = GameObject.Find("CinemachineCamera").GetComponent<TrialCamera>();
+        if (forwardMovement == Vector3.zero)
+            forwardMovement = this.transform.forward;
+
+        camera = GameObject.Find("CinemachineCamera").GetComponent<CameraController>();
     }
 
-    // Only transition in the desired direction if the player has fully moved from left to right (or vice versa) on the trigger areas
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.name == "Player" && !pair.colliding)
-        {
-            transable = false;
-            colliding = true;
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
+    /*private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.name == "Player")
         {
-            if (!pair.colliding && transable)
+            if (camera.GetComponent<CinemachineSplineDolly>().CameraPosition != knot)
             {
-                camera.MoveTo(nextPos, timeToMove);
-                pair.transable = true;
+                float time = timeToMoveForward;
+                if (knot < camera.GetComponent<CinemachineSplineDolly>().CameraPosition) { time = timeToMoveBack; }
+                camera.MoveTo(knot, time);
             }
-            colliding = false;
+        }
+    }*/
+
+    /// When the player leaves a trigger volume, move to the trigger knot that the player is in
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.TryGetComponent<PlayerMovement>(out PlayerMovement p))
+        {
+            List<Trigger> triggers = p.triggers;
+
+            foreach (Trigger t in triggers)
+            {
+                if (t == this)
+                    continue;
+
+                float time = t.timeToMoveForward;
+                if (t.knot < knot) { time = t.timeToMoveForward; }
+                camera.MoveTo(t.knot, time);
+                break;
+            }
         }
     }
 }
