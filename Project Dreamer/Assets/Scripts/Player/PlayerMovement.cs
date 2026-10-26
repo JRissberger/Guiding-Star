@@ -18,9 +18,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float rotationSpeed = 6f;
     [SerializeField] float accelRate = 5f;
     private float speed = 0;
-    private float currentMaxSpeed = 10f;
+    private float currentMaxSpeed;
     private Vector3 velocity;
     private Vector3 moveDirection;
+    bool transitionAxis = false;
 
     LayerMask corporealMask;
     public bool corporeal;
@@ -49,6 +50,7 @@ public class PlayerMovement : MonoBehaviour
         baseHeight = this.transform.position.y;
         corporealMask = LayerMask.GetMask("Barriers", "Phaseable");
         triggers.Add(cam.GetComponent<CameraController>().knots[0].trigger);
+        currentMaxSpeed = maxSpeed;
     }
 
     // Update is called once per frame
@@ -112,9 +114,13 @@ public class PlayerMovement : MonoBehaviour
             }
 
         }
-        else if (waitingForKeyUp == 0) { waitingForKeyUp = 1; }
+        // if W has been released, change axis
+        else if (waitingForKeyUp == 0)
+        {
+            transitionAxis = true;
+        }
 
-        float speedDif = targetSpeed - speed;                                                       // How far we are from target speed
+            float speedDif = targetSpeed - speed;                                                       // How far we are from target speed
         float movement = Mathf.Pow(Mathf.Abs(speedDif) * accelRate, 0.9f) * Mathf.Sign(speedDif);   // Non-linear acceleration
         speed += movement * Time.deltaTime;                                                         // Apply to current speed
         rb.linearVelocity = velocity * speed;
@@ -170,15 +176,14 @@ public class PlayerMovement : MonoBehaviour
 
         // if we need to transition, start listening for key up
         if (waitingForKeyUp == -1 && forward != vv) { waitingForKeyUp = 0; }
-        // if W/S have been released, start listening for them to be pressed again
-        if (waitingForKeyUp == 0 && direction.y == 0) { waitingForKeyUp = 1; }
-        // if W or S has been pressed again, change the axes
-        if (waitingForKeyUp == 1 && Math.Abs(direction.y) > 0)
+        // if W has been released, change axis
+        if (waitingForKeyUp == 0 && (direction.y <= 0 || transitionAxis))
         {
             forward = vv;
             horizontal = Vector3.Cross(Vector3.up, vv);
             //Debug.Log("reassigned axis to " + vv);
             waitingForKeyUp = -1;
+            transitionAxis = false;
         }
 
         // set x/z movement
