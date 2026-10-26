@@ -12,10 +12,11 @@ public class PlayerMovement : MonoBehaviour
     Rigidbody rb;
     private InputAction moveAction;
     private int moveType = 1;
-    [SerializeField] float maxSpeed = 10f;
-    [SerializeField] float transitionSpeed = 6f;
-    [SerializeField] float rotationSpeed = 10f;
-    [SerializeField] float accelRate = 1f;
+    [SerializeField] float maxSpeed = 3f;
+    [Tooltip("The speed the player moves when the camera is transitioning, I've found it feels better when lower")]
+    [SerializeField] float transitionSpeed = 2f;
+    [SerializeField] float rotationSpeed = 6f;
+    [SerializeField] float accelRate = 5f;
     private float speed = 0;
     private float currentMaxSpeed = 10f;
     private Vector3 velocity;
@@ -116,7 +117,7 @@ public class PlayerMovement : MonoBehaviour
         float speedDif = targetSpeed - speed;                                                       // How far we are from target speed
         float movement = Mathf.Pow(Mathf.Abs(speedDif) * accelRate, 0.9f) * Mathf.Sign(speedDif);   // Non-linear acceleration
         speed += movement * Time.deltaTime;                                                         // Apply to current speed
-        rb.linearVelocity = velocity * speed * Time.deltaTime;
+        rb.linearVelocity = velocity * speed;
     }
 
     /// <summary>
