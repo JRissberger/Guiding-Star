@@ -133,6 +133,7 @@ GameObject:
   - component: {fileID: 161143277}
   - component: {fileID: 161143281}
   - component: {fileID: 161143282}
+  - component: {fileID: 161143283}
   m_Layer: 10
   m_Name: Cube
   m_TagString: StarInteractOnly
@@ -276,6 +277,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &161143283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161143276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42cb6275610525a4fab27b257360722d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TEMPInteractable
 --- !u!1001 &173551706
 PrefabInstance:
   m_ObjectHideFlags: 0
