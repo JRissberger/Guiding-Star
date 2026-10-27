@@ -15,11 +15,11 @@ public class DreamerSight : MonoBehaviour
     
 
     //When a trigger enter is recognized, check for item tag, then check raycast to see if item is behind wall
+        //CompoundSight only recognizes things on the Interactables layer right now! If more layers are added, will need a layer check here
     private void OnTriggerEnter(Collider other)
     {
-        //Check if it has the StarInteractable tag
-        //TODO: Tagging/layers may get updated down the line
-        if (other.CompareTag("Interactable"))
+        //Items must be interactable for Star only, or untagged (interactable to either player or Star)
+        if (other.CompareTag("StarInteractOnly") || other.CompareTag(""))
         {
             //Adds to triggered list if it's not already there
             if (!triggeredItems.Contains(other.gameObject))
