@@ -19,7 +19,7 @@ public class DreamerSight : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         //Items must be interactable for Star only, or untagged (interactable to either player or Star)
-        if (other.CompareTag("StarInteractOnly") || other.CompareTag(""))
+        if (other.CompareTag("Untagged") || other.CompareTag("StarInteractOnly"))
         {
             //Adds to triggered list if it's not already there
             if (!triggeredItems.Contains(other.gameObject))

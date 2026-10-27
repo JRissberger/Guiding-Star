@@ -12,9 +12,18 @@ public partial class IsItemThrowableCondition : Condition
 
     public override bool IsTrue()
     {
+        if (Item.Value.TryGetComponent<InteractableBase>(out  var interactable))
+        {
+            Debug.Log("Found");
+        }
+        else
+        {
+            Debug.Log("not found");
+        }
         //If the throwableitem script exists, the item is throwable
         if (Item.Value.TryGetComponent<ThrowableItem>(out ThrowableItem script))
         {
+
             return true;
         }
 
