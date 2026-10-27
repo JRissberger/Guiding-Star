@@ -30,7 +30,6 @@ public partial class FindClosestItemAction : Action
 
     protected override Status OnStart()
     {
-        Debug.Log(TargetItem.Value);
         //Getting player reference
         player = GameObject.Find("Player");
 
@@ -164,7 +163,6 @@ public partial class FindClosestItemAction : Action
             }
         }
 
-        Debug.Log(item);
         Debug.Log(itemScript.IsMidThrow());
         return false;
     }
