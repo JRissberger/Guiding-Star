@@ -4,41 +4,75 @@ inline float3 fade(float3 t)
     // //
     // return t * t * (3 - 2 * t); // old curve
 }
-// HORRID noise function that isn't random but *looks* 
-// random enough that I'm not complaining
-inline float perm(float x) { 
-    return (frac(frac(x * .2 * x * 3.1415926) / 3.1415926 + x * 2.1)); 
-}
-inline float GradientVec(float x, float3 p) { return dot(x, p); }
-// 3D version
-inline float Perlin3Dl(float3 p)
-{
-    float3 P = fmod(floor(p), 256.0);
-    p -= floor(p);
-    float3 f = fade(p);
-    // HASH COORDINATES FOR 6 OF THE 8 CUBE CORNERS
-    float A = perm(P.x) + P.y;
-    float AA = perm(A) + P.z;
-    float AB = perm(A + 1) + P.z;
-    float B = perm(P.x + 1) + P.y;
-    float BA = perm(B) + P.z;
-    float BB = perm(B + 1) + P.z;
-    // AND ADD BLENDED RESULTS FROM 8 CORNERS OF CUBE
-    return lerp(
-        lerp(lerp(GradientVec(perm(AA), p), GradientVec(perm(BA), p + float3(-1, 0, 0)), f.x),
-            lerp(GradientVec(perm(AB), p + float3(0, -1, 0)),
-                    GradientVec(perm(BB), p + float3(-1, -1, 0)), f.x),
-            f.y),
-        lerp(lerp(GradientVec(perm(AA + 1), p + float3(0, 0, -1)),
-                    GradientVec(perm(BA + 1), p + float3(-1, 0, -1)), f.x),
-            lerp(GradientVec(perm(AB + 1), p + float3(0, -1, -1)),
-                    GradientVec(perm(BB + 1), p + float3(-1, -1, -1)), f.x),
-            f.y),
-        f.z);
+// faster noise fuction from https://www.jcgt.org/published/0009/03/02/
+inline uint3 permi3(uint3 v) {
+    v = v * 1664525u + 1013904223u;
+    v.x += v.y*v.z; v.y += v.z*v.x; v.z += v.x*v.y;
+    v ^= v >> 16u;
+    v.x += v.y*v.z; v.y += v.z*v.x; v.z += v.x*v.y;
+    return v; 
 }
 
-inline float3 Perlin3DVec(float3 samplePos){
-    return float3(
+inline fixed3 safeNormFixed(float3 inVec){
+	float dp3 = max (0.005, dot (inVec, inVec));
+	return inVec * rsqrt (dp3);
+}
+
+inline fixed3 perm(int3 s){
+    uint3 u = uint3(s.y + s.z,s.x + s.z, s.x + s.y);
+    u = permi3(u);
+    return safeNormFixed(float3(((int3)u)/16));
+}
+
+// 3D version
+inline fixed Perlin3Dl(float3 pos)
+{
+    int3 G = int3(pos);
+    fixed3 p = pos - floor(pos);
+    fixed3 p1 = p - 1.;
+    fixed3 f = fade(p);
+    int3 G1 = G + 1;
+    fixed AAA = dot(perm(G), p);
+    fixed AAB = dot(perm(int3(G.x, G.y, G1.z)),fixed3(p .x,p .y,p1.z));
+    fixed ABA = dot(perm(int3(G.x, G1.y,G.z )),fixed3(p .x,p1.y,p .z));
+    fixed ABB = dot(perm(int3(G.x, G1.y,G1.z)),fixed3(p .x,p1.y,p1.z));
+    fixed BAA = dot(perm(int3(G1.x,G.y, G.z )),fixed3(p1.x,p .y,p .z));
+    fixed BAB = dot(perm(int3(G1.x,G.y, G1.z)),fixed3(p1.x,p .y,p1.z));
+    fixed BBA = dot(perm(int3(G1.x,G1.y,G.z )),fixed3(p1.x,p1.y,p .z));
+    fixed BBB = dot(perm(G1),p1);
+    return lerp(
+        lerp(
+            lerp(
+                AAA,
+                AAB,
+                f.z
+            ),
+            lerp(
+                ABA,
+                ABB,
+                f.z
+            ),
+            f.y
+        ),
+        lerp(
+            lerp(
+                BAA,
+                BAB,
+                f.z
+            ),
+            lerp(
+                BBA,
+                BBB,
+                f.z
+            ),
+            f.y
+        ),
+        f.x
+    );
+}
+
+inline fixed3 Perlin3DVec(float3 samplePos){
+    return fixed3(
         Perlin3Dl(samplePos),
         Perlin3Dl(samplePos - 20), 
         Perlin3Dl(samplePos + 20)
