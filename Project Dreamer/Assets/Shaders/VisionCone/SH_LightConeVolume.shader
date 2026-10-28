@@ -10,7 +10,7 @@ Shader "Unlit/LightConeVolume"
     {
         Tags { "RenderType"="Transparent" "Queue" ="Transparent" }
         LOD 100
-        Cull Front
+        Cull Back
         ZWrite Off
         Blend One OneMinusSrcAlpha
 
@@ -55,7 +55,7 @@ Shader "Unlit/LightConeVolume"
                 return o;
             }
 
-            #define STEP_PERCENT 0.05
+            #define STEP_PERCENT 0.125
 
             fixed4 frag (v2f i) : SV_Target
             {
@@ -84,8 +84,8 @@ Shader "Unlit/LightConeVolume"
                 
                 for (float i = 0; i < 1.; i += STEP_PERCENT){
                     float3 currentPoint = lerp(enterPoint, exitPoint, i);
-                    float noise = Perlin3Dl(currentPoint) + Perlin3Dl(currentPoint * 1.982) + Perlin3Dl(currentPoint * 3.1415926);
-                    float lerpFac = exp(-_Density * max(noise, 0.) * totalTravel * STEP_PERCENT);
+                    float noise = Perlin3Dln(currentPoint * .55) + Perlin3Dln(currentPoint * 1.2) + Perlin3Dln(currentPoint * 3.1415926);
+                    float lerpFac = exp(-_Density * max(noise * .333 - .2, 0.) * totalTravel * STEP_PERCENT);
                     sum.xyz = lerp(_Color.xyz,sum.xyz,lerpFac);
                     sum.w = lerp(1, sum.w, lerpFac);
                 }
