@@ -21,7 +21,7 @@ inline fixed3 safeNormFixed(float3 inVec){
 inline fixed3 perm(int3 s){
     uint3 u = uint3(s.y + s.z,s.x + s.z, s.x + s.y);
     u = permi3(u);
-    return safeNormFixed(float3(((int3)u)/16));
+    return safeNormFixed(float3(((int3)u)/16.));
 }
 
 // 3D version
@@ -69,6 +69,14 @@ inline fixed Perlin3Dl(float3 pos)
         ),
         f.x
     );
+}
+
+// outputs 3d perlin noise within the normalized range [0,1]
+// the factor was determined based on this thread:
+// https://stackoverflow.com/questions/18261982/output-range-of-perlin-noise#18263038
+inline fixed Perlin3Dln(float3 pos)
+{
+    return Perlin3Dl(pos) * sqrt(3.) + 0.5;
 }
 
 inline fixed3 Perlin3DVec(float3 samplePos){
