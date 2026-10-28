@@ -51,8 +51,6 @@ public partial class NavigateJitterAction : Action
 
     protected override Status OnStart()
     {
-        
-
         //Starts equal to Star's rotation
         rotationVar = Star.Value.transform.eulerAngles.y;
         navAgent = Star.Value.GetComponent<NavMeshAgent>();
@@ -82,7 +80,6 @@ public partial class NavigateJitterAction : Action
         //Ensure there's a valid way to get to the final target
         if (!ValidatePath(Target.Value))
         {
-
             //Node fails, shouldn't get caught in infinite failure as other precautions above navigation will move Star to a more default branch. 
             return Status.Failure;
         }
