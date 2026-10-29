@@ -7,6 +7,28 @@ public class LightHazard : MonoBehaviour
 
     private bool _playerInLight = false;
     private float _inLightTimer = 0.0f;
+
+    //Whether the light is currently active or not
+    private bool isActive = true;
+    public bool IsActive { get { return isActive; }  set { isActive = value; } }
+
+    //Spotlight component
+    Light spotlight;
+
+    private void Start()
+    {
+        //Updates activity based on if the spotlight component is on or not
+        Transform spotlightObject = transform.Find("Spot Light");
+        if (spotlightObject.TryGetComponent<Light>(out spotlight))
+        {
+            //Update activity status if needed
+            if (!spotlight.isActiveAndEnabled)
+            {
+                isActive = false;
+            }
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Player")
@@ -53,5 +75,14 @@ public class LightHazard : MonoBehaviour
     private void PlayerInLight()
     {
         //Do nothing (for now)
+    }
+
+    /// <summary>
+    /// Toggles the light attached to the prefab
+    /// </summary>
+    public void ToggleLight()
+    {
+        spotlight.enabled = !isActive;
+        isActive = !isActive;
     }
 }
