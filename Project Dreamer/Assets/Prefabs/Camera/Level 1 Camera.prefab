@@ -765,7 +765,7 @@ Transform:
   m_GameObject: {fileID: 4981537946229414602}
   serializedVersion: 2
   m_LocalRotation: {x: -0.14662702, y: -0.37916908, z: 0.060987845, w: 0.91159856}
-  m_LocalPosition: {x: -0.2934838, y: 0.08979416, z: 15.903036}
+  m_LocalPosition: {x: -0.2934854, y: 0.08987141, z: 15.903486}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -806,6 +806,7 @@ GameObject:
   - component: {fileID: 8109712658719019687}
   - component: {fileID: 6352158255621315162}
   - component: {fileID: 2404571466902989530}
+  - component: {fileID: 4815907612292791266}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -919,6 +920,18 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!114 &4815907612292791266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5561518045595787466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f3edd2d276e77b6c84dff8f4202c639, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ForceDepth
 --- !u!1 &7294751234345367243
 GameObject:
   m_ObjectHideFlags: 0

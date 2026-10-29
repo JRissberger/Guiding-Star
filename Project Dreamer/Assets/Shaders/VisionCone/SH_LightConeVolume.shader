@@ -2,7 +2,6 @@ Shader "Unlit/LightConeVolume"
 {
     Properties
     {
-        _Radius ("Radius", Float) = 1.0
         _Density ("Fog Density", Float) = 2
         _Color ("Fog Color", Color) = (1,1,1,0)
         _ConeSourceOS ("Cone Source Object Space", Vector, 3) = (0,0,1,0)
@@ -44,6 +43,7 @@ Shader "Unlit/LightConeVolume"
             };
 
             sampler2D _CameraDepthTexture;
+            // sampler2D _LastCameraDepthTexture;
             fixed4 _Color;
             float3 _ConeSourceOS;
             float _Density;

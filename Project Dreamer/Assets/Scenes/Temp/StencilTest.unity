@@ -510,10 +510,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d85623b4a95b2e4a83b482e1aae850a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrialPlayerMovement
+  shadow: {fileID: 0}
+  moveType: 2
   maxSpeed: 6
   transitionSpeed: 2
   rotationSpeed: 6
   accelRate: 5
+  rotAccelRate: 15
   corporeal: 0
   bobDistance: 0.2
   bobSpeed: 3
@@ -3168,7 +3171,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 36aa0c7f967075830a02d45497796777, type: 2}
+  - {fileID: 2100000, guid: 59d5fd66c439a7563b8f99e9c8e60691, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
