@@ -7,6 +7,7 @@ Shader "Unlit/LightConeVolume"
         _ConeSourceOS ("Cone Source Object Space", Vector, 3) = (0,0,1,0)
         _ConeExitPlaneOS ("Cone Exit", Float) = 1
         _Theta ("Cone Angle", Float) = 1
+        _LightDecay ("Light Decay", Float) = .2
     }
     SubShader
     {
@@ -24,8 +25,6 @@ Shader "Unlit/LightConeVolume"
 
             #pragma vertex vert
             #pragma fragment frag
-            // // make fog work
-            // #pragma multi_compile_fog
 
             #include "UnityCG.cginc"
             #include "DepthUtil.cginc"
@@ -43,9 +42,9 @@ Shader "Unlit/LightConeVolume"
             };
 
             sampler2D _CameraDepthTexture;
-            // sampler2D _LastCameraDepthTexture;
             fixed4 _Color;
             float3 _ConeSourceOS;
+            float _LightDecay;
             float _Density;
             float _ConeExitPlaneOS;
             float _Theta;
@@ -119,13 +118,18 @@ Shader "Unlit/LightConeVolume"
 
                 fixed4 sum = fixed4(0,0,0,0);
 
+                float3 lightOrigin = mul(unity_ObjectToWorld, float4(_ConeSourceOS, 1)).xyz;
+
                 float totalTravel = length(enterPoint - exitPoint);
                 
                 for (float i = 0; i < 1.; i += STEP_PERCENT){
                     float3 currentPoint = lerp(enterPoint, exitPoint, i);
                     float noise = Perlin3Dln(currentPoint * .55) + Perlin3Dln(currentPoint * 1.2) + Perlin3Dln(currentPoint * 3.1415926);
-                    float lerpFac = exp(-_Density * max(noise * .333 - .2, 0.) * totalTravel * STEP_PERCENT);
-                    sum.xyz = lerp(_Color.xyz,sum.xyz,lerpFac);
+                    float lerpFac = exp(-_Density * max(noise * .333, 0.) * totalTravel * STEP_PERCENT);
+
+                    float light = exp(Perlin3Dln(lerp(currentPoint, lightOrigin, .5) * .3 + .7) * -length(lightOrigin - currentPoint) * _LightDecay);
+
+                    sum.xyz = lerp(_Color.xyz * light,sum.xyz,lerpFac);
                     sum.w = lerp(1, sum.w, lerpFac);
                 }
                 
