@@ -3,7 +3,8 @@ Shader "Unlit/LightConeVolume"
     Properties
     {
         _Density ("Fog Density", Float) = 2
-        _Color ("Fog Color", Color) = (1,1,1,0)
+        _Color ("Light Color", Color) = (1,1,1,0)
+        _FogColor ("Fog Color", Color) = (1,1,1,0)
         _ConeSourceOS ("Cone Source Object Space", Vector, 3) = (0,0,1,0)
         _ConeExitPlaneOS ("Cone Exit", Float) = 1
         _Theta ("Cone Angle", Float) = 1
@@ -43,6 +44,7 @@ Shader "Unlit/LightConeVolume"
 
             sampler2D _CameraDepthTexture;
             fixed4 _Color;
+            fixed4 _FogColor;
             float3 _ConeSourceOS;
             float _LightDecay;
             float _Density;
@@ -58,6 +60,7 @@ Shader "Unlit/LightConeVolume"
             }
 
             #define STEP_PERCENT 0.1
+            #define LIGHT_STEP_PERCENT 0.5
 
             inline float3 intersectCone(float3 rayOrigin, float3 rayDir, float theta){
                 float tanTheta = tan(theta);
@@ -90,7 +93,7 @@ Shader "Unlit/LightConeVolume"
 
                 bool exitInRange  = (coneExitOS.   z >= 0 && coneExitOS.   z <= _ConeExitPlaneOS);
                 bool enterInRange = (coneEnterOS.  z >= 0 && coneEnterOS.  z <= _ConeExitPlaneOS);
-                
+
                 if(!enterInRange && !exitInRange){
                     discard;
                 }
@@ -127,9 +130,16 @@ Shader "Unlit/LightConeVolume"
                     float noise = Perlin3Dln(currentPoint * .55) + Perlin3Dln(currentPoint * 1.2) + Perlin3Dln(currentPoint * 3.1415926);
                     float lerpFac = exp(-_Density * max(noise * .333, 0.) * totalTravel * STEP_PERCENT);
 
-                    float light = exp(Perlin3Dln(lerp(currentPoint, lightOrigin, .5) * .3 + .7) * -length(lightOrigin - currentPoint) * _LightDecay);
+                    float3 lightColor = _Color.xyz;
+                    float totalLightSrcTravel = length(currentPoint - lightOrigin);
+                    for(float z = 0; z < 1.; z += LIGHT_STEP_PERCENT){
+                        float3 falloffSamplePos = lerp(currentPoint, lightOrigin, z + LIGHT_STEP_PERCENT * .5); 
+                        float fogDensity = totalLightSrcTravel * LIGHT_STEP_PERCENT * Perlin3Dln(falloffSamplePos * .55);
+                        lightColor -= (1. - exp(-fogDensity * _LightDecay)) * lightColor * _FogColor.xyz;
+                        lightColor += exp(-fogDensity * _LightDecay) * _FogColor.xyz;
+                    }
 
-                    sum.xyz = lerp(_Color.xyz * light,sum.xyz,lerpFac);
+                    sum.xyz = lerp(_FogColor.xyz * lightColor,sum.xyz,lerpFac);
                     sum.w = lerp(1, sum.w, lerpFac);
                 }
                 

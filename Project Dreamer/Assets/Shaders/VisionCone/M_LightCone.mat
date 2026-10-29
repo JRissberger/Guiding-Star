@@ -19,7 +19,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
-  m_LockedProperties: 
+  m_LockedProperties: _ConeSourceOS
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -31,13 +31,14 @@ Material:
     m_Floats:
     - _ConeExitPlaneOS: 1
     - _Density: 0.9
-    - _LightDecay: 1.27
+    - _LightDecay: 0.42
     - _Radius: 1.87
     - _Theta: 0.45
     m_Colors:
-    - _Color: {r: 0.97143006, g: 1, b: 0.740566, a: 0}
+    - _Color: {r: 1, g: 0.9524014, b: 0.4764151, a: 0}
     - _ConeDirectionOS: {r: 0, g: 1, b: 1, a: 0}
     - _ConeSourceOS: {r: 0, g: 0, b: -0.5, a: 0}
     - _ConeTangentOS: {r: 1, g: 1, b: 0, a: 0}
+    - _FogColor: {r: 0.8584906, g: 0.83083314, b: 0.7977483, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
