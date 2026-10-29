@@ -31,7 +31,7 @@ public class LightHazard : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Player")
+        if (other.gameObject.tag == "Player" && isActive)
         {
             _playerInLight = true;
         }
@@ -39,7 +39,7 @@ public class LightHazard : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.tag == "Player")
+        if (other.gameObject.tag == "Player" && isActive)
         {
             _playerInLight = false;
             _inLightTimer = 0.0f;
