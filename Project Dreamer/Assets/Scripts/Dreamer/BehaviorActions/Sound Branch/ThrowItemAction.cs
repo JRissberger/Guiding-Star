@@ -43,7 +43,6 @@ public partial class ThrowItemAction : Action
             //If rotation isn't done, return running status
             if (Quaternion.Angle(Star.Value.transform.rotation, rotation) > 1)
             {
-                Debug.Log("Turning");
                 return Status.Running;
             }
         }
@@ -66,13 +65,21 @@ public partial class ThrowItemAction : Action
                 Vector3 direction = (Sound.Value.Location - Star.Value.transform.position).normalized;
 
                 //Create a set of distances to try
+                //If the object is under the max range, set the base throw range to reference to that object's distance
+                float baseThrow = Vector3.Distance(Star.Value.transform.position, Sound.Value.Location);
+
+                if (baseThrow > ThrowRange.Value)
+                {
+                    baseThrow = ThrowRange.Value;
+                }
+                
                 float[] distances =
                 {
-                    ThrowRange.Value,
-                    ThrowRange.Value * 0.9f,
-                    ThrowRange.Value * 0.75f,
-                    ThrowRange.Value * 0.5f,
-                    ThrowRange.Value * 0.25f
+                    baseThrow,
+                    baseThrow * 0.9f,
+                    baseThrow * 0.75f,
+                    baseThrow * 0.5f,
+                    baseThrow * 0.25f
                 };
 
                 //Loop through and try each until one allows for throwing
@@ -81,7 +88,7 @@ public partial class ThrowItemAction : Action
                     Vector3 throwTarget = Star.Value.transform.position + direction * distance;
 
                     //Try throw
-                    if (throwing.ThrowItemAtTry(throwTarget, Vector3.up, ThrowRange.Value))
+                    if (throwing.ThrowItemAtTry(throwTarget, Vector3.up, distance))
                     {
                         HoldingItem.Value = false;
                         HeldItem.Value = null;
@@ -91,7 +98,7 @@ public partial class ThrowItemAction : Action
 
                 //Only reach here if item couldn't be thrown
                 Debug.Log("Couldn't throw item at any position");
-
+                
             }
             
         }
