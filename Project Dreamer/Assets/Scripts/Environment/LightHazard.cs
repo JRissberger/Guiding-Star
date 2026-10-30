@@ -19,7 +19,7 @@ public class LightHazard : MonoBehaviour
     {
         //Updates activity based on if the spotlight component is on or not
         Transform spotlightObject = transform.Find("Spot Light");
-        if (spotlightObject.TryGetComponent<Light>(out spotlight))
+        if (spotlightObject && spotlightObject.TryGetComponent<Light>(out spotlight))
         {
             //Update activity status if needed
             if (!spotlight.isActiveAndEnabled)
