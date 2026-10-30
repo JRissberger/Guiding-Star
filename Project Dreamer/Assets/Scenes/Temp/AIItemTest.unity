@@ -333,7 +333,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 298529272aa5beb44b2af0af7150d2f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightSwitchInteractable
-  light: {fileID: 1825825510}
+  lights:
+  - {fileID: 1825825510}
 --- !u!1001 &173551706
 PrefabInstance:
   m_ObjectHideFlags: 0

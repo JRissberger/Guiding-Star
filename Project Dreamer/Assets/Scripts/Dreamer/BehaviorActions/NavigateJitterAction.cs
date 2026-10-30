@@ -13,8 +13,7 @@ public partial class NavigateJitterAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Star;
     [SerializeReference] public BlackboardVariable<Vector3> Target;
 
-    //Adding item here for if Star should target an item instead
-    [SerializeReference] public BlackboardVariable<GameObject> Item;
+    
 
     //Select this in editor to target item
     [SerializeReference] public BlackboardVariable<bool> targetItem;
@@ -48,6 +47,17 @@ public partial class NavigateJitterAction : Action
     private float speedChange = 0.5f;
     [SerializeReference] public BlackboardVariable<float> baseSpeed;
 
+    //Timers used to exit the branch if too much time elapses with Star not moving
+    private float motionTimer = 0f;
+    private float updateTimer = 0f;
+    private float updateInterval = 1f;
+    [SerializeReference] public BlackboardVariable<float> maxTimeWithoutMovement;
+
+    //Adding item here for if Star should target an item instead
+    [SerializeReference] public BlackboardVariable<GameObject> Item;
+
+    //Used to track position changes for potentially being stuck
+    private Vector3 previousPosition = Vector3.zero;
 
     protected override Status OnStart()
     {
@@ -55,8 +65,10 @@ public partial class NavigateJitterAction : Action
         rotationVar = Star.Value.transform.eulerAngles.y;
         navAgent = Star.Value.GetComponent<NavMeshAgent>();
 
-        //Reset navweight
+        //Reset navweight and timer
         closingWeight = targetNavWeight;
+        motionTimer = 0f;
+        updateTimer = 0f;
 
         //Should Star be targeting an item instead?
         //If the target loc is default and there's an item added, use the item
@@ -84,12 +96,44 @@ public partial class NavigateJitterAction : Action
             return Status.Failure;
         }
 
-       
+        //Recording Star's position
+        previousPosition = Star.Value.transform.position;
+
         return Status.Running;
     }
 
     protected override Status OnUpdate()
     {
+        //Increment timer
+        updateTimer += Time.deltaTime;
+
+        //Every set interval, update where previous position is
+            //Done at set intervals since the update loop is a bit too fast
+        if (updateTimer >= updateInterval )
+        {
+            //Check for movement
+            //Using distance calc since Star can wiggle while being stuck a bit
+            if (Vector3.Distance(previousPosition, Star.Value.transform.position) > 0.1f)
+            {
+                //Reset motion checker
+                motionTimer = 0f;
+            }
+            else
+            {
+                //No notable movement, add timer value onto motion timer
+                motionTimer += updateTimer;
+            }
+
+            //Update position and reset update timer
+            previousPosition = Star.Value.transform.position;
+            updateTimer = 0f;
+        }
+
+        //If the motion timer hits its threshold, Star is likely stuck, fail the node
+        if (motionTimer > maxTimeWithoutMovement)
+        {
+            return Status.Failure;
+        }
 
         //If near target, check if target is close to final target
         if (CloseToTarget(Target.Value))
@@ -124,6 +168,10 @@ public partial class NavigateJitterAction : Action
 
         //Slightly change speed
         navAgent.speed = baseSpeed + Random.Range(-speedChange, speedChange);
+
+        //Debug.Log("Prev pos: " + previousPosition);
+        //Debug.Log(Star.Value.transform.position);
+
 
         return Status.Running;
     }
