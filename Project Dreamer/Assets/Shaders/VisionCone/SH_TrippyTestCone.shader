@@ -1,4 +1,4 @@
-Shader "Unlit/LightConeVolume"
+Shader "Hidden/FunnyCone"
 {
     Properties
     {

@@ -16,7 +16,7 @@ Material:
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 3001
   stringTagMap: {}
   disabledShaderPasses: []
   m_LockedProperties: _ConeSourceOS
@@ -30,8 +30,8 @@ Material:
     m_Ints: []
     m_Floats:
     - _ConeExitPlaneOS: 1
-    - _Density: 0.9
-    - _LightDecay: 0.42
+    - _Density: 0.18
+    - _LightDecay: 1.36
     - _Radius: 1.87
     - _Theta: 0.45
     m_Colors:
@@ -39,6 +39,6 @@ Material:
     - _ConeDirectionOS: {r: 0, g: 1, b: 1, a: 0}
     - _ConeSourceOS: {r: 0, g: 0, b: -0.5, a: 0}
     - _ConeTangentOS: {r: 1, g: 1, b: 0, a: 0}
-    - _FogColor: {r: 0.8584906, g: 0.83083314, b: 0.7977483, a: 0}
+    - _FogColor: {r: 0.8584906, g: 0.8584906, b: 0.8584906, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
