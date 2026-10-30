@@ -8,7 +8,7 @@ public class RespawnTrigger : MonoBehaviour
     {
         if (other.gameObject.name == "Player")
         {
-            RespawnManager.Instance.NewRespawn(this);
+            RespawnManager.Instance.NewRespawn(this, other.gameObject);
             this.enabled = false;
         }
     }
