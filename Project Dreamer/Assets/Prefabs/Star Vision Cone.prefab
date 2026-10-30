@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 319240544485722264}
   - component: {fileID: 5484682643160029833}
   - component: {fileID: 9082189206680129575}
+  - component: {fileID: 6384822460025865264}
   m_Layer: 0
   m_Name: Star Vision Cone
   m_TagString: Untagged
@@ -441,7 +442,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: aebd59b955d7c3a4a847e9e79983e5ed, type: 2}
+  - {fileID: 2100000, guid: 36aa0c7f967075830a02d45497796777, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -465,3 +466,11 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &6384822460025865264
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2838333684643830531}
+  m_Mesh: {fileID: 0}
