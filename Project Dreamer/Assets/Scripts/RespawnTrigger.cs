@@ -2,13 +2,11 @@ using UnityEngine;
 
 public class RespawnTrigger : MonoBehaviour
 {
-
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.name == "Player")
         {
-            RespawnManager.Instance.NewRespawn(this, other.gameObject);
+            RespawnManager.Instance.NewRespawn(other.gameObject);
             this.enabled = false;
         }
     }

@@ -89,6 +89,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1985514750117005736}
   - component: {fileID: 95018758794522621}
+  - component: {fileID: 6605610598146383911}
   m_Layer: 0
   m_Name: LevelManager
   m_TagString: Untagged
@@ -123,3 +124,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b281912d0c390a045a858e1fed91e2cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelManager
+  _starGraph: {fileID: 0}
+--- !u!114 &6605610598146383911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8549738924337189523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 085c826ba5208014c81f951f84c4f19d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RespawnManager
+  _levelChunks: []
+  _mapSegmentManager: {fileID: 0}
+  _playerInstance: {fileID: 0}
+  _starInstance: {fileID: 0}

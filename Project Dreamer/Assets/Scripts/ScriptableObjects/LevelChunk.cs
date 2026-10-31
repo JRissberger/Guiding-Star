@@ -4,9 +4,13 @@ using UnityEngine;
 [Serializable]
 public class LevelChunk
 {
-    [SerializeField] private GameObject chunk;
+    [SerializeField] private GameObject chunkInstance;
 
-    public GameObject Chunk {  get { return chunk; } }
+    public GameObject ChunkInstance {  get { return chunkInstance; } }
+
+    [SerializeField] private GameObject chunkPrefab;
+
+    public GameObject ChunkPrefab { get { return chunkPrefab; } }
 
     [SerializeField] private Transform respawnChunk;
 

@@ -55,7 +55,7 @@ public class ChangeWanderPointsTrigger : MonoBehaviour
             //if oneShot is true, disable this script.
             if (oneShot)
             {
-                this.enabled = false;
+                gameObject.GetComponent<Collider>().enabled = false;
             }
         }
 
