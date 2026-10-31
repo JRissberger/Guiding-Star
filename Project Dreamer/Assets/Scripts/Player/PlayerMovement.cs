@@ -10,13 +10,14 @@ public class PlayerMovement : MonoBehaviour
 {
     // Player Vars
     Rigidbody rb;
+    [SerializeField] GameObject shadow;
     private InputAction moveAction;
-    private int moveType = 1;
+    public int moveType = 2;
     [SerializeField] float maxSpeed = 3f;
     [Tooltip("The speed the player moves when the camera is transitioning, I've found it feels better when lower")]
     [SerializeField] float transitionSpeed = 2f;
-    [SerializeField] float rotationSpeed = 6f;
-    [SerializeField] float accelRate = 5f;
+    [SerializeField] float rotationSpeed = 2f;
+    [SerializeField] float accelRate = 2f;
     private float speed = 0;
     private float currentMaxSpeed;
     private Vector3 velocity;
@@ -44,6 +45,11 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        if (moveType == 1)
+        {
+            rb.maxLinearVelocity = maxSpeed;
+            rb.maxAngularVelocity = rotationSpeed;
+        }
         cam = FindFirstObjectByType<CinemachineCamera>();
         prevRot = new Vector3(0, 0, -1);
         moveAction = InputSystem.actions.FindAction("Move");
@@ -87,6 +93,24 @@ public class PlayerMovement : MonoBehaviour
                     break;
 
                 case 1:
+                    if (direction.x != 0)
+                    {
+                        float speed = rb.linearVelocity.magnitude;
+                        rb.AddTorque(Quaternion.LookRotation(this.transform.right * direction.x * rotationSpeed).eulerAngles);
+                        rb.AddRelativeForce(new Vector3(0, 0, direction.y * accelRate));
+
+                        //prevent loss of speed when changing direction while moving forward or backward
+                        if (direction.y != 0)
+                            rb.linearVelocity = rb.linearVelocity.normalized * speed;
+                    }
+                    else
+                        rb.AddRelativeForce(new Vector3(0, 0, direction.y * accelRate));
+
+                    shadow.transform.position = new Vector3(this.transform.position.x, shadow.transform.position.y, this.transform.position.z);
+
+                    break;
+
+                case 2:
                     moveDirection = velocity = Movement1(direction, Vector3.zero);
 
                     if ((moveDirection - this.transform.forward).magnitude > 0.01)
@@ -94,13 +118,6 @@ public class PlayerMovement : MonoBehaviour
                         targetRotation = Quaternion.LookRotation(moveDirection);
                         this.transform.rotation = Quaternion.Slerp(this.transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
                     }
-                    break;
-
-                case 2:
-                    moveDirection = velocity = new Vector3(direction.x, 0, direction.y);
-
-                    targetRotation = Quaternion.LookRotation(moveDirection);
-                    this.transform.rotation = Quaternion.Slerp(this.transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
                     break;
 
                 case 3:
@@ -120,10 +137,14 @@ public class PlayerMovement : MonoBehaviour
             transitionAxis = true;
         }
 
+        if (moveType == 2)
+        {
             float speedDif = targetSpeed - speed;                                                       // How far we are from target speed
-        float movement = Mathf.Pow(Mathf.Abs(speedDif) * accelRate, 0.9f) * Mathf.Sign(speedDif);   // Non-linear acceleration
-        speed += movement * Time.deltaTime;                                                         // Apply to current speed
-        rb.linearVelocity = velocity * speed;
+            float movement = Mathf.Pow(Mathf.Abs(speedDif) * accelRate, 0.9f) * Mathf.Sign(speedDif);   // Non-linear acceleration
+            speed += movement * Time.deltaTime;                                                         // Apply to current speed
+            rb.linearVelocity = velocity * speed;
+            shadow.transform.position = new Vector3(this.transform.position.x, shadow.transform.position.y, this.transform.position.z);
+        }
     }
 
     /// <summary>
@@ -233,9 +254,17 @@ public class PlayerMovement : MonoBehaviour
     public void SetToTransitioningSpeed(bool transitioning)
     {
         if (transitioning)
+        {
             currentMaxSpeed = transitionSpeed;
+            rb.maxLinearVelocity = transitionSpeed;
+            rb.maxAngularVelocity = transitionSpeed;
+        }
         else
+        {
             currentMaxSpeed = maxSpeed;
+            rb.maxLinearVelocity = maxSpeed;
+            rb.maxAngularVelocity = rotationSpeed;
+        }
     }
 
     public void OnTriggerEnter(Collider collider)

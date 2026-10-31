@@ -85,7 +85,7 @@ public class PlayerThrowing : BaseThrowing
 
                 //Raycast to the clicked point to check for obstructions and range
                 RaycastHit targetInfo;
-                bool targetHit = Physics.Raycast(transform.position, clickedPoint - transform.position, out targetInfo, Mathf.Infinity, _targetableSurfaceMask);
+                bool targetHit = Physics.Raycast(transform.position, clickedPoint - transform.position, out targetInfo, Mathf.Infinity, _targetableSurfaceMask, QueryTriggerInteraction.Ignore);
 
                 Vector3 tryTarget;
                 if (targetHit)
@@ -135,7 +135,7 @@ public class PlayerThrowing : BaseThrowing
                     }
                     Vector3 clampedPoint = transform.position + (tryTarget - transform.position).normalized * clampedDistance;
                     RaycastHit floorInfo;
-                    bool floorHit = Physics.Raycast(clampedPoint, Vector3.down, out floorInfo, Mathf.Infinity, _targetableSurfaceMask);
+                    bool floorHit = Physics.Raycast(clampedPoint, Vector3.down, out floorInfo, Mathf.Infinity, _targetableSurfaceMask, QueryTriggerInteraction.Ignore);
                     targetPoint = floorInfo.point;
                     targetNormal = floorInfo.normal;
                 }
@@ -174,7 +174,7 @@ public class PlayerThrowing : BaseThrowing
                 }
                 else
                 {
-                    SetThrowMarker(targetPoint, targetNormal, false);
+                    ResetThrow();
                 }                
             }
             else

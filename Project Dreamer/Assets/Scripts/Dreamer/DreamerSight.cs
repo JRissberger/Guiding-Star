@@ -12,14 +12,25 @@ public class DreamerSight : MonoBehaviour
     private List<GameObject> triggeredItems = new List<GameObject>();
 
     public List<GameObject> VisibleItems { get { return visibleItems; } }
+
+    //Layers to check for sight
+    [SerializeField] private LayerMask sightLayers;
     
 
     //When a trigger enter is recognized, check for item tag, then check raycast to see if item is behind wall
     private void OnTriggerEnter(Collider other)
     {
-        //Check if it has the StarInteractable tag
-        //TODO: Tagging/layers may get updated down the line
-        if (other.CompareTag("Interactable"))
+        //Ignore the item if it's not on the interactable layer
+        /* Using a bit shift to compare an object's layer to the layer mask
+         * If the return is 0, the object's layer isn't on the layer mask
+         */
+        if ((sightLayers.value & (1 << other.gameObject.layer)) == 0)
+        {
+            return;
+        }
+
+        //Items must be interactable for Star only, or untagged (interactable to either player or Star)
+        if (other.CompareTag("Untagged") || other.CompareTag("StarInteractOnly"))
         {
             //Adds to triggered list if it's not already there
             if (!triggeredItems.Contains(other.gameObject))
@@ -38,7 +49,6 @@ public class DreamerSight : MonoBehaviour
                 
             }
 
-           
         }
 
     }
@@ -46,7 +56,7 @@ public class DreamerSight : MonoBehaviour
     //Remove the object from the visible and trigger list
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Interactable"))
+        if (other.CompareTag("Untagged") || other.CompareTag("StarInteractOnly"))
         {
             visibleItems.Remove(other.gameObject);
             triggeredItems.Remove(other.gameObject);

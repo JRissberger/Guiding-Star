@@ -12,7 +12,14 @@ public partial class IsItemThrowableCondition : Condition
 
     public override bool IsTrue()
     {
-        return true;
+
+        //If the throwableitem script exists, the item is throwable
+        if (Item.Value.TryGetComponent<ThrowableItem>(out ThrowableItem script))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     public override void OnStart()

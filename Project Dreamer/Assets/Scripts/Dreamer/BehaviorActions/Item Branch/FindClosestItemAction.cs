@@ -163,7 +163,6 @@ public partial class FindClosestItemAction : Action
             }
         }
 
-        Debug.Log(itemScript.IsMidThrow());
         return false;
     }
 }

@@ -13,7 +13,7 @@ public class LightHazardEditor : MonoBehaviour
 
     private void Update()
     {
-        _spotLight.spotAngle = Mathf.Atan2(transform.lossyScale.x / 2, transform.lossyScale.y) * 2 * Mathf.Rad2Deg;
+        _spotLight.spotAngle = Mathf.Atan2(transform.lossyScale.x / 2 + 0.5f, transform.lossyScale.y) * 2 * Mathf.Rad2Deg;
     }
 
     private void OnDrawGizmos()
