@@ -121,6 +121,7 @@ public partial class NavigateJitterAction : Action
             else
             {
                 //No notable movement, add timer value onto motion timer
+                Debug.LogWarning("Star may not be moving!");
                 motionTimer += updateTimer;
             }
 
@@ -152,6 +153,7 @@ public partial class NavigateJitterAction : Action
             //Used to prevent potential infinite loop situations
         if (!FindNextDestination())
         {
+            Debug.LogWarning("No valid next targets could be found!");
             return Status.Failure;
         }
 
@@ -161,6 +163,7 @@ public partial class NavigateJitterAction : Action
             //Done each update loop to account for items potentially moving, or paths being blocked
         if (!ValidatePath(Target.Value))
         {
+            Debug.LogWarning("Final target is no longer accessible!");
             return Status.Failure;
         }
 
@@ -282,6 +285,7 @@ public partial class NavigateJitterAction : Action
 
         while (!validPosition)
         {
+            Debug.Log("Finding next jitter target");
             //Continue wandering, with new rotation
             UpdateRotateVar();
 
@@ -311,6 +315,7 @@ public partial class NavigateJitterAction : Action
                 //NOTE: might need to keep an eye out for potential race conditions with checking loc validity and path, if loc gets updated
             if (EnsureLocationOnMesh(jitterTarget) && ValidatePath(jitterTarget))
             {
+                Debug.Log("New target: " + jitterTarget);
                 validPosition = true;
             }
             
