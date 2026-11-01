@@ -6,13 +6,13 @@ using UnityEngine.SceneManagement;
 
 public class RespawnManager : MonoBehaviour
 {
-    private struct PositionedObjectData
+    private struct ThrowableItemData
     {
-        public GameObject instance;
+        public ThrowableItem instance;
         public Vector3 position;
         public Quaternion rotation;
 
-        public PositionedObjectData(GameObject instance, Vector3 position, Quaternion rotation)
+        public ThrowableItemData(ThrowableItem instance, Vector3 position, Quaternion rotation)
         {
             this.instance = instance;
             this.position = position;
@@ -78,7 +78,7 @@ public class RespawnManager : MonoBehaviour
     private Vector3 _savedPlayerPos;
     private float _savedPlayerAngle;
 
-    private List<PositionedObjectData> _savedPositionedObjects = new();
+    private List<ThrowableItemData> _savedThrowables = new();
     private List<MapSegmentData> _savedMapSegments = new();
     private List<LightData> _savedLights = new();
     private List<WanderStateTriggerData> _savedStateTriggers = new();
@@ -88,7 +88,7 @@ public class RespawnManager : MonoBehaviour
 
     private void Awake()
     {
-        // If this instance is not the correct instance, bye bye!.
+        //Singleton structure. Make sure only one RespawnManager ever exists
 
         if (Instance != null && Instance != this)
         {
@@ -100,12 +100,27 @@ public class RespawnManager : MonoBehaviour
         }
     }
 
-    //On level load, save all the things that will need to be reset to their starting state
     private void Start()
     {
+        //Handle cases where a parent of the moving player is passed in
+        //This covers the new player prefab that has a shadow attached
+        if (_playerInstance && !_playerInstance.GetComponent<PlayerMovement>())
+        {
+            PlayerMovement movementScript = _playerInstance.GetComponentInChildren<PlayerMovement>();
+            if (movementScript)
+            {
+                _playerInstance = movementScript.gameObject;
+            }
+            else
+            {
+                Debug.LogWarning("RespawnManager's PlayerInstance field is set incorrectly! This should contain the level's instance of the player.");
+            }
+        }
+
+        //On level load, save all the things that will need to be reset to their starting state
         foreach (ThrowableItem item in FindObjectsByType<ThrowableItem>(FindObjectsSortMode.None))
         {
-            SavePositionedObject(item.gameObject);
+            _savedThrowables.Add(new ThrowableItemData(item, item.transform.position, item.transform.rotation));
         }
 
         foreach (MapSegment segment in _mapSegmentManager.MapSegments)
@@ -128,39 +143,55 @@ public class RespawnManager : MonoBehaviour
             _savedPointTriggers.Add(new WanderPointTriggerData(trigger, trigger.gameObject.GetComponent<Collider>().enabled));
         }
     }
-    
-    /// <summary>
-    /// Stores the position and rotation of the given object.
-    /// The object will be reset to this state when a respawn is triggered,
-    /// and its velocity will be set to zero.
-    /// </summary>
-    /// <param name="obj">The object to save</param>
-    private void SavePositionedObject(GameObject obj)
-    {
-        _savedPositionedObjects.Add(new PositionedObjectData(obj, obj.transform.position, obj.transform.rotation));
-    }
 
+    /// <summary>
+    /// Saves the current positions and states of the player and Star.
+    /// These will be loaded when Respawn() is called.
+    /// </summary>
+    /// <param name="player"></param>
     public void NewRespawn(GameObject player)
     {
         _savedPlayerPos = player.transform.position;
         _savedPlayerAngle = player.transform.rotation.eulerAngles.y;
     }
 
+    /// <summary>
+    /// Loads the states of everything that has been saved previously.
+    /// This includes resetting the player and Star,
+    /// moving throwables to their starting positions,
+    /// resetting lights that were turned off,
+    /// and so on.
+    /// </summary>
     public void Respawn()
     {
+        //Get a list of every throwable currently in the level.
+        //This is used to remove any throwables that didn't exist on level start.
+        List<GameObject> throwableObjects = new();
+        foreach (ThrowableItem item in FindObjectsByType<ThrowableItem>(FindObjectsSortMode.None))
+        {
+            throwableObjects.Add(item.gameObject);
+        }
 
-        // may also handle fadein / fadeout?
-
-        foreach (PositionedObjectData data in _savedPositionedObjects) {
-            GameObject instance = data.instance;
+        foreach (ThrowableItemData data in _savedThrowables) {
+            GameObject instance = data.instance.gameObject;
             instance.transform.position = data.position;
             instance.transform.rotation = data.rotation;
 
-            if (instance.TryGetComponent<Rigidbody>(out Rigidbody rb))
-            {
-                rb.linearVelocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
-            }
+            Rigidbody rb = instance.GetComponent<Rigidbody>();
+            rb.isKinematic = false;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+
+            //Remove this throwable (which existed at the start of the level) from the list from earlier.
+            throwableObjects.Remove(instance);
+        }
+
+        //Remove every remaining throwable (for throwables that were created during the level).
+        //NOTE: Other objects might reference these items; this will need to be handled!
+        //(Example: Star's vision tracks items within sight; Destroy does not count as exiting sight)
+        foreach (GameObject remainingItem in throwableObjects)
+        {
+            Destroy(remainingItem);
         }
 
         foreach (MapSegmentData data in _savedMapSegments)
@@ -170,7 +201,10 @@ public class RespawnManager : MonoBehaviour
 
         foreach (LightData data in _savedLights)
         {
-            data.instance.IsActive = data.enabled;
+            if (data.instance.IsActive != data.enabled)
+            {
+                data.instance.ToggleLight();
+            }
         }
 
         foreach (WanderStateTriggerData data in _savedStateTriggers)
@@ -183,9 +217,10 @@ public class RespawnManager : MonoBehaviour
             data.instance.gameObject.GetComponent<Collider>().enabled = data.enabled;
         }
 
-        Debug.Log(_savedPlayerPos);
         _playerInstance.transform.position = _savedPlayerPos;
         _playerInstance.transform.rotation = Quaternion.Euler(0, _savedPlayerAngle, 0);
+
+        //TODO: Fadein/fadeout
         //TODO: Handle resetting the player's state (held item, corporeality)
     }
 }
