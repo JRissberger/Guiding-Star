@@ -25,6 +25,8 @@ public class DoorInteractable : InteractableBase
 
         //Update shown door state
         UpdateDoors();
+
+        base.Interact();
     }
 
     private void UpdateDoors()
