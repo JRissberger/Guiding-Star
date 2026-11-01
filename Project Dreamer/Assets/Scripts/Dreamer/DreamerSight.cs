@@ -78,10 +78,11 @@ public class DreamerSight : MonoBehaviour
     /// <returns></returns>
     private Boolean CheckIfVisible(GameObject item)
     {
-        
-        if (Physics.Linecast(transform.position, item.transform.position, out RaycastHit hit, ~LayerMask.GetMask("DreamerCompoundSight", "Star")))
+        //Using collider as target since the pivot can be offset
+        Vector3 target = item.GetComponent<Collider>().bounds.center;
+        if (Physics.Linecast(transform.position, target, out RaycastHit hit, ~LayerMask.GetMask("DreamerCompoundSight", "Star")))
         {
-            Debug.LogWarning("Item is " + item + " hit is " + hit.transform.gameObject);
+
             if (hit.transform.gameObject == item)
             {
                 return true;
