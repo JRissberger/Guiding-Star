@@ -161,7 +161,7 @@ public partial class FindWanderPositionAction : Action
             for (int z = 0; z < scale; z++)
             {
                 //Calculating the coordinates for the point
-                    //Moving left to right on an axis starting from the edge, adding the number point we're on times the scale being used
+                    //Moving left to right on an axis starting from the edge, adding the number point we're on
                 float xCoord = -radius + x * point;
                 float zCoord = -radius + z * point;
 
