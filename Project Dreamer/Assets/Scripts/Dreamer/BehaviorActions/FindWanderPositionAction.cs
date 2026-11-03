@@ -6,6 +6,7 @@ using Unity.Properties;
 using UnityEngine.AI;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using Unity.VisualScripting;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "FindWanderPosition", story: "[Star] finds a [wanderPosition] in the current map segment.", category: "Action", id: "f210b7b0cc9651b9682353065a084e8a")]
@@ -53,6 +54,7 @@ public partial class FindWanderPositionAction : Action
             }
         }
 
+        
         //Check to see if the circle is fully covered by disabled lights
         if (inactiveLights.Count > 0 && IsFullyCovered(currentSegment.CenterLoc, currentSegment.Radius, inactiveLights))
         {
@@ -155,31 +157,41 @@ public partial class FindWanderPositionAction : Action
         //Loop through each point
         for (int x = 0; x < scale; x++)
         {
-            //NOTE: might have to account for corners and skipping over them? circle area is r^2 
-
             //Using z since the circle is flat on the ground
             for (int z = 0; z < scale; z++)
             {
                 //Calculating the coordinates for the point
                     //Moving left to right on an axis starting from the edge, adding the number point we're on times the scale being used
-                float xCoord = -radius + x * scale;
-                float zCoord = -radius + z * scale;
+                float xCoord = -radius + x * point;
+                float zCoord = -radius + z * point;
 
                 //Adding on the center location to the calculated loc
                 Vector3 testPoint = center + new Vector3(xCoord, 0, zCoord);
+                
+                //Skipping the point if it's outside the circle (since technically this makes a square)
+                if (new Vector2(xCoord, zCoord).sqrMagnitude > radius * radius) { continue; }
 
-                //Using default state of true, automatically breaking as soon as there's an uncovered point
+                //Check for a light covering the point
+                    //Doesn't have to be all of them
+                bool covered = false;
                 foreach (Collider collider in lights)
                 {
-                    if (!IsInsideLight(testPoint, collider))
-                    {                      
-                        return false;
+                    if (IsInsideLight(testPoint, collider))
+                    {
+                        covered = true;
+                        break; //Only need one light to cover so can skip the rest for this point
                     }
+                }
+
+                //None of the lights overlap the point
+                if (!covered)
+                {
+                    //Stops check here since there's at least one open spot
+                    return false;
                 }
             }
         }
 
-        //No uncovered points were found, the circle is probably covered fully
         return true;
     }
 }
