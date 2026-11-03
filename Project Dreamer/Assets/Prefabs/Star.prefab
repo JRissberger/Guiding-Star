@@ -123,6 +123,7 @@ GameObject:
   - component: {fileID: 7575663960331491441}
   - component: {fileID: 523256298862583610}
   - component: {fileID: 8049680330690764325}
+  - component: {fileID: 1464308456844028892}
   m_Layer: 11
   m_Name: Star
   m_TagString: Star
@@ -382,6 +383,18 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &1464308456844028892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3314137640993944689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7acfd50cd1fc314497c0f879c94f50c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StarManager
 --- !u!1 &5108534301793692594
 GameObject:
   m_ObjectHideFlags: 0
