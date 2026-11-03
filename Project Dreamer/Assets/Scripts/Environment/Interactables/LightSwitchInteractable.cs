@@ -9,9 +9,12 @@ public class LightSwitchInteractable : InteractableBase
 
     public override void Interact()
     {
+
         foreach(LightHazard light in lights)
         {
             light.ToggleLight();
         }
+
+        base.Interact();
     }
 }
