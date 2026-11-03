@@ -30,8 +30,7 @@ public partial class FindWanderPositionAction : Action
         MapSegment currentSegment = MapSegmentManager.Value.MapSegments[WanderIndex.Value];
 
         //Check to see if there's any colliders in this area
-            //TODO: Having lights on a specified layer could make this easier since there's a layer mask overload. Look into?
-        Collider[] colliders = Physics.OverlapSphere(currentSegment.CenterLoc, currentSegment.Radius);
+        Collider[] colliders = Physics.OverlapSphere(currentSegment.CenterLoc, currentSegment.Radius, ~LayerMask.GetMask("Star", "DreamerCompoundSight"));
         activeLights = new List<Collider>();
         inactiveLights = new List<Collider>();
 
