@@ -9,7 +9,7 @@ public abstract class InteractableBase : MonoBehaviour
     [SerializeField] private bool oneUse;
     private float timer;
 
-    private bool canInteract;
+    private bool canInteract = true;
     public bool CanInteract { get { return canInteract; } }
 
     //Generic interact method. All child classes should take the interact base + add on their own unique response
