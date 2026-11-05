@@ -36,6 +36,7 @@ public class DreamerSight : MonoBehaviour
             if (!triggeredItems.Contains(other.gameObject))
             {
                 triggeredItems.Add(other.gameObject);
+                
             }
 
             //Linecast to check if it's an item in view since the collider can go through walls. ignores collider layer
@@ -46,7 +47,6 @@ public class DreamerSight : MonoBehaviour
             {
                 //Adds to visible list
                 visibleItems.Add(other.gameObject);
-                
             }
 
         }
@@ -78,8 +78,11 @@ public class DreamerSight : MonoBehaviour
     /// <returns></returns>
     private Boolean CheckIfVisible(GameObject item)
     {
-        if(Physics.Linecast(transform.position, item.transform.position, out RaycastHit hit, ~LayerMask.GetMask("DreamerCompoundSight")))
+        //Using collider as target since the pivot can be offset
+        Vector3 target = item.GetComponent<Collider>().bounds.center;
+        if (Physics.Linecast(transform.position, target, out RaycastHit hit, ~LayerMask.GetMask("DreamerCompoundSight", "Star")))
         {
+
             if (hit.transform.gameObject == item)
             {
                 return true;

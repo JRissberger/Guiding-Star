@@ -39,12 +39,10 @@ public partial class FindWanderPositionAction : Action
         foreach (Collider collider in colliders)
         {
             //Try to see if the collider's gameobject is a light
-                //TODO: update script search to look for finalized script
-            if (collider.gameObject.TryGetComponent<TEMPLight>(out TEMPLight lightScript))
+            if (collider.gameObject.TryGetComponent<LightHazard>(out LightHazard lightScript))
             {
                 //Add it to the corresponding list
-                    //TODO: update variable name to final
-                if (lightScript.isActive)
+                if (lightScript.IsActive)
                 {
                     activeLights.Add(collider);
                 }
@@ -68,7 +66,6 @@ public partial class FindWanderPositionAction : Action
                 bool inActiveLight = false;
 
                 //Check to make sure it's not in any inactive lights
-                //TODO: again, change script name
                 foreach (Collider light in inactiveLights)
                 {
                     if (IsInsideLight(position, light))
