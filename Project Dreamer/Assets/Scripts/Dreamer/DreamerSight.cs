@@ -34,7 +34,7 @@ public class DreamerSight : MonoBehaviour
         }
 
         //Items must be interactable for Star only, or untagged (interactable to either player or Star)
-        if (other.CompareTag("Untagged") || other.CompareTag("StarInteractOnly") || other.CompareTag("Scare"))
+        if (other.CompareTag("Untagged") || other.CompareTag("StarInteractOnly") || other.CompareTag("Scare") || other.CompareTag("Memory"))
         {
             //Adds to triggered list if it's not already there
             if (!triggeredItems.Contains(other.gameObject))
@@ -74,7 +74,7 @@ public class DreamerSight : MonoBehaviour
     //Remove the object from the visible and trigger list
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Untagged") || other.CompareTag("StarInteractOnly") || other.CompareTag("Scare"))
+        if (other.CompareTag("Untagged") || other.CompareTag("StarInteractOnly") || other.CompareTag("Scare") || other.CompareTag("Memory"))
         {
             visibleItems.Remove(other.gameObject);
             triggeredItems.Remove(other.gameObject);
@@ -142,5 +142,16 @@ public class DreamerSight : MonoBehaviour
                 scares.Remove(item);
             }
         }
+    }
+
+    /// <summary>
+    /// Used to forcibly remove an item from Star's view (used primarily for memories)
+    /// </summary>
+    /// <param name="item">The item to remove</param>
+    public void RemoveFromView(GameObject item)
+    {
+        triggeredItems.Remove(item);
+        visibleItems.Remove(item);
+        scares.Remove(item);
     }
 }
