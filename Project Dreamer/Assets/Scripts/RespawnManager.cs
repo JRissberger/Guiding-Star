@@ -1,8 +1,10 @@
+using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class RespawnManager : MonoBehaviour
 {
@@ -72,8 +74,11 @@ public class RespawnManager : MonoBehaviour
     [SerializeField] private MapSegmentManager _mapSegmentManager;
 
     [Header("Instances")]
+    [SerializeField] private Image _screenFadeImage;
     [SerializeField] private GameObject _playerInstance;
     [SerializeField] private GameObject _starInstance;
+
+    private bool _isRespawning = false;
 
     private Vector3 _savedPlayerPos;
     private float _savedPlayerAngle;
@@ -117,6 +122,8 @@ public class RespawnManager : MonoBehaviour
             }
         }
 
+        _screenFadeImage.color = new Color(0, 0, 0, 0);
+
         //On level load, save all the things that will need to be reset to their starting state
         foreach (ThrowableItem item in FindObjectsByType<ThrowableItem>(FindObjectsSortMode.None))
         {
@@ -155,6 +162,39 @@ public class RespawnManager : MonoBehaviour
         _savedPlayerAngle = player.transform.rotation.eulerAngles.y;
     }
 
+    public void Respawn()
+    {
+        if (!_isRespawning)
+        {
+            StartCoroutine(RespawnCoroutine());
+        }
+    }
+
+    private IEnumerator RespawnCoroutine()
+    {
+        _isRespawning = true;
+
+        float fade = 0.0f;
+        while (fade < 1.0f)
+        {
+            fade += Time.deltaTime * 2;
+            _screenFadeImage.color = new Color(0, 0, 0, fade);
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
+
+        yield return new WaitForSeconds(0.25f);
+        ResetObjects();
+
+        fade = 1.0f;
+        while (fade > 0.0f)
+        {
+            fade -= Time.deltaTime * 2;
+            _screenFadeImage.color = new Color(0, 0, 0, fade);
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
+
+        _isRespawning = false;
+    }
     /// <summary>
     /// Loads the states of everything that has been saved previously.
     /// This includes resetting the player and Star,
@@ -162,8 +202,16 @@ public class RespawnManager : MonoBehaviour
     /// resetting lights that were turned off,
     /// and so on.
     /// </summary>
-    public void Respawn()
+    private void ResetObjects()
     {
+        //Reset the player
+        _playerInstance.transform.position = _savedPlayerPos;
+        _playerInstance.transform.rotation = Quaternion.Euler(0, _savedPlayerAngle, 0);
+        _playerInstance.GetComponent<PlayerThrowing>().DropItem();
+        _playerInstance.GetComponent<PlayerCorporeality>().SetHiding(false);
+        _playerInstance.GetComponent<PlayerCorporeality>().SetCorporeal();
+        _playerInstance.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+
         //Get a list of every throwable currently in the level.
         //This is used to remove any throwables that didn't exist on level start.
         List<GameObject> throwableObjects = new();
@@ -217,10 +265,8 @@ public class RespawnManager : MonoBehaviour
             data.instance.gameObject.GetComponent<Collider>().enabled = data.enabled;
         }
 
-        _playerInstance.transform.position = _savedPlayerPos;
-        _playerInstance.transform.rotation = Quaternion.Euler(0, _savedPlayerAngle, 0);
-
         //TODO: Fadein/fadeout
-        //TODO: Handle resetting the player's state (held item, corporeality)
+        //TODO: Reset doors
+        //TODO: Handle Star
     }
 }
