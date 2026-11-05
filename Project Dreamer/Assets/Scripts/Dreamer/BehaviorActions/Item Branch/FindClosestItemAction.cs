@@ -30,19 +30,6 @@ public partial class FindClosestItemAction : Action
 
     protected override Status OnStart()
     {
-        //If there's a target item already, see if it has an interact script
-        if (TargetItem.Value != null)
-        {
-            if (TargetItem.Value.TryGetComponent<InteractableBase>(out InteractableBase interact))
-            {
-                //Is the item on cooldown? If so, we can't use it and it's not a valid target
-                if (!interact.CanInteract)
-                {
-                    TargetItem.Value = null;
-                }
-            }
-        }
-
         //Getting player reference
         player = GameObject.Find("Player");
 
@@ -67,8 +54,8 @@ public partial class FindClosestItemAction : Action
                 float tempDist = Vector3.Distance(Star.Value.transform.position, item.transform.position);
                 if (tempDist < distance && item != HeldItem.Value)
                 {                   
-                    //Run checks to make sure item is okay to pick
-                    if (CanReach(item) && !HeldByPlayer(item) && !IsItemMidair(item) && !IsOnCooldown(item))
+                    //Check that a valid path exists, isn't held by the player, and isn't midair
+                    if (CanReach(item) && !HeldByPlayer(item) && !IsItemMidair(item))
                     {
                         //Path is valid, can make item the target
                         distance = tempDist;
@@ -96,7 +83,7 @@ public partial class FindClosestItemAction : Action
             return Status.Success;
         }
 
-        //TODO: should move this to a try in order with resolve node, like what happens elsewhere with navigation now
+        Debug.Log("no item");
         SawItem.Value = false;
         return Status.Failure;
     }
@@ -126,6 +113,7 @@ public partial class FindClosestItemAction : Action
         }
     }
 
+    //TODO: might move to condition node?
     /// <summary>
     /// Checks if an item is currently being held by the player. Ignore it if so.
     /// This is checked here rather than sight since an item can still be "locked on" to after
@@ -175,25 +163,7 @@ public partial class FindClosestItemAction : Action
             }
         }
 
-        return false;
-    }
-
-    /// <summary>
-    /// Checks if the item has an interact, and if that interact is on cooldown
-    /// </summary>
-    /// <param name="item">The item to check</param>
-    /// <returns>True if it's on cooldown</returns>
-    private bool IsOnCooldown(GameObject item)
-    {
-        if (item.TryGetComponent<InteractableBase>(out InteractableBase interact))
-        {
-            //Is the item on cooldown? If so, we can't use it and it's not a valid target
-            if (!interact.CanInteract)
-            {
-                return true;
-            }
-        }
-
+        Debug.Log(itemScript.IsMidThrow());
         return false;
     }
 }

@@ -10,7 +10,7 @@ public partial class ItemPushableCondition : Condition
 
     public override bool IsTrue()
     {
-        return false;
+        return true;
     }
 
     public override void OnStart()
