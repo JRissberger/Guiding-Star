@@ -16,6 +16,7 @@ public class PlayerCorporeality : MonoBehaviour
 
     private bool hiding = false;
     private float ghostDistance = 0.0f;
+    public float defaultCorporealityDistance = 15f;
     private List<GameObject> touchingShadows = new List<GameObject>();
     private Renderer rend;
     private InputAction hideAction;
@@ -38,10 +39,10 @@ public class PlayerCorporeality : MonoBehaviour
 
     private void Update()
     {
-        if (hideAction.WasPressedThisFrame() && touchingShadows.Count > 0)
-        {
-            SetHidingInternal(!IsHiding());
-        }
+        if (touchingShadows.Count > 0)
+            SetHidingInternal(true);
+        else
+            SetHidingInternal(false);
 
         if (debugTestAction.WasPressedThisFrame())
         {
@@ -70,6 +71,10 @@ public class PlayerCorporeality : MonoBehaviour
         if (other.gameObject.layer == SHADOW_LAYER)
         {
             touchingShadows.Remove(other.gameObject);
+            if (touchingShadows.Count == 0)
+            {
+                SetIncorporeal(defaultCorporealityDistance);
+            }
         }
     }
 
@@ -83,6 +88,7 @@ public class PlayerCorporeality : MonoBehaviour
         {
             ghostDistance = distance;
             SetCorporealInternal(false);
+            rend.material.color = new Color(rend.material.color.r, rend.material.color.g, rend.material.color.b, 0.4f);
         }
     }
 
@@ -159,12 +165,12 @@ public class PlayerCorporeality : MonoBehaviour
         if (isHiding == true && hiding == false) //Entering a shadow
         {
             rend.material = hideMaterial;
-            GetComponent<PlayerMovement>().enabled = false;
+            //GetComponent<PlayerMovement>().enabled = false;
         }
         else if (isHiding == false && hiding == true) //Leaving a shadow
         {
             rend.material = defaultMaterial;
-            GetComponent<PlayerMovement>().enabled = true;
+            //GetComponent<PlayerMovement>().enabled = true;
             SetIncorporeal(shadowDistance);
         }
 
