@@ -30,8 +30,6 @@ inline float4 ProjectWindDistortVertex(float3 vertex, float height, float3 normO
     float influence = max(height,0);
     influence *= influence;
 
-    // float3 originWS = worldPosition.xyz;
-
     float3 samplePos = ((worldPosition.xyz + worldNormal * relaxedLength) - _TurbulanceRate * _WindDir * _Time.y) * _InvTurbulanceNoiseScale;
     float3 offsetPos = influence * (Perlin3DVec(samplePos) * _TurbulanceDisplace + _WindDir * _WindPower);
 

@@ -12,31 +12,19 @@ public class DreamerSight : MonoBehaviour
     private List<GameObject> triggeredItems = new List<GameObject>();
 
     public List<GameObject> VisibleItems { get { return visibleItems; } }
-
-    //Layers to check for sight
-    [SerializeField] private LayerMask sightLayers;
     
 
     //When a trigger enter is recognized, check for item tag, then check raycast to see if item is behind wall
     private void OnTriggerEnter(Collider other)
     {
-        //Ignore the item if it's not on the interactable layer
-        /* Using a bit shift to compare an object's layer to the layer mask
-         * If the return is 0, the object's layer isn't on the layer mask
-         */
-        if ((sightLayers.value & (1 << other.gameObject.layer)) == 0)
-        {
-            return;
-        }
-
-        //Items must be interactable for Star only, or untagged (interactable to either player or Star)
-        if (other.CompareTag("Untagged") || other.CompareTag("StarInteractOnly"))
+        //Check if it has the StarInteractable tag
+        //TODO: Tagging/layers may get updated down the line
+        if (other.CompareTag("Interactable"))
         {
             //Adds to triggered list if it's not already there
             if (!triggeredItems.Contains(other.gameObject))
             {
                 triggeredItems.Add(other.gameObject);
-                
             }
 
             //Linecast to check if it's an item in view since the collider can go through walls. ignores collider layer
@@ -47,8 +35,10 @@ public class DreamerSight : MonoBehaviour
             {
                 //Adds to visible list
                 visibleItems.Add(other.gameObject);
+                
             }
 
+           
         }
 
     }
@@ -56,7 +46,7 @@ public class DreamerSight : MonoBehaviour
     //Remove the object from the visible and trigger list
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Untagged") || other.CompareTag("StarInteractOnly"))
+        if (other.CompareTag("Interactable"))
         {
             visibleItems.Remove(other.gameObject);
             triggeredItems.Remove(other.gameObject);
@@ -78,11 +68,8 @@ public class DreamerSight : MonoBehaviour
     /// <returns></returns>
     private Boolean CheckIfVisible(GameObject item)
     {
-        //Using collider as target since the pivot can be offset
-        Vector3 target = item.GetComponent<Collider>().bounds.center;
-        if (Physics.Linecast(transform.position, target, out RaycastHit hit, ~LayerMask.GetMask("DreamerCompoundSight", "Star")))
+        if(Physics.Linecast(transform.position, item.transform.position, out RaycastHit hit, ~LayerMask.GetMask("DreamerCompoundSight")))
         {
-
             if (hit.transform.gameObject == item)
             {
                 return true;
