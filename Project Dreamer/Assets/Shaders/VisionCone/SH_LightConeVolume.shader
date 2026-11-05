@@ -9,6 +9,8 @@ Shader "Unlit/LightConeVolume"
         _ConeExitPlaneOS ("Cone Exit", Float) = 1
         _Theta ("Cone Angle", Float) = 1
         _LightDecay ("Light Decay", Float) = .2
+        _ScrollSpeed ("Scroll Speed", Vector, 3) = (0,0,1,0)
+        _Turbulance ("Turbulance Amount", Float) = .5
     }
     SubShader
     {
@@ -50,6 +52,9 @@ Shader "Unlit/LightConeVolume"
             float _Density;
             float _ConeExitPlaneOS;
             float _Theta;
+
+            float _Turbulance;
+            float3 _ScrollSpeed;
             
             v2f vert (appdata v)
             {
@@ -137,12 +142,17 @@ Shader "Unlit/LightConeVolume"
 
                 float totalTravel = length(enterPoint - exitPoint);
                 
+                enterPoint += _ScrollSpeed * _Time.y;
+                exitPoint += _ScrollSpeed * _Time.y;
+
                 for (float j = 0; j < 1.; j += STEP_PERCENT){
                     float3 currentPoint = lerp(exitPoint, enterPoint, j);
+                    currentPoint += _Turbulance * Perlin3DVec(currentPoint * 1.2);
+
                     float noise = Perlin3Dln(currentPoint * .55) + Perlin3Dln(currentPoint * 1.2) + Perlin3Dln(currentPoint * 3.1415926);
                     float lerpFac = exp(-_Density * max(noise * .333, 0.) * totalTravel * STEP_PERCENT);
 
-                    fixed3 lightColor = calcLightColor(currentPoint, lightOrigin);
+                    fixed3 lightColor = clamp(calcLightColor(currentPoint, lightOrigin),0,1);
 
                     //note: not physically accurate, but it does look REALLY good.
                     sum.xyz = lerp(_FogColor.xyz * lightColor,sum.xyz,lerpFac);
