@@ -23,6 +23,13 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (_starGraph == null)
+        {
+            _starGraph = GameObject.FindGameObjectWithTag("Star").GetComponent<BehaviorGraphAgent>();
+        }
+    }
     /// <summary>
     /// Turns off the CanWander variable for Star.
     /// </summary>

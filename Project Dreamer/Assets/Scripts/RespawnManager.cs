@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Behavior;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -8,6 +9,20 @@ using UnityEngine.UI;
 
 public class RespawnManager : MonoBehaviour
 {
+    private struct StarBehaviorData
+    {
+        public MapSegmentManager mapSegments;
+        public SoundManager soundManager;
+        public bool canWander;
+
+        public StarBehaviorData(MapSegmentManager mapSegments, SoundManager soundManager, bool canWander)
+        {
+            this.mapSegments = mapSegments;
+            this.soundManager = soundManager;
+            this.canWander = canWander;
+        }
+    }
+
     private struct ThrowableItemData
     {
         public ThrowableItem instance;
@@ -83,16 +98,21 @@ public class RespawnManager : MonoBehaviour
     [Header("Level Data")]
     [SerializeField] private MapSegmentManager _mapSegmentManager;
 
-    [Header("Instances")]
+    [Header("Instances & Prefabs")]
     [SerializeField] private Image _screenFadeImage;
-    [SerializeField] private GameObject _playerInstance;
-    [SerializeField] private GameObject _starInstance;
+    [SerializeField] private GameObject _starPrefab;
+
+    private GameObject _playerInstance;
+    private GameObject _starInstance;
 
     private bool _isRespawning = false;
 
     private Vector3 _savedPlayerPos;
     private float _savedPlayerAngle;
+    private Vector3 _savedStarPos;
+    private float _savedStarAngle;
 
+    private StarBehaviorData _savedStarBehavior = new();
     private List<ThrowableItemData> _savedThrowables = new();
     private List<MapSegmentData> _savedMapSegments = new();
     private List<LightData> _savedLights = new();
@@ -118,20 +138,10 @@ public class RespawnManager : MonoBehaviour
 
     private void Start()
     {
-        //Handle cases where a parent of the moving player is passed in
-        //This covers the new player prefab that has a shadow attached
-        if (_playerInstance && !_playerInstance.GetComponent<PlayerMovement>())
-        {
-            PlayerMovement movementScript = _playerInstance.GetComponentInChildren<PlayerMovement>();
-            if (movementScript)
-            {
-                _playerInstance = movementScript.gameObject;
-            }
-            else
-            {
-                Debug.LogWarning("RespawnManager's PlayerInstance field is set incorrectly! This should contain the level's instance of the player.");
-            }
-        }
+        _playerInstance = GameObject.FindGameObjectWithTag("Player");
+        _starInstance = GameObject.FindGameObjectWithTag("Star");
+
+        NewRespawn();
 
         _screenFadeImage.color = new Color(0, 0, 0, 0);
 
@@ -172,10 +182,23 @@ public class RespawnManager : MonoBehaviour
     /// These will be loaded when Respawn() is called.
     /// </summary>
     /// <param name="player"></param>
-    public void NewRespawn(GameObject player)
+    public void NewRespawn()
     {
-        _savedPlayerPos = player.transform.position;
-        _savedPlayerAngle = player.transform.rotation.eulerAngles.y;
+        _savedPlayerPos = _playerInstance.transform.position;
+        _savedPlayerAngle = _playerInstance.transform.rotation.eulerAngles.y;
+
+        _savedStarPos = _starInstance.transform.position;
+        _savedStarAngle = _starInstance.transform.rotation.eulerAngles.y;
+
+        BlackboardReference starBehavior = _starInstance.GetComponent<BehaviorGraphAgent>().BlackboardReference;
+        BlackboardVariable mapSegmentsVar, soundManagerVar, canWanderVar;
+        starBehavior.GetVariable("Map Segments", out mapSegmentsVar);
+        starBehavior.GetVariable("SoundManager", out soundManagerVar);
+        starBehavior.GetVariable("Can Wander", out canWanderVar);
+        MapSegmentManager mapSegments = (MapSegmentManager)mapSegmentsVar.ObjectValue;
+        SoundManager soundManager = (SoundManager)soundManagerVar.ObjectValue;
+        bool canWander = (bool)canWanderVar.ObjectValue;
+        _savedStarBehavior = new StarBehaviorData(mapSegments, soundManager, canWander);
     }
 
     public void Respawn()
@@ -227,6 +250,14 @@ public class RespawnManager : MonoBehaviour
         _playerInstance.GetComponent<PlayerCorporeality>().SetHiding(false);
         _playerInstance.GetComponent<PlayerCorporeality>().SetCorporeal();
         _playerInstance.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+
+        //Reset Star
+        Destroy(_starInstance);
+        _starInstance = Instantiate(_starPrefab, _savedStarPos, Quaternion.Euler(0, _savedStarAngle, 0));
+        BlackboardReference starBehavior = _starInstance.GetComponent<BehaviorGraphAgent>().BlackboardReference;
+        starBehavior.SetVariableValue<MapSegmentManager>("Map Segments", _savedStarBehavior.mapSegments);
+        starBehavior.SetVariableValue<SoundManager>("SoundManager", _savedStarBehavior.soundManager);
+        starBehavior.SetVariableValue<bool>("Can Wander", _savedStarBehavior.canWander);
 
         //Get a list of every throwable currently in the level.
         //This is used to remove any throwables that didn't exist on level start.
@@ -285,6 +316,5 @@ public class RespawnManager : MonoBehaviour
         {
             data.instance.ResetInteraction();
         }
-        //TODO: Handle Star
     }
 }
