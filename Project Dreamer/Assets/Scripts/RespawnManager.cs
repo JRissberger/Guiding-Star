@@ -70,6 +70,16 @@ public class RespawnManager : MonoBehaviour
         }
     }
 
+    private struct InteractableData
+    {
+        public InteractableBase instance;
+
+        public InteractableData(InteractableBase instance)
+        {
+            this.instance = instance;
+        }
+    }
+
     [Header("Level Data")]
     [SerializeField] private MapSegmentManager _mapSegmentManager;
 
@@ -88,6 +98,7 @@ public class RespawnManager : MonoBehaviour
     private List<LightData> _savedLights = new();
     private List<WanderStateTriggerData> _savedStateTriggers = new();
     private List<WanderPointTriggerData> _savedPointTriggers = new();
+    private List<InteractableData> _savedInteractables = new();
 
     public static RespawnManager Instance { get; private set; }
 
@@ -148,6 +159,11 @@ public class RespawnManager : MonoBehaviour
         foreach (ChangeWanderPointsTrigger trigger in FindObjectsByType<ChangeWanderPointsTrigger>(FindObjectsSortMode.None))
         {
             _savedPointTriggers.Add(new WanderPointTriggerData(trigger, trigger.gameObject.GetComponent<Collider>().enabled));
+        }
+
+        foreach (InteractableBase interact in FindObjectsByType<InteractableBase>(FindObjectsSortMode.None))
+        {
+            _savedInteractables.Add(new InteractableData(interact));
         }
     }
 
@@ -265,8 +281,10 @@ public class RespawnManager : MonoBehaviour
             data.instance.gameObject.GetComponent<Collider>().enabled = data.enabled;
         }
 
-        //TODO: Fadein/fadeout
-        //TODO: Reset doors
+        foreach (InteractableData data in _savedInteractables)
+        {
+            data.instance.ResetInteraction();
+        }
         //TODO: Handle Star
     }
 }
