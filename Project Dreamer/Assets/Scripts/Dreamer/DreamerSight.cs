@@ -54,7 +54,6 @@ public class DreamerSight : MonoBehaviour
                     //Separating this condition so scares already logged don't move down to be added to the other list
                     if (!scares.Contains(other.gameObject))
                     {
-                        Debug.LogWarning("Scare sighted!");
                         scares.Add(other.gameObject);
                     }
                     
@@ -62,7 +61,6 @@ public class DreamerSight : MonoBehaviour
                 //Otherwise put it on the standard visibility list
                 else if (!visibleItems.Contains(other.gameObject))
                 {
-                    Debug.LogWarning("Added to reg items");
                     visibleItems.Add(other.gameObject);
                 }
             }

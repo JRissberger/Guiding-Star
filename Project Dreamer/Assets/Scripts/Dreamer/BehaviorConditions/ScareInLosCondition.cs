@@ -35,10 +35,9 @@ public partial class ScareInLosCondition : Condition
             {
                 Scare.Value = current;
                 SawScare.Value = true;
-                Debug.LogWarning("Sees scare!");
                 return true;
             }
-            else if (Scare.Value)
+            else if (Scare.Value && SawScare.Value)
             {
                 return true;
             }      
