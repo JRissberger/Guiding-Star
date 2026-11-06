@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Behavior;
+using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -104,6 +105,7 @@ public class RespawnManager : MonoBehaviour
 
     private GameObject _playerInstance;
     private GameObject _starInstance;
+    private CameraController _cameraController;
 
     private bool _isRespawning = false;
 
@@ -111,6 +113,7 @@ public class RespawnManager : MonoBehaviour
     private float _savedPlayerAngle;
     private Vector3 _savedStarPos;
     private float _savedStarAngle;
+    private int _savedCameraKnot;
 
     private StarBehaviorData _savedStarBehavior = new();
     private List<ThrowableItemData> _savedThrowables = new();
@@ -140,6 +143,7 @@ public class RespawnManager : MonoBehaviour
     {
         _playerInstance = GameObject.FindGameObjectWithTag("Player");
         _starInstance = GameObject.FindGameObjectWithTag("Star");
+        _cameraController = FindAnyObjectByType<CameraController>();
 
         NewRespawn();
 
@@ -189,6 +193,8 @@ public class RespawnManager : MonoBehaviour
 
         _savedStarPos = _starInstance.transform.position;
         _savedStarAngle = _starInstance.transform.rotation.eulerAngles.y;
+
+        _savedCameraKnot = _cameraController.goal;
 
         BlackboardReference starBehavior = _starInstance.GetComponent<BehaviorGraphAgent>().BlackboardReference;
         BlackboardVariable mapSegmentsVar, soundManagerVar, canWanderVar;
@@ -258,6 +264,9 @@ public class RespawnManager : MonoBehaviour
         starBehavior.SetVariableValue<MapSegmentManager>("Map Segments", _savedStarBehavior.mapSegments);
         starBehavior.SetVariableValue<SoundManager>("SoundManager", _savedStarBehavior.soundManager);
         starBehavior.SetVariableValue<bool>("Can Wander", _savedStarBehavior.canWander);
+
+        //Reset the camera
+        _cameraController.MoveTo(_savedCameraKnot, 0);
 
         //Get a list of every throwable currently in the level.
         //This is used to remove any throwables that didn't exist on level start.
