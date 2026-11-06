@@ -144,7 +144,7 @@ public class PlayerCorporeality : MonoBehaviour
     {
         if (corporeal)
         {
-
+            rend.material.color = new Color(rend.material.color.r, rend.material.color.g, rend.material.color.b, 0.4f);
         }
         else
         {
