@@ -1,9 +1,11 @@
 
 inline float3 depthToWS(float2 vertex, sampler2D depthTex){
     float3 ndc;
-    ndc.z = tex2D(depthTex, vertex / _ScreenParams.xy).x;
+    ndc.z = DecodeFloatRG(tex2D(depthTex, vertex / _ScreenParams.xy).xy);
+    
     ndc.xy = vertex / _ScreenParams.xy;
-    ndc.xyz = ndc * 2. - 1.;
+    ndc.xy = ndc.xy * 2. - 1.;
+    return ndc;
 
     float4 baseWS = mul(unity_CameraInvProjection,float4(ndc, 1.));
     baseWS.xyz /= baseWS.w;

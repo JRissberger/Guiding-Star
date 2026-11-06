@@ -112,9 +112,9 @@ Shader "Unlit/LightConeVolume"
                 float enterPointDepth = dot(unity_WorldToCamera._m20_m21_m22_m23, float4(enterPoint,     1.)); 
                 float worldPointDepth = dot(unity_WorldToCamera._m20_m21_m22_m23, float4(baseWorldPoint, 1.)); 
 
-                if(enterPointDepth > worldPointDepth){
-                    discard;
-                }
+                // if(enterPointDepth > worldPointDepth){
+                //     discard;
+                // }
                 if(exitPointDepth > worldPointDepth){
                     exitPoint = baseWorldPoint;
                 }
@@ -143,7 +143,7 @@ Shader "Unlit/LightConeVolume"
                     sum.w = lerp(1, sum.w, lerpFac);
                 }
                 
-                return sum;
+                return half4(frac(baseWorldPoint),1.);
             }
             ENDCG
         }
