@@ -6,7 +6,7 @@ public abstract class InteractableBase : MonoBehaviour
     [SerializeField] private float interactCD;
 
     [Tooltip("Is the interactable one use only?")]
-    [SerializeField] private bool oneUse;
+    [SerializeField] protected bool oneUse;
     private float timer;
 
     private bool canInteract = true;
@@ -19,6 +19,16 @@ public abstract class InteractableBase : MonoBehaviour
             //If it's a one use item, this cooldown won't update, leaving it unusable
         canInteract = false;
         timer = interactCD;
+    }
+
+    /// <summary>
+    /// Resets the interactable to a usable state, for use by the respawn system.
+    /// For the base class this just resets the timer, but child classes can add additional behavior if needed.
+    /// </summary>
+    public virtual void ResetInteraction()
+    {
+        timer = 0;
+        canInteract = true;
     }
 
     private void Update()

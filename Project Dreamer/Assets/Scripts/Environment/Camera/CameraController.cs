@@ -96,6 +96,10 @@ public class CameraController : MonoBehaviour
         if (distance > maxDistance) {
             cam.Lens.FieldOfView = 75 - (distance - maxDistance);
         }
+        else
+        {
+            cam.Lens.FieldOfView = 75;
+        }
     }
 
     /// <summary>
