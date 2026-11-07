@@ -115,7 +115,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5883106537424380389}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 10.612605, y: 1.1900002, z: -21.52}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -123,7 +123,7 @@ Transform:
   - {fileID: 2805902962029808162}
   - {fileID: 5742558944474949004}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1001 &882555761725862980
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -136,6 +136,10 @@ PrefabInstance:
       propertyPath: shadow
       value: 
       objectReference: {fileID: 131034807818038385}
+    - target: {fileID: 2355750428480363185, guid: 01ca99d70aad47c469d059b2abba5aa5, type: 3}
+      propertyPath: moveType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3084937341025140326, guid: 01ca99d70aad47c469d059b2abba5aa5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -183,10 +187,33 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6118523028690880424, guid: 01ca99d70aad47c469d059b2abba5aa5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8800610276698524913}
   m_SourcePrefab: {fileID: 100100000, guid: 01ca99d70aad47c469d059b2abba5aa5, type: 3}
 --- !u!4 &2805902962029808162 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3084937341025140326, guid: 01ca99d70aad47c469d059b2abba5aa5, type: 3}
   m_PrefabInstance: {fileID: 882555761725862980}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6401351804592731116 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6118523028690880424, guid: 01ca99d70aad47c469d059b2abba5aa5, type: 3}
+  m_PrefabInstance: {fileID: 882555761725862980}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8800610276698524913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6401351804592731116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5a5027b0604bd243aa948eaae2e9583, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCorporeality
+  hideMaterial: {fileID: 2100000, guid: a7a94d8f14fab04488a97789a693ab93, type: 2}
+  shadowDistance: 5
+  defaultCorporealityDistance: 15
