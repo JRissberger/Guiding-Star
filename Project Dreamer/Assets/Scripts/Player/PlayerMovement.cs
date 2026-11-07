@@ -13,17 +13,19 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] GameObject shadow;
     private InputAction moveAction;
     public int moveType = 2;
-    [SerializeField] float maxSpeed = 3f;
-    [Tooltip("The speed the player moves when the camera is transitioning, I've found it feels better when lower")]
-    [SerializeField] float transitionSpeed = 2f;
-    [SerializeField] float rotationSpeed = 2f;
-    [SerializeField] float accelRate = 2f;
+    [SerializeField] float maxSpeed = 7f;
+    [Tooltip("The speed the player moves when the camera is transitioning, should be lower than maxSpeed")]
+    [SerializeField] float transitionSpeed = 3f;
+    [SerializeField] float rotationSpeed = 10f;
+    [SerializeField] float accelRate = 10f;
+    [SerializeField] float rotAccelRate = 15f;
     private float speed = 0;
     private float currentMaxSpeed;
     private Vector3 velocity;
     private Vector3 moveDirection;
     bool transitionAxis = false;
 
+    PlayerCorporeality playerCorporeality;
     LayerMask corporealMask;
     public bool corporeal;
 
@@ -38,6 +40,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 lookAt;
     //private Vector3 tempRot;
     private Vector3 prevRot = Vector3.zero;
+    private Vector3 prevPos = Vector3.zero;
     private int waitingForKeyUp = -1;
 
 
@@ -52,8 +55,10 @@ public class PlayerMovement : MonoBehaviour
         }
         cam = FindFirstObjectByType<CinemachineCamera>();
         prevRot = new Vector3(0, 0, -1);
+        prevPos = this.transform.position;
         moveAction = InputSystem.actions.FindAction("Move");
         baseHeight = this.transform.position.y;
+        playerCorporeality = this.GetComponent<PlayerCorporeality>();
         corporealMask = LayerMask.GetMask("Barriers", "Phaseable");
         triggers.Add(cam.GetComponent<CameraController>().knots[0].trigger);
         currentMaxSpeed = maxSpeed;
@@ -71,6 +76,8 @@ public class PlayerMovement : MonoBehaviour
         this.transform.position = new Vector3(this.transform.position.x, baseHeight + Mathf.Sin(Time.time * bobSpeed) * bobDistance, this.transform.position.z);
         moveDirection = Vector3.zero;
         float targetSpeed = 0;
+        if (!playerCorporeality.IsCorporeal())
+            playerCorporeality.SubtractDistance((this.transform.position - prevPos).magnitude);
 
         // Get player input
         if (moveAction.IsPressed())
@@ -96,17 +103,16 @@ public class PlayerMovement : MonoBehaviour
                     if (direction.x != 0)
                     {
                         float speed = rb.linearVelocity.magnitude;
-                        rb.AddTorque(Quaternion.LookRotation(this.transform.right * direction.x * rotationSpeed).eulerAngles);
-                        rb.AddRelativeForce(new Vector3(0, 0, direction.y * accelRate));
+                        rb.AddTorque(this.transform.up * direction.x * 10 * rotAccelRate, ForceMode.Acceleration); //Quaternion.LookRotation(this.transform.right * direction.x).eulerAngles * rotationSpeed);
+                        //rb.AddForce(-1 * rb.GetAccumulatedForce());
 
                         //prevent loss of speed when changing direction while moving forward or backward
                         if (direction.y != 0)
-                            rb.linearVelocity = rb.linearVelocity.normalized * speed;
+                            rb.AddRelativeForce(new Vector3(0, 0, direction.y * accelRate));
+                            //rb.linearVelocity = rb.linearVelocity.normalized * speed
                     }
                     else
                         rb.AddRelativeForce(new Vector3(0, 0, direction.y * accelRate));
-
-                    shadow.transform.position = new Vector3(this.transform.position.x, shadow.transform.position.y, this.transform.position.z);
 
                     break;
 
@@ -143,8 +149,9 @@ public class PlayerMovement : MonoBehaviour
             float movement = Mathf.Pow(Mathf.Abs(speedDif) * accelRate, 0.9f) * Mathf.Sign(speedDif);   // Non-linear acceleration
             speed += movement * Time.deltaTime;                                                         // Apply to current speed
             rb.linearVelocity = velocity * speed;
-            shadow.transform.position = new Vector3(this.transform.position.x, shadow.transform.position.y, this.transform.position.z);
         }
+
+        shadow.transform.position = new Vector3(this.transform.position.x, shadow.transform.position.y, this.transform.position.z);
     }
 
     /// <summary>
