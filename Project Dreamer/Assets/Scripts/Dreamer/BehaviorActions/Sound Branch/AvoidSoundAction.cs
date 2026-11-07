@@ -13,13 +13,24 @@ public partial class AvoidSoundAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Star;
     [SerializeReference] public BlackboardVariable<float> RunDistance;
 
+    [SerializeReference] public BlackboardVariable<Boolean> TargetScare;
+    [SerializeReference] public BlackboardVariable<GameObject> Scare;
+
     protected override Status OnStart()
     {
         //Find most efficient direction to put distance between Star and the sound
 
         //Direction vector opposite of the loud sound
-        Vector3 soundDir = Sound.Value.Location - Star.Value.transform.position;
-
+        Vector3 soundDir = Vector3.zero;
+        if (TargetScare.Value)
+        {
+            soundDir = Scare.Value.transform.position - Star.Value.transform.position;
+        }
+        else
+        {
+            soundDir = Sound.Value.Location - Star.Value.transform.position;
+        }
+            
         //Normalize and invert 
         Vector3 runDir = Vector3.Normalize(soundDir) * -1;
 

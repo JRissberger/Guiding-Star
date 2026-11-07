@@ -15,7 +15,7 @@ public partial class ItemInteractAction : Action
     {
         //Make sure the item is interactable and get the script
             //This returns true for scripts that are children of the generic script
-        if(Item.Value.TryGetComponent<InteractableBase>(out InteractableBase interactable))
+        if(Item.Value && Item.Value.TryGetComponent<InteractableBase>(out InteractableBase interactable))
         {
             //Call the interact method. This will access the interact method on the child script that's actually on the object
             interactable.Interact();

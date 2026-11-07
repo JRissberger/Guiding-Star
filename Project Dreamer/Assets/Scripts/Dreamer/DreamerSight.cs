@@ -13,6 +13,10 @@ public class DreamerSight : MonoBehaviour
 
     public List<GameObject> VisibleItems { get { return visibleItems; } }
 
+    //List of scares
+    private List<GameObject> scares = new List<GameObject>();
+    public List <GameObject> Scares { get { return scares; } }
+
     //Layers to check for sight
     [SerializeField] private LayerMask sightLayers;
     
@@ -30,7 +34,7 @@ public class DreamerSight : MonoBehaviour
         }
 
         //Items must be interactable for Star only, or untagged (interactable to either player or Star)
-        if (other.CompareTag("Untagged") || other.CompareTag("StarInteractOnly"))
+        if (other.CompareTag("Untagged") || other.CompareTag("StarInteractOnly") || other.CompareTag("Scare") || other.CompareTag("Memory"))
         {
             //Adds to triggered list if it's not already there
             if (!triggeredItems.Contains(other.gameObject))
@@ -42,11 +46,23 @@ public class DreamerSight : MonoBehaviour
             //Linecast to check if it's an item in view since the collider can go through walls. ignores collider layer
             //NOTE: Might be good to have a specific layer for obstacles, filter specifically for that. bring up with team?
             //Also checks if the item's already in the list, done since it could collide with multiple triggers at once
-            if (CheckIfVisible(other.gameObject)
-                && !VisibleItems.Contains(other.gameObject))
+            if (CheckIfVisible(other.gameObject))
             {
-                //Adds to visible list
-                visibleItems.Add(other.gameObject);
+                //Check again, if it's a scare it goes to a separate list
+                if (other.CompareTag("Scare"))
+                {
+                    //Separating this condition so scares already logged don't move down to be added to the other list
+                    if (!scares.Contains(other.gameObject))
+                    {
+                        scares.Add(other.gameObject);
+                    }
+                    
+                }
+                //Otherwise put it on the standard visibility list
+                else if (!visibleItems.Contains(other.gameObject))
+                {
+                    visibleItems.Add(other.gameObject);
+                }
             }
 
         }
@@ -56,11 +72,11 @@ public class DreamerSight : MonoBehaviour
     //Remove the object from the visible and trigger list
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Untagged") || other.CompareTag("StarInteractOnly"))
+        if (other.CompareTag("Untagged") || other.CompareTag("StarInteractOnly") || other.CompareTag("Scare") || other.CompareTag("Memory"))
         {
             visibleItems.Remove(other.gameObject);
             triggeredItems.Remove(other.gameObject);
-            
+            scares.Remove(other.gameObject);
         }
     }
 
@@ -101,16 +117,39 @@ public class DreamerSight : MonoBehaviour
         foreach(GameObject item in triggeredItems)
         {
             //Adds it to the list if it's not there but visible
-            if (CheckIfVisible(item) && !VisibleItems.Contains(item.gameObject))
+            if (CheckIfVisible(item))
             {
-                VisibleItems.Add(item);
+                if(item.CompareTag("Scare"))
+                {
+                    if (!scares.Contains(item.gameObject))
+                    {
+                        scares.Add(item.gameObject);
+                    }                  
+                }
+                else if (!visibleItems.Contains(item.gameObject))
+                {
+                    visibleItems.Add(item);
+                }
+                
             }
 
             //If it's no longer visible, remove from list (doesn't crash if item wasn't there to begin with)
             else
             {
-                VisibleItems.Remove(item);
+                visibleItems.Remove(item);
+                scares.Remove(item);
             }
         }
+    }
+
+    /// <summary>
+    /// Used to forcibly remove an item from Star's view (used primarily for memories)
+    /// </summary>
+    /// <param name="item">The item to remove</param>
+    public void RemoveFromView(GameObject item)
+    {
+        triggeredItems.Remove(item);
+        visibleItems.Remove(item);
+        scares.Remove(item);
     }
 }

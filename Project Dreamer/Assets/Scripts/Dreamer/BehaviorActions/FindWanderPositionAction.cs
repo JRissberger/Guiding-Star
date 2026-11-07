@@ -5,6 +5,8 @@ using Action = Unity.Behavior.Action;
 using Unity.Properties;
 using UnityEngine.AI;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
+using Unity.VisualScripting;
 
 [Serializable, GeneratePropertyBag]
 [NodeDescription(name: "FindWanderPosition", story: "[Star] finds a [wanderPosition] in the current map segment.", category: "Action", id: "f210b7b0cc9651b9682353065a084e8a")]
@@ -30,8 +32,7 @@ public partial class FindWanderPositionAction : Action
         MapSegment currentSegment = MapSegmentManager.Value.MapSegments[WanderIndex.Value];
 
         //Check to see if there's any colliders in this area
-            //TODO: Having lights on a specified layer could make this easier since there's a layer mask overload. Look into?
-        Collider[] colliders = Physics.OverlapSphere(currentSegment.CenterLoc, currentSegment.Radius);
+        Collider[] colliders = Physics.OverlapSphere(currentSegment.CenterLoc, currentSegment.Radius, ~LayerMask.GetMask("Star", "DreamerCompoundSight"));
         activeLights = new List<Collider>();
         inactiveLights = new List<Collider>();
 
@@ -51,6 +52,20 @@ public partial class FindWanderPositionAction : Action
                     inactiveLights.Add(collider);
                 }
             }
+        }
+
+        
+        //Check to see if the circle is fully covered by disabled lights
+        if (inactiveLights.Count > 0 && IsFullyCovered(currentSegment.CenterLoc, currentSegment.Radius, inactiveLights))
+        {
+            //Nowhere for Star to move, skip over the point
+            Debug.LogWarning("Wander point is likely fully inaccessible!");
+
+            //Increment index 
+            WanderIndex.Value++;
+
+            //Incrementing the index but returning failure means that a re attempt will move down the wander list
+            return Status.Failure;
         }
 
         while (!foundValidTarget)
@@ -90,6 +105,7 @@ public partial class FindWanderPositionAction : Action
                 {
                     foundValidTarget = true;
                 }
+
             }
         }
 
@@ -117,6 +133,66 @@ public partial class FindWanderPositionAction : Action
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Determines if a wander area is fully covered by lights in the provided list. 
+    /// Divides the circle into a grid of points and runs a check on each to see if there's collision with a light.
+    /// Technically speaking this isn't perfect but should be good enough for wander pathing and can be updated with more sample points if we really need it
+    /// </summary>
+    /// <param name="center">Center of the circle</param>
+    /// <param name="radius">Radius of the circle</param>
+    /// <param name="lights">List of lights to check. Should be a list of inactive or active lights, not a mix</param>
+    /// <returns>True if the area is fully covered</returns>
+    private bool IsFullyCovered(Vector3 center, float radius, List<Collider> lights)
+    {
+        //How many points along each axis are being used to make the grid
+            //Using 10 is kinda arbitrary and we can change it for more precision if needed
+        int scale = 10;
+
+        //How many points are going to be used
+            //This is getting the length of the circle and cutting it up into a number of points
+        float point = (radius * 2f) / scale;
+
+        //Loop through each point
+        for (int x = 0; x < scale; x++)
+        {
+            //Using z since the circle is flat on the ground
+            for (int z = 0; z < scale; z++)
+            {
+                //Calculating the coordinates for the point
+                    //Moving left to right on an axis starting from the edge, adding the number point we're on
+                float xCoord = -radius + x * point;
+                float zCoord = -radius + z * point;
+
+                //Adding on the center location to the calculated loc
+                Vector3 testPoint = center + new Vector3(xCoord, 0, zCoord);
+                
+                //Skipping the point if it's outside the circle (since technically this makes a square)
+                if (new Vector2(xCoord, zCoord).sqrMagnitude > radius * radius) { continue; }
+
+                //Check for a light covering the point
+                    //Doesn't have to be all of them
+                bool covered = false;
+                foreach (Collider collider in lights)
+                {
+                    if (IsInsideLight(testPoint, collider))
+                    {
+                        covered = true;
+                        break; //Only need one light to cover so can skip the rest for this point
+                    }
+                }
+
+                //None of the lights overlap the point
+                if (!covered)
+                {
+                    //Stops check here since there's at least one open spot
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }
 
