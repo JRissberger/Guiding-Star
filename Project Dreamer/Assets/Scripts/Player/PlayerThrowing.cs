@@ -221,7 +221,14 @@ public class PlayerThrowing : BaseThrowing
         //Picking up the highlighted item
         if (_pickupAction.WasPressedThisFrame() && _pickupTarget != null)
         {
-            SetHeldItem(_pickupTarget);
+            if (_pickupTarget.GetComponent<ThrowableItem>())
+            {
+                SetHeldItem(_pickupTarget);
+            }
+            else if (_pickupTarget.GetComponent<InteractableBase>() && _pickupTarget.GetComponent<InteractableBase>().CanInteract)
+            {
+                _pickupTarget.GetComponent<InteractableBase>().Interact();
+            }
         }
     }
 
@@ -250,7 +257,7 @@ public class PlayerThrowing : BaseThrowing
 
     public void AddPickupByCollider(Collider other)
     {
-        if (other.gameObject.GetComponent<ThrowableItem>() != null && other.gameObject != _heldItem)
+        if ((other.gameObject.GetComponent<ThrowableItem>() != null && other.gameObject != _heldItem) || (LayerMask.LayerToName(other.gameObject.layer) == "Interactable" && other.gameObject.tag != "StarInteractOnly"))
         {
             _pickupableItems.Add(other.gameObject);
         }
@@ -258,7 +265,7 @@ public class PlayerThrowing : BaseThrowing
 
     public void RemovePickupByCollider(Collider other)
     {
-        if (other.gameObject.GetComponent<ThrowableItem>() != null)
+        if (other.gameObject.GetComponent<ThrowableItem>() != null || (LayerMask.LayerToName(other.gameObject.layer) == "Interactable" && other.gameObject.tag != "StarInteractOnly"))
         {
             _pickupableItems.Remove(other.gameObject);
         }
