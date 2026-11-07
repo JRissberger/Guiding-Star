@@ -227,8 +227,8 @@ public class RespawnManager : MonoBehaviour
             yield return new WaitForSeconds(Time.deltaTime);
         }
 
-        yield return new WaitForSeconds(0.25f);
         ResetObjects();
+        yield return new WaitForSeconds(0.25f);
 
         fade = 1.0f;
         while (fade > 0.0f)
