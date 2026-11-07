@@ -187,6 +187,14 @@ public class PlayerThrowing : BaseThrowing
             ResetThrow();
         }
 
+        for (int i = _pickupableItems.Count - 1; i >= 0; i--)
+        {
+            if (_pickupableItems[i] == null)
+            {
+                _pickupableItems.RemoveAt(i);
+            }
+        }
+
         //Determining the nearest item, to highlight it
         if (_pickupableItems.Count > 0)
         {
