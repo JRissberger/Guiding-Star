@@ -145,7 +145,19 @@ public class RespawnManager : MonoBehaviour
         _starInstance = GameObject.FindGameObjectWithTag("Star");
         _cameraController = FindAnyObjectByType<CameraController>();
 
-        NewRespawn();
+        //Reset the map segments (Hardcoded to level 1 for now)
+        //TODO: Change this to be less hardcoded, and probably go through LevelManager's methods for doing this
+        for (int i = 0; i < _mapSegmentManager.MapSegments.Count; i++)
+        {
+            if (i <= 4)
+            {
+                _mapSegmentManager.MapSegments[i].IsActive = true;
+            }
+            else
+            {
+                _mapSegmentManager.MapSegments[i].IsActive = false;
+            }
+        }
 
         _screenFadeImage.color = new Color(0, 0, 0, 0);
 
@@ -155,30 +167,17 @@ public class RespawnManager : MonoBehaviour
             _savedThrowables.Add(new ThrowableItemData(item, item.transform.position, item.transform.rotation));
         }
 
-        foreach (MapSegment segment in _mapSegmentManager.MapSegments)
-        {
-            _savedMapSegments.Add(new MapSegmentData(segment, segment.IsActive));
-        }
-
         foreach (LightHazard light in FindObjectsByType<LightHazard>(FindObjectsSortMode.None))
         {
             _savedLights.Add(new LightData(light, light.IsActive));
-        }
-
-        foreach (ChangeWanderStateTrigger trigger in FindObjectsByType<ChangeWanderStateTrigger>(FindObjectsSortMode.None))
-        {
-            _savedStateTriggers.Add(new WanderStateTriggerData(trigger, trigger.gameObject.GetComponent<Collider>().enabled));
-        }
-
-        foreach (ChangeWanderPointsTrigger trigger in FindObjectsByType<ChangeWanderPointsTrigger>(FindObjectsSortMode.None))
-        {
-            _savedPointTriggers.Add(new WanderPointTriggerData(trigger, trigger.gameObject.GetComponent<Collider>().enabled));
         }
 
         foreach (InteractableBase interact in FindObjectsByType<InteractableBase>(FindObjectsSortMode.None))
         {
             _savedInteractables.Add(new InteractableData(interact));
         }
+
+        NewRespawn();
     }
 
     /// <summary>
@@ -205,6 +204,24 @@ public class RespawnManager : MonoBehaviour
         SoundManager soundManager = (SoundManager)soundManagerVar.ObjectValue;
         bool canWander = (bool)canWanderVar.ObjectValue;
         _savedStarBehavior = new StarBehaviorData(mapSegments, soundManager, canWander);
+
+        _savedMapSegments.Clear();
+        foreach (MapSegment segment in _mapSegmentManager.MapSegments)
+        {
+            _savedMapSegments.Add(new MapSegmentData(segment, segment.IsActive));
+        }
+
+        _savedStateTriggers.Clear();
+        foreach (ChangeWanderStateTrigger trigger in FindObjectsByType<ChangeWanderStateTrigger>(FindObjectsSortMode.None))
+        {
+            _savedStateTriggers.Add(new WanderStateTriggerData(trigger, trigger.gameObject.GetComponent<Collider>().enabled));
+        }
+
+        _savedPointTriggers.Clear();
+        foreach (ChangeWanderPointsTrigger trigger in FindObjectsByType<ChangeWanderPointsTrigger>(FindObjectsSortMode.None))
+        {
+            _savedPointTriggers.Add(new WanderPointTriggerData(trigger, trigger.gameObject.GetComponent<Collider>().enabled));
+        }
     }
 
     public void Respawn()
