@@ -151,6 +151,8 @@ public class PlayerMovement : MonoBehaviour
             rb.linearVelocity = velocity * speed;
         }
 
+        prevPos = this.transform.position;
+
         shadow.transform.position = new Vector3(this.transform.position.x, shadow.transform.position.y, this.transform.position.z);
     }
 
