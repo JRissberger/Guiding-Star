@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.LowLevelPhysics2D;
 
 public class PlayerCorporeality : MonoBehaviour
 {
@@ -39,11 +41,6 @@ public class PlayerCorporeality : MonoBehaviour
 
     private void Update()
     {
-        if (touchingShadows.Count > 0)
-            SetHidingInternal(true);
-        else
-            SetHidingInternal(false);
-
         if (debugTestAction.WasPressedThisFrame())
         {
             if (IsCorporeal())
@@ -58,23 +55,21 @@ public class PlayerCorporeality : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void OnShadowEnter(ShadowTrigger other)
     {
-        if (other.gameObject.layer == SHADOW_LAYER)
-        {
-            touchingShadows.Add(other.gameObject);
-        }
+        touchingShadows.Add(other.gameObject);
+        SetHiding(true);
+        Debug.Log("setting hiding");
     }
 
-    private void OnTriggerExit(Collider other)
+    public void OnShadowExit(ShadowTrigger other)
     {
-        if (other.gameObject.layer == SHADOW_LAYER)
+        touchingShadows.Remove(other.gameObject);
+        if (touchingShadows.Count == 0)
         {
-            touchingShadows.Remove(other.gameObject);
-            if (touchingShadows.Count == 0)
-            {
-                SetIncorporeal(defaultCorporealityDistance);
-            }
+            SetIncorporeal(defaultCorporealityDistance);
+            SetHiding(false);
+            Debug.Log("setting incorporeal");
         }
     }
 
@@ -84,12 +79,8 @@ public class PlayerCorporeality : MonoBehaviour
     /// <param name="distance">The total distance the player can move before becoming corporeal again</param>
     public void SetIncorporeal(float distance)
     {
-        if (distance > 0)
-        {
-            ghostDistance = distance;
-            SetCorporealInternal(false);
-            rend.material.color = new Color(rend.material.color.r, rend.material.color.g, rend.material.color.b, 0.4f);
-        }
+        ghostDistance = distance;
+        SetCorporealInternal(false);
     }
 
     /// <summary>
@@ -97,7 +88,6 @@ public class PlayerCorporeality : MonoBehaviour
     /// </summary>
     public void SetCorporeal()
     {
-        ghostDistance = 0;
         SetCorporealInternal(true);
     }
 
@@ -144,11 +134,14 @@ public class PlayerCorporeality : MonoBehaviour
     {
         if (corporeal)
         {
-            rend.material.color = new Color(rend.material.color.r, rend.material.color.g, rend.material.color.b, 0.4f);
+            Physics.IgnoreLayerCollision(2, 7, false);
+            ghostDistance = 0;
+            rend.material.color = new Color(rend.material.color.r, rend.material.color.g, rend.material.color.b, 1f);
         }
         else
         {
-
+            Physics.IgnoreLayerCollision(2, 7, true);
+            rend.material.color = new Color(rend.material.color.r, rend.material.color.g, rend.material.color.b, 0.4f);
         }
     }
 
@@ -165,14 +158,14 @@ public class PlayerCorporeality : MonoBehaviour
         //At some point we should add a method within movement to disable it more cleanly.
         if (isHiding == true && hiding == false) //Entering a shadow
         {
-            rend.material = hideMaterial;
+            //rend.material = hideMaterial;
             //GetComponent<PlayerMovement>().enabled = false;
         }
         else if (isHiding == false && hiding == true) //Leaving a shadow
         {
-            rend.material = defaultMaterial;
+            //rend.material = defaultMaterial;
             //GetComponent<PlayerMovement>().enabled = true;
-            SetIncorporeal(shadowDistance);
+            //SetIncorporeal(shadowDistance);
         }
 
         hiding = isHiding;
