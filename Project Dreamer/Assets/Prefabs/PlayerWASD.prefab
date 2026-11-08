@@ -101,7 +101,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6552966905480379955}
   m_Layer: 2
-  m_Name: Player
+  m_Name: PlayerWASD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -183,10 +183,33 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6118523028690880424, guid: 01ca99d70aad47c469d059b2abba5aa5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6405032924935359827}
   m_SourcePrefab: {fileID: 100100000, guid: 01ca99d70aad47c469d059b2abba5aa5, type: 3}
 --- !u!4 &1974590528076110289 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3084937341025140326, guid: 01ca99d70aad47c469d059b2abba5aa5, type: 3}
   m_PrefabInstance: {fileID: 3578322887699326903}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7296286542075338783 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6118523028690880424, guid: 01ca99d70aad47c469d059b2abba5aa5, type: 3}
+  m_PrefabInstance: {fileID: 3578322887699326903}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6405032924935359827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7296286542075338783}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5a5027b0604bd243aa948eaae2e9583, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCorporeality
+  hideMaterial: {fileID: 0}
+  shadowDistance: 5
+  defaultCorporealityDistance: 15
