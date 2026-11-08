@@ -23,6 +23,14 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    //Re-find Star's behavior graph if Star was destroyed by the respawn system
+    private void Update()
+    {
+        if (_starGraph == null)
+        {
+            _starGraph = GameObject.FindGameObjectWithTag("Star").GetComponent<BehaviorGraphAgent>();
+        }
+    }
     /// <summary>
     /// Turns off the CanWander variable for Star.
     /// </summary>

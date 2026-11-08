@@ -6,7 +6,7 @@ using Unity.Properties;
 using Unity.VisualScripting;
 
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "Throw item", story: "Throw [HeldItem] towards [Sound] location.", category: "Action", id: "c0ce95087eb4b9d7039a90ca62f1e1c4")]
+[NodeDescription(name: "Throw item", story: "Throw [HeldItem] towards [Sound] (or scare) location.", category: "Action", id: "c0ce95087eb4b9d7039a90ca62f1e1c4")]
 public partial class ThrowItemAction : Action
 {
     [SerializeReference] public BlackboardVariable<GameObject> HeldItem;
@@ -14,6 +14,9 @@ public partial class ThrowItemAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Star;
     [SerializeReference] public BlackboardVariable<Boolean> HoldingItem;
     [SerializeReference] public BlackboardVariable<float> ThrowRange;
+    [SerializeReference] public BlackboardVariable<Boolean> TargetScare;
+    [SerializeReference] public BlackboardVariable<GameObject> Scare;
+
     DreamerThrowing throwing = null;
     Vector3 turnDirection = Vector3.zero;
 
@@ -21,7 +24,16 @@ public partial class ThrowItemAction : Action
     {
         //Access throwing script on Star
         throwing = Star.Value.gameObject.GetComponent<DreamerThrowing>();
-        turnDirection = Sound.Value.Location - Star.Value.transform.position;
+
+        if (!TargetScare.Value)
+        {
+            turnDirection = Sound.Value.Location - Star.Value.transform.position;
+        }
+        else
+        {
+            turnDirection = Scare.Value.transform.position - Star.Value.transform.position;
+        }
+        
         turnDirection.y = 0;
 
         return Status.Running;

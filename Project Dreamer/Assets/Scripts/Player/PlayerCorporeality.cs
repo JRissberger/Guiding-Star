@@ -153,11 +153,12 @@ public class PlayerCorporeality : MonoBehaviour
     }
 
     /// <summary>
-    /// Updates values based on whether the player is hiding in a shadow.
-    /// Called by public methods when the player starts or finishes hiding.
+    /// Sets whether the player is currently hiding in a shadow.
+    /// Currently this toggles the player's movement, updates the player's renderer,
+    /// and, if the player is becoming hidden, makes them incorporeal.
     /// </summary>
     /// <param name="isHiding">True for hiding, false for not hiding</param>
-    private void SetHidingInternal(bool isHiding)
+    public void SetHiding(bool isHiding)
     {
         //TODO:
         //Currently hiding just disables the player movement script which is a bit janky.
