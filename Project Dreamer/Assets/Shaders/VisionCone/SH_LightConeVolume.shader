@@ -93,6 +93,29 @@ Shader "Unlit/LightConeVolume"
                 return lightColor;
             }
 
+            inline fixed4 sampleVolume(float3 enterPoint, float3 exitPoint, float3 lightPoint){
+                fixed4 sum = fixed4(0,0,0,0);
+
+                float totalTravel = length(enterPoint - exitPoint);
+
+                for (float j = 0; j < 1.; j += STEP_PERCENT){
+                    float3 currentPoint = lerp(exitPoint, enterPoint, j);
+                    float3 currentNoisePoint = currentPoint + _ScrollSpeed * _Time.y;
+                    currentNoisePoint += _Turbulance * Perlin3DVec(currentNoisePoint * 1.2);
+
+                    float noise = Perlin3Dln(currentNoisePoint * .55) + Perlin3Dln(currentNoisePoint * 1.2) + Perlin3Dln(currentNoisePoint * 3.1415926);
+                    float lerpFac = exp(-_Density * max(noise * .333, 0.) * totalTravel * STEP_PERCENT);
+
+                    fixed3 lightColor = clamp(calcLightColor(currentPoint, lightPoint),0,1);
+
+                    //note: not physically accurate, but it does look REALLY good.
+                    sum.xyz = lerp(_FogColor.xyz * lightColor,sum.xyz,lerpFac);
+                    sum.w = lerp(1, sum.w, lerpFac);
+                }
+                
+                return sum;
+            }
+
             fixed4 frag (v2f i) : SV_Target
             {
                 float3 fragWS = i.view + _WorldSpaceCameraPos;
@@ -137,28 +160,9 @@ Shader "Unlit/LightConeVolume"
                     exitPoint = baseWorldPoint;
                 }
 
-                fixed4 sum = fixed4(0,0,0,0);
-
                 float3 lightOrigin = mul(unity_ObjectToWorld, float4(_ConeSourceOS, 1)).xyz;
-
-                float totalTravel = length(enterPoint - exitPoint);
                 
-                for (float j = 0; j < 1.; j += STEP_PERCENT){
-                    float3 currentPoint = lerp(exitPoint, enterPoint, j);
-                    float3 currentNoisePoint = currentPoint + _ScrollSpeed * _Time.y;
-                    currentPoint += _Turbulance * Perlin3DVec(currentNoisePoint * 1.2);
-
-                    float noise = Perlin3Dln(currentNoisePoint * .55) + Perlin3Dln(currentNoisePoint * 1.2) + Perlin3Dln(currentNoisePoint * 3.1415926);
-                    float lerpFac = exp(-_Density * max(noise * .333, 0.) * totalTravel * STEP_PERCENT);
-
-                    fixed3 lightColor = clamp(calcLightColor(currentPoint, lightOrigin),0,1);
-
-                    //note: not physically accurate, but it does look REALLY good.
-                    sum.xyz = lerp(_FogColor.xyz * lightColor,sum.xyz,lerpFac);
-                    sum.w = lerp(1, sum.w, lerpFac);
-                }
-                
-                return sum;
+                return sampleVolume(enterPoint, exitPoint, lightOrigin);
             }
             ENDCG
         }
