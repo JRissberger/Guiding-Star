@@ -15,12 +15,14 @@ public class RespawnManager : MonoBehaviour
         public MapSegmentManager mapSegments;
         public SoundManager soundManager;
         public bool canWander;
+        public int wanderIndex;
 
-        public StarBehaviorData(MapSegmentManager mapSegments, SoundManager soundManager, bool canWander)
+        public StarBehaviorData(MapSegmentManager mapSegments, SoundManager soundManager, bool canWander, int wanderIndex)
         {
             this.mapSegments = mapSegments;
             this.soundManager = soundManager;
             this.canWander = canWander;
+            this.wanderIndex = wanderIndex;
         }
     }
 
@@ -113,6 +115,7 @@ public class RespawnManager : MonoBehaviour
     private float _savedPlayerAngle;
     private Vector3 _savedStarPos;
     private float _savedStarAngle;
+    private int _savedStarPoint;
     private int _savedCameraKnot;
 
     private StarBehaviorData _savedStarBehavior = new();
@@ -196,14 +199,16 @@ public class RespawnManager : MonoBehaviour
         _savedCameraKnot = _cameraController.goal;
 
         BlackboardReference starBehavior = _starInstance.GetComponent<BehaviorGraphAgent>().BlackboardReference;
-        BlackboardVariable mapSegmentsVar, soundManagerVar, canWanderVar;
+        BlackboardVariable mapSegmentsVar, soundManagerVar, canWanderVar, wanderIndexVar;
         starBehavior.GetVariable("Map Segments", out mapSegmentsVar);
         starBehavior.GetVariable("SoundManager", out soundManagerVar);
         starBehavior.GetVariable("Can Wander", out canWanderVar);
+        starBehavior.GetVariable("Wander Index", out wanderIndexVar);
         MapSegmentManager mapSegments = (MapSegmentManager)mapSegmentsVar.ObjectValue;
         SoundManager soundManager = (SoundManager)soundManagerVar.ObjectValue;
         bool canWander = (bool)canWanderVar.ObjectValue;
-        _savedStarBehavior = new StarBehaviorData(mapSegments, soundManager, canWander);
+        int wanderIndex = (int)wanderIndexVar.ObjectValue;
+        _savedStarBehavior = new StarBehaviorData(mapSegments, soundManager, canWander, wanderIndex);
 
         _savedMapSegments.Clear();
         foreach (MapSegment segment in _mapSegmentManager.MapSegments)
@@ -281,6 +286,7 @@ public class RespawnManager : MonoBehaviour
         starBehavior.SetVariableValue<MapSegmentManager>("Map Segments", _savedStarBehavior.mapSegments);
         starBehavior.SetVariableValue<SoundManager>("SoundManager", _savedStarBehavior.soundManager);
         starBehavior.SetVariableValue<bool>("Can Wander", _savedStarBehavior.canWander);
+        starBehavior.SetVariableValue<int>("Wander Index", _savedStarBehavior.wanderIndex);
 
         //Reset the camera
         _cameraController.MoveTo(_savedCameraKnot, 0);

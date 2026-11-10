@@ -265,7 +265,7 @@ public class PlayerThrowing : BaseThrowing
 
     public void AddPickupByCollider(Collider other)
     {
-        if ((other.gameObject.GetComponent<ThrowableItem>() != null && other.gameObject != _heldItem) || (LayerMask.LayerToName(other.gameObject.layer) == "Interactable" && other.gameObject.tag != "StarInteractOnly"))
+        if (other.gameObject != _heldItem && LayerMask.LayerToName(other.gameObject.layer) == "Interactable" && other.gameObject.tag != "StarInteractOnly")
         {
             _pickupableItems.Add(other.gameObject);
         }
@@ -273,7 +273,7 @@ public class PlayerThrowing : BaseThrowing
 
     public void RemovePickupByCollider(Collider other)
     {
-        if (other.gameObject.GetComponent<ThrowableItem>() != null || (LayerMask.LayerToName(other.gameObject.layer) == "Interactable" && other.gameObject.tag != "StarInteractOnly"))
+        if (LayerMask.LayerToName(other.gameObject.layer) == "Interactable" && other.gameObject.tag != "StarInteractOnly")
         {
             _pickupableItems.Remove(other.gameObject);
         }
