@@ -96,13 +96,17 @@ public class CameraController : MonoBehaviour
         if (distance > maxDistance) {
             cam.Lens.FieldOfView = 75 - (distance - maxDistance);
         }
+        else
+        {
+            cam.Lens.FieldOfView = 75;
+        }
     }
 
     /// <summary>
     /// Method that the triggers call to set the relevant camera variables and start its movement
     /// </summary>
-    /// <param name="index">Whether the camera should be moving forwards or backwards (should only ever be -1 or 1)</param>
-    /// <param name="t">The time it should take to transition (if less than zero, use default) </param>
+    /// <param name="index">the index of the knot to move to</param>
+    /// <param name="t">The time it should take to transition (set it to <0 to use the default) </param>
     public void MoveTo(int index, float t)
     {
         goal = index;
