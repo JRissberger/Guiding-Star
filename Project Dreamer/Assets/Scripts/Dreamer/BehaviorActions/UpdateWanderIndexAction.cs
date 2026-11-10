@@ -10,6 +10,8 @@ public partial class UpdateWanderIndexAction : Action
 {
     [SerializeReference] public BlackboardVariable<int> WanderIndex;
     [SerializeReference] public BlackboardVariable<MapSegmentManager> MapSegmentManager;
+
+    [SerializeReference] public BlackboardVariable<bool> IsRepositioning;
     protected override Status OnStart()
     {
         //Can only set index as an active node
@@ -29,7 +31,9 @@ public partial class UpdateWanderIndexAction : Action
             //Is the new map segment an active node?
             activeNode = MapSegmentManager.Value.MapSegments[WanderIndex.Value].IsActive;
         }
-        
+
+        //No longer repositioning
+        IsRepositioning.Value = false;
         
         return Status.Running;
     }

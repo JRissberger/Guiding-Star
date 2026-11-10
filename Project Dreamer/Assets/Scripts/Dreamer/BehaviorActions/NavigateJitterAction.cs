@@ -13,7 +13,7 @@ public partial class NavigateJitterAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Star;
     [SerializeReference] public BlackboardVariable<Vector3> Target;
 
-    
+    [SerializeReference] public BlackboardVariable<bool> IsRepositioning;
 
     //Select this in editor to target item
     [SerializeReference] public BlackboardVariable<bool> targetItem;
@@ -304,8 +304,12 @@ public partial class NavigateJitterAction : Action
                 closingWeight = Mathf.Lerp(1f, closingWeight, distToFinal.magnitude / approachDistance);
             }
 
-            //Using lerp to blend the wander target and overall target
-            Vector3 overallDirection = Vector3.Slerp(direction, targetDirection, targetNavWeight);
+            //Using lerp to blend the wander target and overall target if Star isn't repositioning
+            Vector3 overallDirection = targetDirection;
+            if (!IsRepositioning.Value)
+            {
+                overallDirection = Vector3.Slerp(direction, targetDirection, targetNavWeight);
+            }
             Vector3 overallDirNormalized = overallDirection.normalized;
 
             //Update target location with random distance within max range
