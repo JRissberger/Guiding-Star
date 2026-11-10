@@ -35,7 +35,7 @@ public class ChangeWanderStateTrigger : MonoBehaviour
         }
 
         //enables or disabled based on given enum
-        if (other.gameObject.name == actorName)
+        if (other.gameObject.tag == actorName)
         {
             if (enableDisable == EnableDisable.Enable)
             {

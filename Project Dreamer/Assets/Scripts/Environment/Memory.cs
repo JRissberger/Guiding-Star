@@ -27,6 +27,16 @@ public class Memory : MonoBehaviour
         }
     }
 
+    //Re-find Star if they were destroyed by the respawn system
+    //This is getting hack-y, may need to discuss resetting Star without destroying their GameObject
+    private void Update()
+    {
+        if (star == null)
+        {
+            star = GameObject.FindGameObjectWithTag("Star");
+        }
+    }
+
     /// <summary>
     /// Marks the memory as collected--will eventually send a signal to patches
     /// </summary>
