@@ -280,6 +280,7 @@ public class RespawnManager : MonoBehaviour
         _playerInstance.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
 
         //Reset Star
+        _starInstance.GetComponent<DreamerThrowing>().DropItem();
         Destroy(_starInstance);
         _starInstance = Instantiate(_starPrefab, _savedStarPos, Quaternion.Euler(0, _savedStarAngle, 0));
         BlackboardReference starBehavior = _starInstance.GetComponent<BehaviorGraphAgent>().BlackboardReference;
@@ -303,6 +304,8 @@ public class RespawnManager : MonoBehaviour
             GameObject instance = data.instance.gameObject;
             instance.transform.position = data.position;
             instance.transform.rotation = data.rotation;
+
+            instance.GetComponent<ThrowableItem>().ClearThrown();
 
             Rigidbody rb = instance.GetComponent<Rigidbody>();
             rb.isKinematic = false;

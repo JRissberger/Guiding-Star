@@ -196,7 +196,7 @@ public class PlayerThrowing : BaseThrowing
         }
 
         //Determining the nearest item, to highlight it
-        if (_pickupableItems.Count > 0)
+        if (_pickupableItems.Count > 0 && GetComponent<PlayerCorporeality>().IsCorporeal())
         {
             GameObject nearestItem = _pickupableItems[0];
             float nearestDistance = (_pickupableItems[0].transform.position - transform.position).magnitude;
@@ -265,7 +265,7 @@ public class PlayerThrowing : BaseThrowing
 
     public void AddPickupByCollider(Collider other)
     {
-        if (other.gameObject != _heldItem && LayerMask.LayerToName(other.gameObject.layer) == "Interactable" && other.gameObject.tag != "StarInteractOnly")
+        if (other.gameObject != _heldItem && LayerMask.LayerToName(other.gameObject.layer) == "Interactable" && other.gameObject.tag != "Memory" && other.gameObject.tag != "StarInteractOnly")
         {
             _pickupableItems.Add(other.gameObject);
         }
@@ -273,7 +273,7 @@ public class PlayerThrowing : BaseThrowing
 
     public void RemovePickupByCollider(Collider other)
     {
-        if (LayerMask.LayerToName(other.gameObject.layer) == "Interactable" && other.gameObject.tag != "StarInteractOnly")
+        if (LayerMask.LayerToName(other.gameObject.layer) == "Interactable" && other.gameObject.tag != "Memory" && other.gameObject.tag != "StarInteractOnly")
         {
             _pickupableItems.Remove(other.gameObject);
         }

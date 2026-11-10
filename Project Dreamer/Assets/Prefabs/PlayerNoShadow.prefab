@@ -202,6 +202,7 @@ MonoBehaviour:
   transitionSpeed: 2
   rotationSpeed: 6
   accelRate: 5
+  rotAccelRate: 15
   corporeal: 1
   bobDistance: 0.2
   bobSpeed: 3
@@ -239,7 +240,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a7a94d8f14fab04488a97789a693ab93, type: 2}
+  - {fileID: 2100000, guid: fdf961e22c32fe04e9fdf9af61284680, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -389,3 +390,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCorporeality
   hideMaterial: {fileID: 2100000, guid: 50622d9ef96e0a44ab741cc580968f2b, type: 2}
   shadowDistance: 5
+  defaultCorporealityDistance: 15
