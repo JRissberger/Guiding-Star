@@ -61,6 +61,8 @@ public partial class NavigateJitterAction : Action
 
     protected override Status OnStart()
     {
+        Debug.Log("TARGET WANDER: " + Target.Value);
+        Debug.Log(IsRepositioning.Value);
         //Starts equal to Star's rotation
         rotationVar = Star.Value.transform.eulerAngles.y;
         navAgent = Star.Value.GetComponent<NavMeshAgent>();
@@ -285,7 +287,7 @@ public partial class NavigateJitterAction : Action
 
         while (!validPosition)
         {
-            Debug.Log("Finding next jitter target");
+            //Debug.Log("Finding next jitter target");
             //Continue wandering, with new rotation
             UpdateRotateVar();
 
@@ -319,7 +321,7 @@ public partial class NavigateJitterAction : Action
                 //NOTE: might need to keep an eye out for potential race conditions with checking loc validity and path, if loc gets updated
             if (EnsureLocationOnMesh(jitterTarget) && ValidatePath(jitterTarget))
             {
-                Debug.Log("New target: " + jitterTarget);
+                //Debug.Log("New target: " + jitterTarget);
                 validPosition = true;
             }
             
@@ -342,23 +344,26 @@ public partial class NavigateJitterAction : Action
     /// <param name="location">Location being checked</param>
     private bool EnsureLocationOnMesh(Vector3 location)
     {
-        //NOTE: may be tweaked as needed for accuracy, especially with any vertical movement that might be added later        
-        //TODO: check absolute pathing from agent pos?
-        location.y = 0f; //NOTE: squashing y for the time being but similarly, may need to be tweaked for vertical traversal
-        if (NavMesh.SamplePosition(location, out NavMeshHit hit, 1f, NavMesh.AllAreas))
-        {
-            //Update target but keeps y value the same (should be the same value if the target is already on the mesh)
-                //NOTE: may need to check more if vertical traversal is added, but works for the time being
-            jitterTarget = new Vector3(hit.position.x, Star.Value.transform.position.y, hit.position.z);
-            return true;
-        }
+        ////NOTE: may be tweaked as needed for accuracy, especially with any vertical movement that might be added later        
+        ////TODO: check absolute pathing from agent pos?
+        //location.y = 0f; //NOTE: squashing y for the time being but similarly, may need to be tweaked for vertical traversal
+        //if (NavMesh.SamplePosition(location, out NavMeshHit hit, 1f, NavMesh.AllAreas))
+        //{
+        //    //Update target but keeps y value the same (should be the same value if the target is already on the mesh)
+        //        //NOTE: may need to check more if vertical traversal is added, but works for the time being
+        //    jitterTarget = new Vector3(hit.position.x, Star.Value.transform.position.y, hit.position.z);
+        //    Debug.Log("ENSURING POSITION: " + jitterTarget);
+        //    return true;
+        //}
 
-        //Will only be hit if the position is nowhere near the navmesh, which realistically shouldn't occur
-        else
-        {
-            Debug.LogWarning("No targets found near position " + location);
-            return false;
-        }
+        ////Will only be hit if the position is nowhere near the navmesh, which realistically shouldn't occur
+        //else
+        //{
+        //    Debug.LogWarning("No targets found near position " + location);
+        //    return false;
+        //}
+
+        return true;
     }
 
     /// <summary>

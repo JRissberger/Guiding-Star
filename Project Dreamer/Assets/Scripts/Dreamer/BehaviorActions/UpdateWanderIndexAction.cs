@@ -17,6 +17,13 @@ public partial class UpdateWanderIndexAction : Action
         //Can only set index as an active node
         bool activeNode = false;
 
+        //Resolving repositioning if needed
+        if (MapSegmentManager.Value.MapSegments[WanderIndex.Value].IsActive && IsRepositioning.Value)
+        {
+            Debug.Log("RESOLVING REPOSITIONING");
+            IsRepositioning.Value = false;
+        }
+
         while (!activeNode)
         {
             //Increments the wander index by 1
@@ -31,6 +38,7 @@ public partial class UpdateWanderIndexAction : Action
             //Is the new map segment an active node?
             activeNode = MapSegmentManager.Value.MapSegments[WanderIndex.Value].IsActive;
         }
+
 
         //No longer repositioning
         IsRepositioning.Value = false;
