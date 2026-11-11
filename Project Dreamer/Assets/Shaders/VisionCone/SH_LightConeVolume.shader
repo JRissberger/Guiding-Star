@@ -22,15 +22,18 @@ Shader "Unlit/LightConeVolume"
 
         Pass
         {
-            CGPROGRAM
+            HLSLPROGRAM
             // Upgrade NOTE: excluded shader from OpenGL ES 2.0 because it uses non-square matrices
-            #pragma exclude_renderers gles
+            // #pragma exclude_renderers gles
 
             #pragma vertex vert
             #pragma fragment frag
 
-            #include "UnityCG.cginc"
+            #include "../CGTypes.hlsl"
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "DepthUtil.cginc"
+
             #include "../PlayerCharacterFur/Perlin3D.cginc"
 
             struct appdata
@@ -44,7 +47,6 @@ Shader "Unlit/LightConeVolume"
                 float3 view: COLOR0;
             };
 
-            sampler2D _CameraDepthTexture;
             fixed4 _Color;
             fixed4 _FogColor;
             float3 _ConeSourceOS;
@@ -59,7 +61,7 @@ Shader "Unlit/LightConeVolume"
             v2f vert (appdata v)
             {
                 v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
+                o.vertex = TransformObjectToHClip(v.vertex.xyz);
                 o.view = mul(unity_ObjectToWorld,v.vertex).xyz - _WorldSpaceCameraPos; 
                 return o;
             }
@@ -145,9 +147,9 @@ Shader "Unlit/LightConeVolume"
                     coneExitOS = planeIntersectOS;
                 }
 
-                float3 enterPoint = mul(unity_ObjectToWorld, float4(coneEnterOS + _ConeSourceOS,1.));
-                float3 exitPoint = mul(unity_ObjectToWorld, float4(coneExitOS + _ConeSourceOS, 1.));
-                float3 baseWorldPoint = depthToWS(i.vertex.xy, _CameraDepthTexture);
+                float3 enterPoint = mul(unity_ObjectToWorld, float4(coneEnterOS + _ConeSourceOS,1.)).xyz;
+                float3 exitPoint = mul(unity_ObjectToWorld, float4(coneExitOS + _ConeSourceOS, 1.)) .xyz;
+                float3 baseWorldPoint = depthToWS(i.vertex.xy);
 
                 float exitPointDepth  = dot(unity_WorldToCamera._m20_m21_m22_m23, float4(exitPoint,      1.)); 
                 float enterPointDepth = dot(unity_WorldToCamera._m20_m21_m22_m23, float4(enterPoint,     1.)); 
@@ -164,7 +166,7 @@ Shader "Unlit/LightConeVolume"
                 
                 return sampleVolume(enterPoint, exitPoint, lightOrigin);
             }
-            ENDCG
+            ENDHLSL
         }
     }
 }
