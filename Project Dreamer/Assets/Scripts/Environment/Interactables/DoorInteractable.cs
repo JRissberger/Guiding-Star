@@ -43,10 +43,10 @@ public class DoorInteractable : InteractableBase
 
     public override void ResetInteraction()
     {
-        base.ResetInteraction();
-
         if (!respawnOpen)
         {
+            base.ResetInteraction();
+
             isOpen = startedOpen;
             UpdateDoors();
         }
