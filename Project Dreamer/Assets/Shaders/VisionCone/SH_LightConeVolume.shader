@@ -32,7 +32,7 @@ Shader "Unlit/LightConeVolume"
             #include "../CGTypes.hlsl"
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "DepthUtil.cginc"
+            #include "DepthUtil.hlsl"
 
             #include "../PlayerCharacterFur/Perlin3D.cginc"
 
