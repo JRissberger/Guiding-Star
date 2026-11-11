@@ -78,7 +78,6 @@ public partial class NavigateJitterAction : Action
             Target.Value = Item.Value.transform.position;
         }
 
-
         if (!FindNextDestination())
         {
             return Status.Failure;
@@ -318,7 +317,7 @@ public partial class NavigateJitterAction : Action
                 Debug.Log("New target: " + jitterTarget);
                 validPosition = true;
             }
-            
+
             //Increments attempts. If Star keeps failing to path, end the method with false.
                 //Realistically shouldn't happen as targets are validated ahead of time
             attemptCount++;
