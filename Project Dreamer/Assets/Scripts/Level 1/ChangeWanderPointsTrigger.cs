@@ -41,7 +41,7 @@ public class ChangeWanderPointsTrigger : MonoBehaviour
             actorName = "Star";
         }
 
-        if (other.gameObject.name == actorName)
+        if (other.gameObject.tag == actorName)
         {
             if (changeMethod == ChangeMethod.SetActive)
             {

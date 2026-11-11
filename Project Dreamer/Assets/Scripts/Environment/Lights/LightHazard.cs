@@ -9,7 +9,7 @@ public class LightHazard : MonoBehaviour
     private float _inLightTimer = 0.0f;
 
     //Whether the light is currently active or not
-    [SerializeField] private bool isActive = true;
+    [SerializeField] private bool isActive;
     public bool IsActive { get { return isActive; }  set { isActive = value; } }
 
     //Spotlight component
@@ -21,7 +21,6 @@ public class LightHazard : MonoBehaviour
         Transform spotlightObject = transform.Find("Spot Light");
         if (spotlightObject && spotlightObject.TryGetComponent<Light>(out spotlight))
         {
-
             //Adjust activity if needed
             spotlight.enabled = isActive;
         }
