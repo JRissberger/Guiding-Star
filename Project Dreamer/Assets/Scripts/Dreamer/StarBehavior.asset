@@ -146,14 +146,6 @@ MonoBehaviour:
           m_Value1: 0
         Name: 
         m_Value: 4
-    - rid: 1988043716648763665
-      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 0
     - rid: 1988043716648763669
       type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
@@ -226,14 +218,6 @@ MonoBehaviour:
           m_Value1: 0
         Name: 
         m_Value: {fileID: 0}
-    - rid: 1988043716648763688
-      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 0
     - rid: 1988043716648763689
       type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
@@ -298,14 +282,6 @@ MonoBehaviour:
           m_Value1: 0
         Name: 
         m_Value: {fileID: 0}
-    - rid: 1988043716648763698
-      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 0
     - rid: 1988043716648763701
       type: {class: 'BlackboardVariable`1[[UnityEngine.Vector3, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
@@ -330,14 +306,6 @@ MonoBehaviour:
           m_Value1: 0
         Name: 
         m_Value: 4
-    - rid: 1988043716648763704
-      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 0
     - rid: 1988043716648763710
       type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
@@ -410,14 +378,6 @@ MonoBehaviour:
           m_Value1: 0
         Name: 
         m_Value: {fileID: 0}
-    - rid: 1988043716648763728
-      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 0
     - rid: 1988043716648763729
       type: {class: 'BlackboardVariable`1[[LastHeardSound, Assembly-CSharp]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
@@ -1376,8 +1336,6 @@ MonoBehaviour:
           rid: 1988043717197955609
         Item:
           rid: 1988043717197955610
-        IsRepositioning:
-          rid: 1988043717197956008
     - rid: 1988043717359698250
       type: {class: SequenceComposite, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
@@ -1500,8 +1458,6 @@ MonoBehaviour:
           rid: 1988043716648763664
         Item:
           rid: 1988043717197955996
-        IsRepositioning:
-          rid: 1988043716648763665
     - rid: 1988043717359698257
       type: {class: SequenceComposite, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
@@ -1777,8 +1733,6 @@ MonoBehaviour:
           rid: 1988043716648763686
         Item:
           rid: 1988043716648763687
-        IsRepositioning:
-          rid: 1988043716648763688
     - rid: 1988043717359698276
       type: {class: ResolveScareAction, ns: , asm: Assembly-CSharp}
       data:
@@ -1889,8 +1843,6 @@ MonoBehaviour:
           rid: 1988043716648763696
         Item:
           rid: 1988043716648763697
-        IsRepositioning:
-          rid: 1988043716648763698
     - rid: 1988043717359698282
       type: {class: SequenceComposite, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
@@ -1931,8 +1883,6 @@ MonoBehaviour:
           rid: 1988043716648763703
         Item:
           rid: 1988043717197955996
-        IsRepositioning:
-          rid: 1988043716648763704
     - rid: 1988043717359698284
       type: {class: BranchingConditionComposite, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
@@ -2171,8 +2121,6 @@ MonoBehaviour:
           rid: 1988043716648763726
         Item:
           rid: 1988043716648763727
-        IsRepositioning:
-          rid: 1988043716648763728
     - rid: 1988043717359698299
       type: {class: SoundResolvedAction, ns: , asm: Assembly-CSharp}
       data:
@@ -2419,7 +2367,7 @@ MonoBehaviour:
           m_Value0: 7235444720683080010
           m_Value1: 2963014735335137570
         Name: Throw Range
-        m_Value: 5
+        m_Value: 10
     - rid: 2337766746550174138
       type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:

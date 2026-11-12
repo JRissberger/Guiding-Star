@@ -210,6 +210,8 @@ public class RespawnManager : MonoBehaviour
         int wanderIndex = (int)wanderIndexVar.ObjectValue;
         _savedStarBehavior = new StarBehaviorData(mapSegments, soundManager, canWander, wanderIndex);
 
+        soundManager.HeardSounds.Clear();
+
         _savedMapSegments.Clear();
         foreach (MapSegment segment in _mapSegmentManager.MapSegments)
         {
