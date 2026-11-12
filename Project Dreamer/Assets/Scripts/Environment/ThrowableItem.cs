@@ -44,6 +44,17 @@ public class ThrowableItem : MonoBehaviour
     }
 
     /// <summary>
+    /// Cancels the effect of SetThrown and QueueLandSound, reverting the item to its default state.
+    /// It will no longer run landing code or make a sound the next time it hits a surface.
+    /// Used by the respawn system
+    /// </summary>
+    public void ClearThrown()
+    {
+        _isMidThrow = false;
+        _makeLandingSound = false;
+    }
+
+    /// <summary>
     /// When called, the next time this item lands, it will create its associated landing sound (determined in the inspector).
     /// Make sure to also call SetThrown() to run the normal landing code! The landing sound is also dependent on that being run.
     /// </summary>

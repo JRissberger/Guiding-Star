@@ -44,7 +44,7 @@ public partial class NewSoundFoundCondition : Condition
 
             //Make sure there's still any valid targets
             if (soundList.Count > 0)
-            {
+            {               
                 //Get the closest sound out of the valid ones
                 Sound closestSound = soundList[0];
                 float distance = Mathf.Infinity;
@@ -52,6 +52,12 @@ public partial class NewSoundFoundCondition : Condition
                 //Compare sounds, find the shortest distance
                 for (int i = 0; i < soundList.Count; i++)
                 {
+                    //Skip the sound if it's not valid (shouldn't happen, but just in case)
+                    if (!soundList[i])
+                    {
+                        continue;
+                    }
+
                     //Get the distance between the current sound and Star
                     float currDistance = Vector3.Distance(Star.Value.transform.position, soundList[i].gameObject.transform.position);
 
@@ -63,8 +69,8 @@ public partial class NewSoundFoundCondition : Condition
                     }
                 }
 
-                //Is it a different value than the current target?
-                if ((TargetSound.Value && (TargetSound.Value.SoundType != closestSound.SoundType
+                //Is it a valid and different value than the current target?
+                if (closestSound && (TargetSound.Value && (TargetSound.Value.SoundType != closestSound.SoundType
                     || TargetSound.Value.Location != closestSound.gameObject.transform.position)) || !TargetSound.Value)
                 {
                     /* IMPORTANT: Scriptable objects aren't gotten by the garbage collector.

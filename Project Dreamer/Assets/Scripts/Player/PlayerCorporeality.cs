@@ -80,6 +80,7 @@ public class PlayerCorporeality : MonoBehaviour
     public void SetIncorporeal(float distance)
     {
         ghostDistance = distance;
+        gameObject.GetComponent<PlayerThrowing>().DropItem();
         SetCorporealInternal(false);
     }
 

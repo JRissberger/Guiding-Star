@@ -64,7 +64,7 @@ public class LevelManager : MonoBehaviour
     /// <summary>
     /// Turns on points in the newOpen array, and turns off points in the newClosed array. Any points not listed are not affected.
     /// </summary>
-    /// <param name="newOpen">New open poitns</param>
+    /// <param name="newOpen">New open points</param>
     /// <param name="newClosed">New closed points</param>
     public void SetWanderPointsActive(int[] newOpen, int[] newClosed)
     {
@@ -80,6 +80,15 @@ public class LevelManager : MonoBehaviour
             {
                 segmentManager.MapSegments[(int)closedPoint].IsActive = false;
             }
+
+            Debug.Log("CHANGING TRIGGER POINTS");
+
+            //Alert Star that they need to reposition, this decreases wander jitter temporarily
+            _starGraph.SetVariableValue("Is Repositioning", true);
+
+            _starGraph.SetVariableValue("Wander Index", newOpen[0]);
+
+            Debug.Log(_starGraph.GetVariable("Is Repositioning", out BlackboardVariable<bool> reposition));
         }
     }
 
@@ -103,5 +112,14 @@ public class LevelManager : MonoBehaviour
                 segmentManager.MapSegments[(int)openPoint].IsActive = true;
             }
         }
+
+        Debug.Log("CHANGING TRIGGER POINTS");
+
+        //Alert Star that they need to reposition, this decreases wander jitter temporarily
+        _starGraph.SetVariableValue("Is Repositioning", true);
+
+        _starGraph.SetVariableValue("Wander Index", onlyOpen[0]);
+
+        Debug.Log(_starGraph.GetVariable("Is Repositioning", out BlackboardVariable<bool> reposition));
     }
 }
