@@ -4450,8 +4450,28 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1190014309607585793, guid: 081e5a1bd72c2c649a81eef83b267fdd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 200355517}
   m_SourcePrefab: {fileID: 100100000, guid: 081e5a1bd72c2c649a81eef83b267fdd, type: 3}
+--- !u!1 &200355516 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1190014309607585793, guid: 081e5a1bd72c2c649a81eef83b267fdd, type: 3}
+  m_PrefabInstance: {fileID: 200355515}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &200355517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 200355516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f3edd2d276e77b6c84dff8f4202c639, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ForceDepth
 --- !u!43 &201316719
 Mesh:
   m_ObjectHideFlags: 0

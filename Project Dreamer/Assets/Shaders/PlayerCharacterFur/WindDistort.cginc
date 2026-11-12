@@ -1,20 +1,14 @@
 #include "Perlin3D.cginc"
 
-uniform float _TurbulanceDisplace;
-uniform float _TurbulanceRate; 
-uniform float3 _WindDir;
-uniform float2 _SwayFactors;
-uniform float _WindPower;
-uniform float _FurLength;
-uniform float _InvTurbulanceNoiseScale;
-uniform float2 _DefaultTangentDisplace;
-
-//todo: change normalization const based on 
-// #pragma multi_compile QUALITY_LOW QUALITY_MED QUALITY_HIGH
-inline half3 SafeNormalize(half3 inVec){
-	float dp3 = max (0.005, dot (inVec, inVec));
-	return inVec * rsqrt (dp3);
-}
+//copy this to the top of the file or it won't work
+// float _TurbulanceDisplace;
+// float _TurbulanceRate; 
+// float3 _WindDir;
+// float2 _SwayFactors;
+// float _WindPower;
+// float _FurLength;
+// float _InvTurbulanceNoiseScale;
+// float2 _DefaultTangentDisplace;
 
 // performs full transformation of a vertex based on wind
 inline float4 ProjectWindDistortVertex(float3 vertex, float height, float3 normOS, float3 tangentOS){
@@ -29,8 +23,6 @@ inline float4 ProjectWindDistortVertex(float3 vertex, float height, float3 normO
     float relaxedLength = _FurLength * height;
     float influence = max(height,0);
     influence *= influence;
-
-    // float3 originWS = worldPosition.xyz;
 
     float3 samplePos = ((worldPosition.xyz + worldNormal * relaxedLength) - _TurbulanceRate * _WindDir * _Time.y) * _InvTurbulanceNoiseScale;
     float3 offsetPos = influence * (Perlin3DVec(samplePos) * _TurbulanceDisplace + _WindDir * _WindPower);

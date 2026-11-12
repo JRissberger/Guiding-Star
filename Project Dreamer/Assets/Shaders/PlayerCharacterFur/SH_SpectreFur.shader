@@ -14,86 +14,95 @@ Shader "Custom/Spectre Fur"
         _DefaultTangentDisplace ("Default Tangent Displace", Vector, 2) = (1,0,0,0)
         _GlimmerColor("Glimmer Color", Color) = (0,0,1,0)
     }
+
     SubShader
     {
-        Tags {"LightMode"="ForwardBase" "RenderType"="Transparent" "Queue" ="Transparent"}
+        Tags { "RenderType"="Transparent" "Queue" ="Transparent" "RenderPipeline" = "UniversalPipeline" }
+
         Pass
         {
-            LOD 100
+            ZWrite On
             Cull Off
             Blend One OneMinusSrcAlpha
-            
             HLSLPROGRAM
+
             #pragma vertex vert
             #pragma fragment frag
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-
-            // compile shader into multiple variants, with and without shadows
-            // (we don't care about any lightmaps yet, so skip these variants)
-            #pragma multi_compile_fwdbase nolightmap nodirlightmap nodynlightmap novertexlight
+ // // compile shader into multiple variants, with and without shadows
+            // // (we don't care about any lightmaps yet, so skip these variants)
+            // #pragma multi_compile_fwdbase nolightmap nodirlightmap nodynlightmap novertexlight
             #pragma multi_compile_instancing
-            // shadow helper functions and macros
-            #include "AutoLight.cginc"
-            #include "WindDistort.cginc"
+            // // shadow helper functions and macros
+            // #include "AutoLight.cginc"
+            // #include "UnityCG.cginc"
+            // #include "Lighting.cginc"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+
+            #include "../CGTypes.hlsl"
 
             struct appdata {
                 float4 vertex : POSITION;
                 float4 tangent : TANGENT;
                 float3 normal : NORMAL;
                 float4 texcoord : TEXCOORD0;
-                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct v2f
             {
                 float4 pos : SV_POSITION;
-                float2 uv : TEXCOORD0;
-                SHADOW_COORDS(1) // put shadows data into TEXCOORD1
-                half3 diff : COLOR0;
-                half3 ambient : COLOR1;
-                UNITY_VERTEX_INPUT_INSTANCE_ID
+                fixed2 uv : TEXCOORD0;
+                half3 lambert : COLOR0;
+                // half3 ambient : COLOR1;
             };
 
-            sampler2D _MainTex;
-            uniform float _ScrollVelocity;
-            uniform fixed4 _GlimmerColor;
+            TEXTURE2D(_MainTex);
+            SAMPLER(sampler_MainTex);
 
-            UNITY_INSTANCING_BUFFER_START(Props)
-                // put more per-instance properties here
-            UNITY_INSTANCING_BUFFER_END(Props)
+            CBUFFER_START(UnityPerMaterial)
+                float _TurbulanceDisplace;
+                float _TurbulanceRate;
+                float3 _WindDir;
+                float2 _SwayFactors;
+                float _WindPower;
+                float _FurLength;
+                float _InvTurbulanceNoiseScale;
+                float2 _DefaultTangentDisplace;
+                float _ScrollVelocity;
+                fixed4 _GlimmerColor;
+            CBUFFER_END
 
-            v2f vert (appdata v)
+            #include "WindDistort.cginc"
+
+            v2f vert(appdata v)
             {
-                v2f o;
-                UNITY_SETUP_INSTANCE_ID(v);
-                UNITY_TRANSFER_INSTANCE_ID(v, o);
-                o.uv = v.texcoord;
-                //FIXME: replace this with another piece of input data.
-                // float r = max(v.vertex.y, 0);
-                o.pos = ProjectWindDistortVertex(v.vertex.xyz, v.texcoord.y, v.normal, v.tangent);
+                v2f OUT;
+                OUT.uv = v.texcoord;
+                OUT.pos = ProjectWindDistortVertex(v.vertex.xyz, v.texcoord.y, v.normal.xyz, v.tangent.xyz);
 
-                half3 worldNormal = UnityObjectToWorldNormal(v.normal);
-                half nl = max(0, dot(worldNormal, _WorldSpaceLightPos0.xyz));
-                o.diff = nl * _LightColor0.rgb;
-                o.ambient = ShadeSH9(half4(worldNormal,1));
+                // the lighting model is now using lambertian diffuse, not realistic but
+                // it's good enough.
+                // Get the VertexNormalInputs of the vertex, which contains the normal in world space
+                VertexNormalInputs positions = GetVertexNormalInputs(v.vertex.xyz);
+
+                // Get the properties of the main light
+                Light light = GetMainLight();
+
+                // Calculate the amount of light the vertex receives
+                OUT.lambert = LightingLambert(light.color, light.direction, positions.normalWS.xyz);
                 
-                TRANSFER_SHADOW(o);
-                return o;
+                return OUT;
             }
 
-            half4 frag (v2f i) : SV_Target
+            half4 frag(v2f i) : SV_Target
             {
-                UNITY_SETUP_INSTANCE_ID(i);
-                float2 scrolledUV;
-                scrolledUV = i.uv.xy * .5;
-                scrolledUV.y += frac(_ScrollVelocity * -_Time.y);
-                fixed noise1 = tex2D(_MainTex, scrolledUV).x;
-                
-                scrolledUV = i.uv.xy * .4;
-                scrolledUV.x += .2;
-                scrolledUV.y += frac(_ScrollVelocity * -_Time.y);
-                fixed noise2 = tex2D(_MainTex, scrolledUV).x;
+                fixed2 uvOffset1 = float2(i.uv * .5);
+                uvOffset1.y += frac(_ScrollVelocity * -_Time.y);
+                fixed2 uvOffset2 = float2(i.uv * .4);
+                uvOffset2.y += frac(2.* _ScrollVelocity * -_Time.y);
+
+                fixed noise1 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uvOffset1).x;
+                fixed noise2 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uvOffset2).x;
 
                 fixed value = (noise1 - noise2) * .8 + .5;
                 value -= i.uv.y;
@@ -103,94 +112,12 @@ Shader "Custom/Spectre Fur"
                 }
                 
                 fixed3 col = (1. - smoothstep(.0,.5,noise1)) * _GlimmerColor.xyz;
-                // compute shadow attenuation (1.0 = fully lit, 0.0 = fully shadowed)
-                half shadow = SHADOW_ATTENUATION(i);
-                // darken light's illumination with shadow, keep ambient intact
-                fixed3 lighting = i.diff * shadow + i.ambient;
+                
+                fixed3 lighting = i.lambert;
                 col.rgb *= lighting;
                 return fixed4(col, 1.) * smoothstep(.0,.3,value);
             }
             ENDHLSL
         }
-
-        // shadow caster rendering pass, implemented manually to allow for
-        // deformation shadowcasting mesh's shape
-        // using macros from UnityCG.cginc
-        // Pass
-        // {
-        //     Tags {"LightMode"="ShadowCaster"}
-        //     Cull Off
-
-        //     HLSLPROGRAM
-        //     #pragma vertex vert
-        //     #pragma fragment frag
-        //     #pragma multi_compile_shadowcaster
-        //     #pragma multi_compile_instancing
-        //     #include "UnityCG.cginc"
-        //     #include "ManualShadows.cginc"
-        //     #include "WindDistort.cginc"
-        
-        //     UNITY_INSTANCING_BUFFER_START(Props)
-        //         // put more per-instance properties here
-        //     UNITY_INSTANCING_BUFFER_END(Props)
-            
-        //     struct appdata {
-        //         float4 vertex : POSITION;
-        //         // float4 tangent : TANGENT;
-        //         float3 normal : NORMAL;
-        //         float4 texcoord : TEXCOORD0;
-        //         UNITY_VERTEX_INPUT_INSTANCE_ID
-        //     };
-
-        //     struct v2f { 
-        //         float2 uv: TEXCOORD0;
-        //         V2F_SHADOW_CASTER;
-        //         UNITY_VERTEX_INPUT_INSTANCE_ID
-        //     };
-
-        //     sampler2D _MainTex;
-        //     uniform float _ScrollVelocity;
-
-        //     v2f vert(appdata v)
-        //     {
-        //         v2f o;
-        //         UNITY_SETUP_INSTANCE_ID(v);
-        //         UNITY_TRANSFER_INSTANCE_ID(v, o);
-        //         o.pos = ProjectWindDistortVertex(v.vertex.xyz, v.texcoord.y);
-        //         o.uv = v.texcoord;
-
-		//         float3 wNormal = UnityObjectToWorldNormal (v.normal);
-        //         // technically, this is wrong, since we are using model source normals
-        //         // to compute the normal bias, however, unless you have enough turbulance
-        //         // to kill a person, nobody else noticed.
-        //         o.pos = ApplyShadowNormalBias(o.pos,wNormal);
-        //         o.pos = UnityApplyLinearShadowBias(o.pos);
-        //         return o;
-        //     }
-
-        //     float4 frag(v2f i) : SV_Target
-        //     {
-        //         UNITY_SETUP_INSTANCE_ID(i);
-        //         float2 scrolledUV;
-        //         half value;
-        //         scrolledUV = i.uv.xy * 2.;
-        //         scrolledUV.y += frac(_ScrollVelocity * -_Time.y);
-        //         value = tex2D(_MainTex, scrolledUV).x;
-                
-        //         scrolledUV = i.uv.xy;
-        //         scrolledUV.x += .2;
-        //         scrolledUV.y += frac(_ScrollVelocity * -_Time.y);
-        //         value -= tex2D(_MainTex, scrolledUV).x;
-
-        //         value = value * .8 + .5;
-        //         value -= i.uv.y;
-        //         // value +=
-        //         if(value < 0.){
-        //             discard;
-        //         }
-        //         SHADOW_CASTER_FRAGMENT(i)
-        //     }
-        //     ENDHLSL
-        // }
     }
 }
