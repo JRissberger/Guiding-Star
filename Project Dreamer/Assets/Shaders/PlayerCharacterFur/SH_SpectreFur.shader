@@ -48,7 +48,7 @@ Shader "Custom/Spectre Fur"
             struct v2f
             {
                 float4 pos : SV_POSITION;
-                float2 uv : TEXCOORD0;
+                fixed2 uv : TEXCOORD0;
                 SHADOW_COORDS(1) // put shadows data into TEXCOORD1
                 half3 diff : COLOR0;
                 half3 ambient : COLOR1;
@@ -69,6 +69,9 @@ Shader "Custom/Spectre Fur"
                 UNITY_SETUP_INSTANCE_ID(v);
                 UNITY_TRANSFER_INSTANCE_ID(v, o);
                 o.uv = v.texcoord;
+                // o.uv.xy = v.texcoord * .5;
+                // o.uv.zw = v.texcoord * .4;
+                // o.uv.yw += frac(_ScrollVelocity * -_Time.y);
                 //FIXME: replace this with another piece of input data.
                 // float r = max(v.vertex.y, 0);
                 o.pos = ProjectWindDistortVertex(v.vertex.xyz, v.texcoord.y, v.normal, v.tangent);
@@ -85,15 +88,16 @@ Shader "Custom/Spectre Fur"
             half4 frag (v2f i) : SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(i);
-                float2 scrolledUV;
-                scrolledUV = i.uv.xy * .5;
-                scrolledUV.y += frac(_ScrollVelocity * -_Time.y);
-                fixed noise1 = tex2D(_MainTex, scrolledUV).x;
-                
-                scrolledUV = i.uv.xy * .4;
-                scrolledUV.x += .2;
-                scrolledUV.y += frac(_ScrollVelocity * -_Time.y);
-                fixed noise2 = tex2D(_MainTex, scrolledUV).x;
+                // fixed noise1 = tex2D(_MainTex, i.uv.xy).x;
+                // fixed noise2 = tex2D(_MainTex, i.uv.zw).x;
+
+                fixed2 uvOffset1 = float2(i.uv * .5);
+                uvOffset1.y += frac(_ScrollVelocity * -_Time.y);
+                fixed2 uvOffset2 = float2(i.uv * .4);
+                uvOffset2.y += frac(2.* _ScrollVelocity * -_Time.y);
+
+                fixed noise1 = tex2D(_MainTex, uvOffset1);
+                fixed noise2 = tex2D(_MainTex, uvOffset2);
 
                 fixed value = (noise1 - noise2) * .8 + .5;
                 value -= i.uv.y;
@@ -104,6 +108,7 @@ Shader "Custom/Spectre Fur"
                 
                 fixed3 col = (1. - smoothstep(.0,.5,noise1)) * _GlimmerColor.xyz;
                 // compute shadow attenuation (1.0 = fully lit, 0.0 = fully shadowed)
+                // fixed3 col = 1;
                 half shadow = SHADOW_ATTENUATION(i);
                 // darken light's illumination with shadow, keep ambient intact
                 fixed3 lighting = i.diff * shadow + i.ambient;
