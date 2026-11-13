@@ -47,8 +47,8 @@ Shader "Unlit/LightConeVolume"
                 float3 view: COLOR0;
             };
 
-            fixed4 _Color;
-            fixed4 _FogColor;
+            half4 _Color;
+            half4 _FogColor;
             float3 _ConeSourceOS;
             float _LightDecay;
             float _Density;
