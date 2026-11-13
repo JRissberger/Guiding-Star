@@ -2808,8 +2808,16 @@ PrefabInstance:
       value: Change Star WanderPoints
       objectReference: {fileID: 0}
     - target: {fileID: 8559962345966651202, guid: 96d9609fa81c40649a3a061842e86418, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8559962345966651202, guid: 96d9609fa81c40649a3a061842e86418, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8559962345966651202, guid: 96d9609fa81c40649a3a061842e86418, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 20.98
+      value: 19.9
       objectReference: {fileID: 0}
     - target: {fileID: 8559962345966651202, guid: 96d9609fa81c40649a3a061842e86418, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2817,7 +2825,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8559962345966651202, guid: 96d9609fa81c40649a3a061842e86418, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -44.3
+      value: -43.4
       objectReference: {fileID: 0}
     - target: {fileID: 8559962345966651202, guid: 96d9609fa81c40649a3a061842e86418, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2880,7 +2888,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 5
+  m_Radius: 2
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!4 &8794465287216383726 stripped
 Transform:

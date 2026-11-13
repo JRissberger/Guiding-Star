@@ -154,13 +154,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d85623b4a95b2e4a83b482e1aae850a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrialPlayerMovement
+  shadow: {fileID: 0}
   moveType: 3
   maxSpeed: 6
+  transitionSpeed: 3
   rotationSpeed: 10
+  accelRate: 10
+  rotAccelRate: 15
   corporeal: 0
   bobDistance: 0.2
   bobSpeed: 2
-  lookAts: []
+  triggers: []
 --- !u!136 &373576653
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -209,7 +213,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -300,6 +304,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCorporeality
   hideMaterial: {fileID: 2100000, guid: 50622d9ef96e0a44ab741cc580968f2b, type: 2}
   shadowDistance: 5
+  defaultCorporealityDistance: 15
 --- !u!54 &373576659
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -408,11 +413,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae1fdaa1c5ce6ad41b04f23cc5bddfda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrialCamera
-  cam3Displacement: {x: 11, y: 9, z: 0}
+  playerColliding: 0
   transitioning: 0
-  halfTrans: 0
   goal: 0
   startPos: 0
+  maxDistance: 30
+  rotationSpeed: 10
+  knots: []
 --- !u!114 &1114622966
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -697,7 +704,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -69,7 +69,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: cdbb66191b659b143b0ddb1d2f4008fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -106,7 +106,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ThrowableItem
   _soundType: 0
-  _soundRadius: 5
+  _soundRadius: 15
   _soundDuration: 2
   _willDespawn: 0
 --- !u!136 &3721073272580105635
@@ -116,7 +116,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3790007970559920335}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 084fe2baa0ff2d14aba88b63e36aaf8f, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

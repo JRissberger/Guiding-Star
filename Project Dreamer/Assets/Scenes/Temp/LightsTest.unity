@@ -297,11 +297,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae1fdaa1c5ce6ad41b04f23cc5bddfda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrialCamera
-  cam3Displacement: {x: 11, y: 9, z: 0}
+  playerColliding: 0
   transitioning: 0
-  halfTrans: 0
   goal: 0
   startPos: 0
+  maxDistance: 30
+  rotationSpeed: 10
+  knots: []
 --- !u!114 &248011894
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -766,7 +768,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -833,20 +835,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2520dc0be6a3964bb3721cda275b172, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerThrowing
-  _handOffset: {x: 0.5, y: 0, z: 0.5}
   _curveRaycastSegments: 10
   _throwCurveHeight: 1
-  _throwSpeed: 1
+  _solidToThrownMask:
+    serializedVersion: 2
+    m_Bits: 1
+  _handOffset: {x: 0.5, y: 0, z: 0.5}
   _drawCurve: 1
   _curveDisplayWidth: 0.01
   _curveDisplaySegments: 50
   _throwRadius: 5
+  _throwHeightUp: 3
+  _throwHeightDown: 3
+  _pickupHighlightMaterial: {fileID: 0}
+  _targetableSurfaceMask:
+    serializedVersion: 2
+    m_Bits: 1
   _validMarkerPrefab: {fileID: 8064065595831018745, guid: 33cbea4f5a37b554ba609a6a27c5b2c1, type: 3}
   _invalidMarkerPrefab: {fileID: 8064065595831018745, guid: 6885662ee430ce444b12c720c5570ce8, type: 3}
   _targetMarkerHover: 0.01
   _camera: {fileID: 0}
-  _debugItem1: {fileID: 0}
-  _debugItem2: {fileID: 0}
 --- !u!114 &1806938447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -889,13 +897,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d85623b4a95b2e4a83b482e1aae850a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrialPlayerMovement
+  shadow: {fileID: 0}
   moveType: 0
   maxSpeed: 6
+  transitionSpeed: 3
   rotationSpeed: 10
+  accelRate: 10
+  rotAccelRate: 15
   corporeal: 0
   bobDistance: 0.2
   bobSpeed: 2
-  lookAts: []
+  triggers: []
 --- !u!23 &1806938449
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -921,7 +933,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

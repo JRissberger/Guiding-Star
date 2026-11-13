@@ -86,6 +86,8 @@ public class LevelManager : MonoBehaviour
             //Alert Star that they need to reposition, this decreases wander jitter temporarily
             _starGraph.SetVariableValue("Is Repositioning", true);
 
+            _starGraph.SetVariableValue("Wander Index", newOpen[0]);
+
             Debug.Log(_starGraph.GetVariable("Is Repositioning", out BlackboardVariable<bool> reposition));
         }
     }
@@ -115,6 +117,8 @@ public class LevelManager : MonoBehaviour
 
         //Alert Star that they need to reposition, this decreases wander jitter temporarily
         _starGraph.SetVariableValue("Is Repositioning", true);
+
+        _starGraph.SetVariableValue("Wander Index", onlyOpen[0]);
 
         Debug.Log(_starGraph.GetVariable("Is Repositioning", out BlackboardVariable<bool> reposition));
     }

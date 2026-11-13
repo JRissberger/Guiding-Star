@@ -196,7 +196,7 @@ public class PlayerThrowing : BaseThrowing
         }
 
         //Determining the nearest item, to highlight it
-        if (_pickupableItems.Count > 0)
+        if (_pickupableItems.Count > 0 && GetComponent<PlayerCorporeality>().IsCorporeal())
         {
             GameObject nearestItem = _pickupableItems[0];
             float nearestDistance = (_pickupableItems[0].transform.position - transform.position).magnitude;
@@ -242,30 +242,40 @@ public class PlayerThrowing : BaseThrowing
 
     private void SetPickupTarget(GameObject target)
     {
-        if (_pickupTarget != null)
-        {
-            Renderer oldPickupRenderer = _pickupTarget.GetComponent<Renderer>();
-            List<Material> oldPickupMaterials = new List<Material>();
-            oldPickupRenderer.GetSharedMaterials(oldPickupMaterials);
-            oldPickupMaterials.Remove(_pickupHighlightMaterial);
-            oldPickupRenderer.SetSharedMaterials(oldPickupMaterials);
-        }
+        GameObject starItem = FindAnyObjectByType<DreamerThrowing>().GetHeldItem();
 
-        _pickupTarget = target;
-
-        if (_pickupTarget != null)
+        if (starItem == null || target != starItem)
         {
-            Renderer pickupRenderer = _pickupTarget.GetComponent<Renderer>();
-            List<Material> pickupMaterials = new List<Material>();
-            pickupRenderer.GetSharedMaterials(pickupMaterials);
-            pickupMaterials.Add(_pickupHighlightMaterial);
-            pickupRenderer.SetSharedMaterials(pickupMaterials);
+            if (_pickupTarget != null)
+            {
+                Renderer oldPickupRenderer = _pickupTarget.GetComponent<Renderer>();
+                List<Material> oldPickupMaterials = new List<Material>();
+                oldPickupRenderer.GetSharedMaterials(oldPickupMaterials);
+                oldPickupMaterials.Remove(_pickupHighlightMaterial);
+                oldPickupRenderer.SetSharedMaterials(oldPickupMaterials);
+            }
+
+            _pickupTarget = target;
+
+            if (_pickupTarget != null)
+            {
+                Renderer pickupRenderer = _pickupTarget.GetComponent<Renderer>();
+                List<Material> pickupMaterials = new List<Material>();
+                pickupRenderer.GetSharedMaterials(pickupMaterials);
+                pickupMaterials.Add(_pickupHighlightMaterial);
+                pickupRenderer.SetSharedMaterials(pickupMaterials);
+            }
         }
     }
 
     public void AddPickupByCollider(Collider other)
     {
-        if (other.gameObject != _heldItem && LayerMask.LayerToName(other.gameObject.layer) == "Interactable" && other.gameObject.tag != "StarInteractOnly")
+        GameObject starItem = FindAnyObjectByType<DreamerThrowing>().GetHeldItem();
+        if (other.gameObject != _heldItem
+            && other.gameObject != starItem
+            && LayerMask.LayerToName(other.gameObject.layer) == "Interactable"
+            && other.gameObject.tag != "Memory"
+            && other.gameObject.tag != "StarInteractOnly")
         {
             _pickupableItems.Add(other.gameObject);
         }
@@ -273,7 +283,9 @@ public class PlayerThrowing : BaseThrowing
 
     public void RemovePickupByCollider(Collider other)
     {
-        if (LayerMask.LayerToName(other.gameObject.layer) == "Interactable" && other.gameObject.tag != "StarInteractOnly")
+        if (LayerMask.LayerToName(other.gameObject.layer) == "Interactable"
+            && other.gameObject.tag != "Memory"
+            && other.gameObject.tag != "StarInteractOnly")
         {
             _pickupableItems.Remove(other.gameObject);
         }
@@ -294,7 +306,7 @@ public class PlayerThrowing : BaseThrowing
         _pickupableItems.Remove(item);
         base.SetHeldItem(item);
     }
-
+    
     public override void DropItem()
     {
         _pickupableItems.Add(_heldItem);
