@@ -38,10 +38,6 @@ public partial class UpdateWanderIndexAction : Action
             //Is the new map segment an active node?
             activeNode = MapSegmentManager.Value.MapSegments[WanderIndex.Value].IsActive;
         }
-
-
-        //No longer repositioning
-        IsRepositioning.Value = false;
         
         return Status.Running;
     }
