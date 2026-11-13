@@ -470,7 +470,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -572,7 +572,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -631,9 +631,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d85623b4a95b2e4a83b482e1aae850a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrialPlayerMovement
-  cam: {fileID: 2083722784}
-  lookAts: []
-  speed: 0.5
+  shadow: {fileID: 0}
+  moveType: 2
+  maxSpeed: 7
+  transitionSpeed: 3
+  rotationSpeed: 10
+  accelRate: 10
+  rotAccelRate: 15
+  corporeal: 0
+  bobDistance: 0.2
+  bobSpeed: 2
+  triggers: []
 --- !u!114 &239677819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -816,10 +824,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b32b2a507c5de1c4486e96e9bef40381, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Trigger
-  pair: {fileID: 1317887150}
-  colliding: 0
-  nextPos: 1
-  timeToMove: 0
+  knot: 0
+  timeToMoveForward: -1
+  timeToMoveBack: -1
+  forwardMovement: {x: 0, y: 0, z: 0}
 --- !u!1 &333860772
 GameObject:
   m_ObjectHideFlags: 0
@@ -933,7 +941,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1187,10 +1195,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b32b2a507c5de1c4486e96e9bef40381, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Trigger
-  pair: {fileID: 278556130}
-  colliding: 0
-  nextPos: -1
-  timeToMove: 0
+  knot: 0
+  timeToMoveForward: -1
+  timeToMoveBack: -1
+  forwardMovement: {x: 0, y: 0, z: 0}
 --- !u!1 &1419491299
 GameObject:
   m_ObjectHideFlags: 0
@@ -1384,7 +1392,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1543,7 +1551,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae1fdaa1c5ce6ad41b04f23cc5bddfda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrialCamera
-  cam3Displacement: {x: 11, y: 9, z: 0}
+  playerColliding: 0
+  transitioning: 0
+  goal: 0
+  startPos: 0
+  maxDistance: 30
+  rotationSpeed: 10
+  knots: []
 --- !u!114 &2083722789
 MonoBehaviour:
   m_ObjectHideFlags: 0
