@@ -88,6 +88,7 @@ public class LightHazard : MonoBehaviour
 
         if (isActive)
         {
+            //TODO: check this--seems to be throwing a warning
             OnLightOn.Invoke();
         }
     }

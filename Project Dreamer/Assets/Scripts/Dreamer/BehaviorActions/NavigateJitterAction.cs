@@ -13,8 +13,6 @@ public partial class NavigateJitterAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Star;
     [SerializeReference] public BlackboardVariable<Vector3> Target;
 
-    [SerializeReference] public BlackboardVariable<bool> IsRepositioning;
-
     //Select this in editor to target item
     [SerializeReference] public BlackboardVariable<bool> targetItem;
 
@@ -23,8 +21,8 @@ public partial class NavigateJitterAction : Action
     private float maxRotation = 10f; 
 
     //Min/Max distance a new location can be set for
-    private float minDistance = 0.1f;
-    private float maxDistance = 0.5f;
+    private float minDistance = 0.5f;
+    private float maxDistance = 1f;
 
     //Distance to weight nav more heavily to target
     private float approachDistance = 2f;
@@ -61,8 +59,7 @@ public partial class NavigateJitterAction : Action
 
     protected override Status OnStart()
     {
-        Debug.Log("TARGET WANDER: " + Target.Value);
-        Debug.Log(IsRepositioning.Value);
+
         //Starts equal to Star's rotation
         rotationVar = Star.Value.transform.eulerAngles.y;
         navAgent = Star.Value.GetComponent<NavMeshAgent>();
@@ -172,10 +169,6 @@ public partial class NavigateJitterAction : Action
 
         //Slightly change speed
         navAgent.speed = baseSpeed + Random.Range(-speedChange, speedChange);
-
-        //Debug.Log("Prev pos: " + previousPosition);
-        //Debug.Log(Star.Value.transform.position);
-
 
         return Status.Running;
     }
@@ -306,11 +299,8 @@ public partial class NavigateJitterAction : Action
             }
 
             //Using lerp to blend the wander target and overall target if Star isn't repositioning
-            Vector3 overallDirection = targetDirection;
-            if (!IsRepositioning.Value)
-            {
-                overallDirection = Vector3.Slerp(direction, targetDirection, targetNavWeight);
-            }
+            Vector3 overallDirection = Vector3.Lerp(direction, targetDirection.normalized, closingWeight);
+
             Vector3 overallDirNormalized = overallDirection.normalized;
 
             //Update target location with random distance within max range
@@ -345,22 +335,21 @@ public partial class NavigateJitterAction : Action
     {
         ////NOTE: may be tweaked as needed for accuracy, especially with any vertical movement that might be added later        
         ////TODO: check absolute pathing from agent pos?
-        //location.y = 0f; //NOTE: squashing y for the time being but similarly, may need to be tweaked for vertical traversal
-        //if (NavMesh.SamplePosition(location, out NavMeshHit hit, 1f, NavMesh.AllAreas))
-        //{
-        //    //Update target but keeps y value the same (should be the same value if the target is already on the mesh)
-        //        //NOTE: may need to check more if vertical traversal is added, but works for the time being
-        //    jitterTarget = new Vector3(hit.position.x, Star.Value.transform.position.y, hit.position.z);
-        //    Debug.Log("ENSURING POSITION: " + jitterTarget);
-        //    return true;
-        //}
+        location.y = 0f; //NOTE: squashing y for the time being but similarly, may need to be tweaked for vertical traversal
+        if (NavMesh.SamplePosition(location, out NavMeshHit hit, 1f, NavMesh.AllAreas))
+        {
+            //Update target but keeps y value the same (should be the same value if the target is already on the mesh)
+            //NOTE: may need to check more if vertical traversal is added, but works for the time being
+            jitterTarget = new Vector3(hit.position.x, Star.Value.transform.position.y, hit.position.z);
+            return true;
+        }
 
-        ////Will only be hit if the position is nowhere near the navmesh, which realistically shouldn't occur
-        //else
-        //{
-        //    Debug.LogWarning("No targets found near position " + location);
-        //    return false;
-        //}
+        //Will only be hit if the position is nowhere near the navmesh, which realistically shouldn't occur
+        else
+        {
+            Debug.LogWarning("No targets found near position " + location);
+            return false;
+        }
 
         return true;
     }
@@ -378,7 +367,7 @@ public partial class NavigateJitterAction : Action
             //Unless top of objects is considered a different navmesh? things to consider and look into as we progress
         distance.y = 0;
         
-        if (distance.sqrMagnitude < 0.01f)
+        if (distance.sqrMagnitude < 0.1f)
         {
             return true;
         }

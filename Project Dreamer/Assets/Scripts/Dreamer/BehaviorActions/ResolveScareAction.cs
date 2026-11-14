@@ -13,7 +13,6 @@ public partial class ResolveScareAction : Action
 
     protected override Status OnStart()
     {
-        Debug.LogWarning("resolved scare");
         Scare.Value = null;
         sawScare.Value = false;
         return Status.Running;
