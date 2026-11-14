@@ -44,10 +44,10 @@ Shader "Custom/SoundRange"
             sampler2D _CameraDepthTexture;
             float _CameraPositionResponse;
             float _FresnelPower;
-            fixed4 _FresnelColor;
+            half4 _FresnelColor;
             sampler2D _FrenzelTexture;
             float _WaveHeight;
-            fixed4 _WaveColor;
+            half4 _WaveColor;
             sampler2D _WaveTexture;
 
             v2f vert (appdata v)

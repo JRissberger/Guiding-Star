@@ -69,7 +69,7 @@ Shader "Custom/Spectre Fur"
                 float _InvTurbulanceNoiseScale;
                 float2 _DefaultTangentDisplace;
                 float _ScrollVelocity;
-                fixed4 _GlimmerColor;
+                half4 _GlimmerColor;
             CBUFFER_END
 
             #include "WindDistort.cginc"
