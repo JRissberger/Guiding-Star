@@ -44,7 +44,7 @@ Shader "Hidden/FunnyCone"
 
             sampler2D _CameraDepthTexture;
             float _Density;
-            fixed4 _Color;
+            half4 _Color;
             float3 _ConeSourceOS;
             float _Theta;
             
