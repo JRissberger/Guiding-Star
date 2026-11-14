@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class LightHazard : MonoBehaviour
@@ -14,6 +15,9 @@ public class LightHazard : MonoBehaviour
 
     //Spotlight component
     Light spotlight;
+
+    //Action signal sent to scares as needed
+    public event Action OnLightOn;
 
     private void Start()
     {
@@ -81,5 +85,10 @@ public class LightHazard : MonoBehaviour
     {
         spotlight.enabled = !isActive;
         isActive = !isActive;
+
+        if (isActive)
+        {
+            OnLightOn.Invoke();
+        }
     }
 }
