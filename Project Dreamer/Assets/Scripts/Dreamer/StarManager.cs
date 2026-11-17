@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.Behavior;
 using UnityEngine;
 
@@ -5,6 +6,9 @@ public class StarManager : MonoBehaviour
 {
     private StarState starCurrentState;
     private BehaviorGraphAgent behaviorGraph;
+
+    private bool isFearless = false;
+    public bool IsFearless { get { return isFearless; } set { isFearless = value; } }
 
     private void Start()
     {

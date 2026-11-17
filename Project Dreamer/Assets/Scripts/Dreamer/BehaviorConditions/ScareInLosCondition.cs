@@ -15,10 +15,13 @@ public partial class ScareInLosCondition : Condition
 
     public override bool IsTrue()
     {
-        
+
+        //Get the Star manager
+        starManager = Star.Value.GetComponent<StarManager>();
 
         //Access scarelist from dreamer sight
-        if (SawScare.Value || DreamerSight.Value.Scares.Count > 0)
+            //Automatic fail if fearless
+        if ((SawScare.Value || DreamerSight.Value.Scares.Count > 0) && !starManager.IsFearless)
         {
             //There's a scare spotted, determine what to pick
             GameObject current = null;
@@ -40,8 +43,7 @@ public partial class ScareInLosCondition : Condition
                 Scare.Value = current;
                 SawScare.Value = true;
 
-                //Get the Star manager and update state
-                starManager = Star.Value.GetComponent<StarManager>();
+                //Update state
                 starManager.UpdateStar(StarState.Scared);
 
                 return true;
