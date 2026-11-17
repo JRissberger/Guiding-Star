@@ -24,7 +24,7 @@ public partial class SoundResolvedAction : Action
         NewTargetSound.Value = null;
         IsInvestigating.Value = false;
 
-        //Get the Star manager and update state
+        //Get the Star manager and update state to default
         starManager = GameObject.GetComponent<StarManager>();
         starManager.UpdateStar(StarState.Wander);
 
