@@ -13,6 +13,8 @@ public partial class SoundResolvedAction : Action
     [SerializeReference] public BlackboardVariable<LastHeardSound> NewTargetSound;
     [SerializeReference] public BlackboardVariable<Boolean> IsInvestigating;
 
+    private StarManager starManager;
+
     protected override Status OnStart()
     {
         //Updates previous sound and nulls target sound
@@ -21,7 +23,11 @@ public partial class SoundResolvedAction : Action
         TargetSound.Value = null;
         NewTargetSound.Value = null;
         IsInvestigating.Value = false;
-        
+
+        //Get the Star manager and update state
+        starManager = GameObject.GetComponent<StarManager>();
+        starManager.UpdateStar(StarState.Wander);
+
         return Status.Running;
     }
 

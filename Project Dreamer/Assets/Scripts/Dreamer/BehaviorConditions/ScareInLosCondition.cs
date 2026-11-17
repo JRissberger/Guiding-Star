@@ -11,8 +11,12 @@ public partial class ScareInLosCondition : Condition
     [SerializeReference] public BlackboardVariable<GameObject> Scare;
     [SerializeReference] public BlackboardVariable<GameObject> Star;
 
+    private StarManager starManager;
+
     public override bool IsTrue()
     {
+        
+
         //Access scarelist from dreamer sight
         if (SawScare.Value || DreamerSight.Value.Scares.Count > 0)
         {
@@ -35,6 +39,11 @@ public partial class ScareInLosCondition : Condition
             {
                 Scare.Value = current;
                 SawScare.Value = true;
+
+                //Get the Star manager and update state
+                starManager = Star.Value.GetComponent<StarManager>();
+                starManager.UpdateStar(StarState.Scared);
+
                 return true;
             }
             else if (Scare.Value && SawScare.Value)
