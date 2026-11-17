@@ -9,11 +9,16 @@ public partial class IsSoundLoudCondition : Condition
     [SerializeReference] public BlackboardVariable<LastHeardSound> Sound;
     [SerializeReference] public BlackboardVariable<Vector3> TargetPosition;
 
+    private StarManager starManager;
 
     public override bool IsTrue()
     {
         if (Sound.Value.SoundType == SoundType.Loud)
         {
+            //Get the Star manager and update state
+            starManager = GameObject.GetComponent<StarManager>();
+            starManager.UpdateStar(StarState.Scared);
+
             return true;
         }
 

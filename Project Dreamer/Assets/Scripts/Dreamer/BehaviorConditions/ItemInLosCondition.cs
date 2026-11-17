@@ -1,5 +1,6 @@
 using System;
 using Unity.Behavior;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [Serializable, Unity.Properties.GeneratePropertyBag]
@@ -11,6 +12,7 @@ public partial class ItemInLosCondition : Condition
     [SerializeReference] public BlackboardVariable<Boolean> SawItem;
     [SerializeReference] public BlackboardVariable<GameObject> HeldItem;
 
+    private StarManager starManager;
 
     public override bool IsTrue()
     {
@@ -25,7 +27,10 @@ public partial class ItemInLosCondition : Condition
 
         if (DreamerSight.Value.VisibleItems.Count > 0 || SawItem.Value)
         {
-            
+            //Get the Star manager and update state
+            starManager = GameObject.GetComponent<StarManager>();
+            starManager.UpdateStar(StarState.Curious);
+
             SawItem.Value = true;
             return true;
         }

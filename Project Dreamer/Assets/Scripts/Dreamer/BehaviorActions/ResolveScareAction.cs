@@ -11,11 +11,17 @@ public partial class ResolveScareAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Scare;
     [SerializeReference] public BlackboardVariable<bool> sawScare;
 
+    private StarManager starManager;
+
     protected override Status OnStart()
     {
-        Debug.LogWarning("resolved scare");
         Scare.Value = null;
         sawScare.Value = false;
+
+        //Get the Star manager and update state to default
+        starManager = GameObject.GetComponent<StarManager>();
+        starManager.UpdateStar(StarState.Wander);
+
         return Status.Running;
     }
 

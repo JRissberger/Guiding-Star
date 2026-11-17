@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class StarManager : MonoBehaviour
 {
+    private StarState starCurrentState;
     private BehaviorGraphAgent behaviorGraph;
 
     private void Start()
@@ -22,4 +23,25 @@ public class StarManager : MonoBehaviour
     {
         behaviorGraph.enabled = !behaviorGraph.enabled;
     }
+
+    /// <summary>
+    /// Checks Star's current state and updates display accordingly
+    /// </summary>
+    public void UpdateStar(StarState newState)
+    {
+        starCurrentState = newState;
+
+        //Check Star's current state
+        Debug.Log("Star is now " + starCurrentState);
+
+        //Enable/disable corresponding display
+    }
+}
+
+//States for Star--will likely update if we need more precise ones fo
+public enum StarState
+{
+    Scared,
+    Curious,
+    Wander
 }

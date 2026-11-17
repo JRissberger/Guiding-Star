@@ -11,11 +11,18 @@ public partial class ItemResolvedAction : Action
     [SerializeReference] public BlackboardVariable<GameObject> Item;
     [SerializeReference] public BlackboardVariable<Boolean> SawItem;
 
+    private StarManager starManager;
+
     protected override Status OnStart()
     {
         //Resets values
         Item.Value = null;
         SawItem.Value = false;
+
+        //Get the Star manager and update state to default
+        starManager = GameObject.GetComponent<StarManager>();
+        starManager.UpdateStar(StarState.Wander);
+
         return Status.Running;
     }
 
