@@ -59,7 +59,8 @@ public class PlayerCorporeality : MonoBehaviour
     {
         touchingShadows.Add(other.gameObject);
         SetHiding(true);
-        Debug.Log("setting hiding");
+        SetIncorporeal(defaultCorporealityDistance);
+        Debug.Log("setting hiding and incorporeal");
     }
 
     public void OnShadowExit(ShadowTrigger other)
@@ -67,9 +68,8 @@ public class PlayerCorporeality : MonoBehaviour
         touchingShadows.Remove(other.gameObject);
         if (touchingShadows.Count == 0)
         {
-            SetIncorporeal(defaultCorporealityDistance);
             SetHiding(false);
-            Debug.Log("setting incorporeal");
+            Debug.Log("monitoring incorporeal distance, vulnerable to sight");
         }
     }
 

@@ -24,7 +24,7 @@ public class CameraController : MonoBehaviour
     float time = 0;
     float defaultTime = 4f;
     float timeToMove;
-    public float maxDistance = 30;
+    public float maxDistance = 25;
     public float rotationSpeed = 10;
     public List<Knot> knots = new List<Knot>();
 

@@ -76,7 +76,7 @@ public class PlayerMovement : MonoBehaviour
         this.transform.position = new Vector3(this.transform.position.x, baseHeight + Mathf.Sin(Time.time * bobSpeed) * bobDistance, this.transform.position.z);
         moveDirection = Vector3.zero;
         float targetSpeed = 0;
-        if (!playerCorporeality.IsCorporeal())
+        if (!playerCorporeality.IsCorporeal() && !playerCorporeality.IsHiding())
             playerCorporeality.SubtractDistance((this.transform.position - prevPos).magnitude);
 
         // Get player input

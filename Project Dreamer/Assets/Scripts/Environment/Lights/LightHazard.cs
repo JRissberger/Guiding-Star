@@ -5,6 +5,7 @@ public class LightHazard : MonoBehaviour
     [Tooltip("How long it takes for light to kill the player, in seconds.")]
     [SerializeField] private float _lightKillTime = 1.0f;
 
+    PlayerCorporeality player;
     private bool _playerInLight = false;
     private float _inLightTimer = 0.0f;
 
@@ -30,6 +31,8 @@ public class LightHazard : MonoBehaviour
     {
         if (other.gameObject.tag == "Player" && isActive)
         {
+            if (player == null)
+                player = other.gameObject.GetComponent<PlayerCorporeality>();
             _playerInLight = true;
         }
     }
@@ -45,7 +48,7 @@ public class LightHazard : MonoBehaviour
 
     private void Update()
     {
-        if (_playerInLight)
+        if (_playerInLight && !player.IsHiding())
         {
             _inLightTimer += Time.deltaTime;
 
@@ -71,7 +74,7 @@ public class LightHazard : MonoBehaviour
     /// </summary>
     private void PlayerInLight()
     {
-        //Do nothing (for now)
+        // smoke effect
     }
 
     /// <summary>
