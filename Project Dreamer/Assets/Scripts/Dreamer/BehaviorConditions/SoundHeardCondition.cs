@@ -7,8 +7,8 @@ using UnityEditor;
 using Unity.VisualScripting;
 
 [Serializable, Unity.Properties.GeneratePropertyBag]
-[Condition(name: "Sound Heard", story: "Sound heard or [IsInvestigating]? [SoundManager]", category: "Conditions", id: "0d54f36f5442cb9cf2faf000615d9f0f")]
-public partial class SoundHeardCondition : Condition
+[Condition(name: "Soft Sound Heard", story: "Soft Sound heard or [IsInvestigating]? [SoundManager]", category: "Conditions", id: "0d54f36f5442cb9cf2faf000615d9f0f")]
+public partial class SoftSoundHeardCondition : Condition
 {
     [SerializeReference] public BlackboardVariable<SoundManager> SoundManager;
     [SerializeReference] public BlackboardVariable<Boolean> IsInvestigating;
@@ -18,16 +18,25 @@ public partial class SoundHeardCondition : Condition
         List<Sound> soundList = SoundManager.Value.HeardSounds;
 
 
-        //Are there current sounds in hearing range, or is one currently being tracked?
-        if (soundList.Count > 0 || IsInvestigating.Value)
+        //Is there currently a soft sound being checked?
+        if (IsInvestigating.Value)
         {
-            //Sets to true for if there's sound but not a current investigation
-            IsInvestigating.Value = true;
             return true;
         }
 
 
-        //List is empty and no sound being tracked
+        //Otherwise, loops through the sound list to see if any are soft
+        foreach (Sound sound in soundList)
+        {
+            //Soft sound found
+            if (sound.SoundType == SoundType.Soft)
+            {
+                IsInvestigating.Value = true;
+                return true;
+            }
+        }
+
+        //List is empty/no soft sounds and no sound being tracked
         return false;
     }
 }

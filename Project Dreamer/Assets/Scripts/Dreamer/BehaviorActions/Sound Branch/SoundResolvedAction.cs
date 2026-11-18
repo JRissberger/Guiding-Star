@@ -11,7 +11,10 @@ public partial class SoundResolvedAction : Action
 
     [SerializeReference] public BlackboardVariable<LastHeardSound> TargetSound;
     [SerializeReference] public BlackboardVariable<LastHeardSound> NewTargetSound;
-    [SerializeReference] public BlackboardVariable<Boolean> IsInvestigating;
+    [SerializeReference] public BlackboardVariable<Boolean> IsInvestigatingLoud;
+
+    [SerializeReference] public BlackboardVariable<Boolean> IsInvestigatingSoft;
+
     [SerializeReference] public BlackboardVariable<Vector3> TargetPosition;
 
     private StarManager starManager;
@@ -23,7 +26,8 @@ public partial class SoundResolvedAction : Action
         UnityEngine.Object.Destroy(NewTargetSound.Value);
         TargetSound.Value = null;
         NewTargetSound.Value = null;
-        IsInvestigating.Value = false;
+        IsInvestigatingLoud.Value = false;
+        IsInvestigatingSoft.Value = false;
 
         //Also resetting target position to navigate to
         TargetPosition.Value = Vector3.zero;

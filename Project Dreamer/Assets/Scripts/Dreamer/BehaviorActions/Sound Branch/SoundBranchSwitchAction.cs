@@ -9,6 +9,10 @@ using Unity.Properties;
 public partial class SoundBranchSwitchAction : Action
 {
     [SerializeReference] public BlackboardVariable<bool> IsHarshSound;
+
+    [SerializeReference] public BlackboardVariable<Boolean> IsInvestigatingLoud;
+
+    [SerializeReference] public BlackboardVariable<Boolean> IsInvestigatingSoft;
     protected override Status OnStart()
     {
         /* Return status depends on sound type. Since this is a mismatch handler, a harsh sound on soft branch should succeed,
@@ -19,10 +23,13 @@ public partial class SoundBranchSwitchAction : Action
         //Harsh sound on soft branch
         if (IsHarshSound.Value)
         {
+            //Turn off the current branch's bool
+            IsInvestigatingSoft.Value = false;
             return Status.Success;
         }
 
         //Soft sound on harsh branch
+        IsInvestigatingLoud.Value = false;
         return Status.Failure;
     }
 
