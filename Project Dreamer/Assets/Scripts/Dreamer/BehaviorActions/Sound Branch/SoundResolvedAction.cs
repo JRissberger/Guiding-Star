@@ -12,6 +12,7 @@ public partial class SoundResolvedAction : Action
     [SerializeReference] public BlackboardVariable<LastHeardSound> TargetSound;
     [SerializeReference] public BlackboardVariable<LastHeardSound> NewTargetSound;
     [SerializeReference] public BlackboardVariable<Boolean> IsInvestigating;
+    [SerializeReference] public BlackboardVariable<Vector3> TargetPosition;
 
     private StarManager starManager;
 
@@ -23,6 +24,9 @@ public partial class SoundResolvedAction : Action
         TargetSound.Value = null;
         NewTargetSound.Value = null;
         IsInvestigating.Value = false;
+
+        //Also resetting target position to navigate to
+        TargetPosition.Value = Vector3.zero;
 
         //Get the Star manager and update state to default
         starManager = GameObject.GetComponent<StarManager>();
