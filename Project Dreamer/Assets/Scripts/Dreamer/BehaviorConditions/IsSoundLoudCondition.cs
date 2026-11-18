@@ -17,7 +17,7 @@ public partial class IsSoundLoudCondition : Condition
         starManager = GameObject.GetComponent<StarManager>();
 
         //Ignore sound if Star's fearless
-        if (Sound.Value.SoundType == SoundType.Loud && !starManager.IsFearless)
+        if (Sound.Value.SoundType == SoundType.Loud) // && !starManager.IsFearless)
         {
             //Update state
             starManager.UpdateStar(StarState.Scared);
