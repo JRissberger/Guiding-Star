@@ -37,7 +37,7 @@ Shader "Unlit/Spectre Fresnel"
             };
 
             sampler2D _MainTex;
-            fixed4 _FresnelColor;
+            half4 _FresnelColor;
             float _FresnelPower;
 
             v2f vert (appdata v)
