@@ -15,8 +15,8 @@ public partial class NewSoundFoundCondition : Condition
 
     public override bool IsTrue()
     {
-
         List<Sound> soundList = SoundManager.Value.HeardSounds;
+
 
         if (soundList.Count > 0)
         {
@@ -69,6 +69,8 @@ public partial class NewSoundFoundCondition : Condition
                     }
                 }
 
+                
+
                 //Is it a valid and different value than the current target?
                 if (closestSound && (TargetSound.Value && (TargetSound.Value.SoundType != closestSound.SoundType
                     || TargetSound.Value.Location != closestSound.gameObject.transform.position)) || !TargetSound.Value)
@@ -84,10 +86,10 @@ public partial class NewSoundFoundCondition : Condition
                         UnityEngine.Object.Destroy(TargetSound.Value);
                     }
 
-
                     //If NewTargetSound is null, create the object
                     if (!NewTargetSound.Value)
                     {
+                        Debug.Log("Creating target sound");
                         NewTargetSound.Value = ScriptableObject.CreateInstance<LastHeardSound>();
                         NewTargetSound.Value.Location = closestSound.gameObject.transform.position;
                         NewTargetSound.Value.SoundType = closestSound.SoundType;
@@ -97,12 +99,14 @@ public partial class NewSoundFoundCondition : Condition
                     //Reusing the same objects if this interrupts an existing sound investigation
                     else
                     {
+                        Debug.Log("Updating target sound");
                         NewTargetSound.Value.Location = closestSound.gameObject.transform.position;
                         NewTargetSound.Value.SoundType = closestSound.SoundType;
                     }
 
                     return true;
                 }
+
             }
         }
 

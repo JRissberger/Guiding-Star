@@ -19,7 +19,7 @@ public partial class SoundBranchSwitchAction : Action
          * ending the current tree check and looping back to hit the harsh branch. Conversely, a soft sound on a harsh branch should fail,
          * so the check continues down to the soft sound branch.
          */
-        
+
         //Harsh sound on soft branch
         if (IsHarshSound.Value)
         {

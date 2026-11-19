@@ -23,9 +23,9 @@ public partial class SoundResolvedAction : Action
     {
         //Updates previous sound and nulls target sound
         UnityEngine.Object.Destroy(TargetSound.Value);
-        UnityEngine.Object.Destroy(NewTargetSound.Value);
+        //UnityEngine.Object.Destroy(NewTargetSound.Value);
         TargetSound.Value = null;
-        NewTargetSound.Value = null;
+        //NewTargetSound.Value = null;
         IsInvestigatingLoud.Value = false;
         IsInvestigatingSoft.Value = false;
 
