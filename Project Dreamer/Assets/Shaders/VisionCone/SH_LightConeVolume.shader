@@ -16,7 +16,7 @@ Shader "Unlit/LightConeVolume"
     {
         Tags { "RenderType"="Transparent" "Queue" ="Transparent" }
         LOD 100
-        Cull Back
+        Cull Front
         ZWrite Off
         Blend One OneMinusSrcAlpha
 
@@ -25,6 +25,9 @@ Shader "Unlit/LightConeVolume"
             HLSLPROGRAM
             // Upgrade NOTE: excluded shader from OpenGL ES 2.0 because it uses non-square matrices
             // #pragma exclude_renderers gles
+
+            // use multi_compile in the future to choose to use variant with allow camera clip or not.
+            // #pragma multi_compile CAMERA_ENTER CAMERA_OUTSIDE
 
             #pragma vertex vert
             #pragma fragment frag
@@ -101,7 +104,7 @@ Shader "Unlit/LightConeVolume"
                 float totalTravel = length(enterPoint - exitPoint);
 
                 for (float j = 0; j < 1.; j += STEP_PERCENT){
-                    float3 currentPoint = lerp(exitPoint, enterPoint, j);
+                    float3 currentPoint = lerp(exitPoint, enterPoint, j + .5 * STEP_PERCENT);
                     float3 currentNoisePoint = currentPoint + _ScrollSpeed * _Time.y;
                     currentNoisePoint += _Turbulance * Perlin3DVec(currentNoisePoint * 1.2);
 
@@ -118,7 +121,9 @@ Shader "Unlit/LightConeVolume"
                 return sum;
             }
 
-            fixed4 frag (v2f i) : SV_Target
+            #define CAMERA_ENTER
+
+            fixed4 frag (v2f i, out float depth: SV_DEPTH) : SV_Target
             {
                 float3 fragWS = i.view + _WorldSpaceCameraPos;
                 float3 enterPointOS = mul(unity_WorldToObject, float4(fragWS,1.)).xyz - _ConeSourceOS;
@@ -128,7 +133,7 @@ Shader "Unlit/LightConeVolume"
                 if(points.z < 0){
                     discard;
                 }
-                
+
                 float3 coneEnterOS = enterPointOS + viewVecOS * points.x;
                 float3 coneExitOS = enterPointOS + viewVecOS * points.y;
                 float planeTravelDistance = (_ConeExitPlaneOS - enterPointOS.z) / viewVecOS.z;
@@ -150,17 +155,41 @@ Shader "Unlit/LightConeVolume"
                 float3 enterPoint = mul(unity_ObjectToWorld, float4(coneEnterOS + _ConeSourceOS,1.)).xyz;
                 float3 exitPoint = mul(unity_ObjectToWorld, float4(coneExitOS + _ConeSourceOS, 1.)) .xyz;
                 float3 baseWorldPoint = depthToWS(i.vertex.xy);
+                //compute position on near clip
+                float3 nearClipPoint = ComputeWorldSpacePosition(i.vertex.xy / _ScaledScreenParams.xy, UNITY_NEAR_CLIP_VALUE, UNITY_MATRIX_I_VP);
+                //end compute position on near clip
 
-                float exitPointDepth  = dot(unity_WorldToCamera._m20_m21_m22_m23, float4(exitPoint,      1.)); 
-                float enterPointDepth = dot(unity_WorldToCamera._m20_m21_m22_m23, float4(enterPoint,     1.)); 
-                float worldPointDepth = dot(unity_WorldToCamera._m20_m21_m22_m23, float4(baseWorldPoint, 1.)); 
-
-                if(enterPointDepth > worldPointDepth){
-                    discard;
-                }
+                float exitPointDepth    = dot(unity_WorldToCamera._m20_m21_m22_m23, float4(exitPoint,        1.));
+                float worldPointDepth   = dot(unity_WorldToCamera._m20_m21_m22_m23, float4(baseWorldPoint,   1.)); 
+  
+                float enterPointDepth   = dot(unity_WorldToCamera._m20_m21_m22_m23, float4(enterPoint,       1.));
+                #ifdef CAMERA_ENTER
+                float nearClipDepth     = dot(unity_WorldToCamera._m20_m21_m22_m23, float4(nearClipPoint,    1.)); 
+                #endif
                 if(exitPointDepth > worldPointDepth){
                     exitPoint = baseWorldPoint;
+                    exitPointDepth = worldPointDepth;
                 }
+
+                #ifdef CAMERA_ENTER
+                if(enterPointDepth < nearClipDepth){
+                    enterPoint = nearClipPoint;
+                    enterPointDepth = nearClipDepth;
+                }
+                #endif
+
+                if(exitPointDepth < enterPointDepth){
+                    discard;
+                }
+
+                float4 p = TransformWorldToHClip(enterPoint);
+                float depthOut = p.z / p.w;
+                
+                #ifdef UNITY_REVERSED_Z
+                    depth = depthOut;
+                #else
+                    depth = depthOut * .5 + .5;
+                #endif
 
                 float3 lightOrigin = mul(unity_ObjectToWorld, float4(_ConeSourceOS, 1)).xyz;
                 
