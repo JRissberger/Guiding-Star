@@ -19,6 +19,12 @@ public class LightHazard : MonoBehaviour
     //Action signal sent to scares as needed
     public event Action OnLightOn;
 
+    [Tooltip("Check this if it's a light attached to Star's vision cone!")]
+    [SerializeField] private bool IsOnStar = false;
+
+    //References player
+    private GameObject player;
+
     private void Start()
     {
         //Updates activity based on if the spotlight component is on or not
@@ -34,6 +40,8 @@ public class LightHazard : MonoBehaviour
     {
         if (other.gameObject.tag == "Player" && isActive)
         {
+            //Reference to player
+            player = other.gameObject;
             _playerInLight = true;
         }
     }
@@ -49,7 +57,35 @@ public class LightHazard : MonoBehaviour
 
     private void Update()
     {
-        if (_playerInLight)
+        //Extra checks are run if this is a light on Star, to account for their light cone mesh potentially clipping through a wall
+        if (_playerInLight && IsOnStar)
+        {
+            //Make sure there's a direct line between star and the player (avoiding clipping through walls incidents)
+                //Using transform.root to use Star's position, since the cone's transform is in the middle
+            if (Physics.Linecast(transform.root.position, player.transform.position, out RaycastHit hit, ~LayerMask.GetMask("DreamerCompoundSight", "Star")))
+            { 
+                if (hit.transform.gameObject == player)
+                {
+                    _inLightTimer += Time.deltaTime;
+
+                    PlayerInLight();
+
+                    if (_inLightTimer >= _lightKillTime)
+                    {
+                        KillPlayer();
+                    }
+                }
+            }
+
+            else
+            {
+                Debug.LogWarning("Player in cone but linecast is blocked!");
+            }
+
+        }
+
+        //Standard light, calculate normally without linecast
+        else if (_playerInLight)
         {
             _inLightTimer += Time.deltaTime;
 
