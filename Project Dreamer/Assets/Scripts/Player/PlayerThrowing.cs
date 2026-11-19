@@ -52,6 +52,9 @@ public class PlayerThrowing : BaseThrowing
     private List<GameObject> _pickupableItems = new List<GameObject>();
     private GameObject _pickupTarget = null;
 
+    //Used to check the radius/height around Star at which throwing isn't allowed
+    private StarManager starManager;
+
     protected override void Start()
     {
         base.Start();
@@ -68,6 +71,9 @@ public class PlayerThrowing : BaseThrowing
         {
             _camera = Camera.main;
         }
+
+        //Get StarManager
+        starManager = GameObject.Find("Star").GetComponent<StarManager>();
     }
 
     private void Update()
@@ -100,6 +106,25 @@ public class PlayerThrowing : BaseThrowing
                 //If the target info reports that it's on Star's field, adjust the vector3 until it's....not??
                     //Need to find the distance between the edge of star's radius and the point, then add that value onto the vector to move it back towards the player
                     //Vector math!! get the direction to the player, multiply the distance by it, then add it to the vector. may need to cross reference this.
+
+                //Check the distance to star, ignoring height
+                float distanceToStar = Vector3.Distance(new Vector3(clickedPoint.x, 0, clickedPoint.z), new Vector3 (starManager.gameObject.transform.position.x, 0, starManager.gameObject.transform.position.z));
+                
+                //If the distance is under the allowed amount, check height as well
+                if (distanceToStar < starManager.PlayerThrowRadius)
+                {
+                    //Height check
+                    if (clickedPoint.y < starManager.PlayerThrowHeight)
+                    {
+                        //The selected point is within the area around Star that's blocked off
+                        Debug.Log("Selected area is too close to Star!");
+
+                        //Should be updating trytarget
+                        
+                    }
+                }
+
+
 
                 //Cylindrical range check
                 Vector2 displacementXZ = new Vector2(tryTarget.x, tryTarget.z) - new Vector2(transform.position.x, transform.position.z);

@@ -10,6 +10,14 @@ public class StarManager : MonoBehaviour
     private bool isFearless = false;
     public bool IsFearless { get { return isFearless; } set { isFearless = value; } }
 
+    [Tooltip("The radius around Star where the player is blocked from throwing")]
+    [SerializeField] private float playerThrowRadius = 1.0f;
+    public float PlayerThrowRadius { get { return playerThrowRadius; } }
+
+    //The height above star where the player isn't allowed to throw. Star height x2
+    private float playerThrowHeight;
+    public float PlayerThrowHeight {  get { return playerThrowHeight; } }
+
     private void Start()
     {
         behaviorGraph = GetComponent<BehaviorGraphAgent>();
@@ -18,6 +26,11 @@ public class StarManager : MonoBehaviour
         {
             Debug.LogWarning("Behavior graph was not found!");
         }
+
+        //Get the collider to get Star's height
+        Collider collider = gameObject.GetComponent<Collider>();
+        playerThrowHeight = collider.bounds.size.y * 2;
+
     }
 
     /// <summary>
@@ -42,7 +55,7 @@ public class StarManager : MonoBehaviour
     }
 }
 
-//States for Star--will likely update if we need more precise ones fo
+//States for Star--will likely update if we need more precise ones
 public enum StarState
 {
     Scared,
