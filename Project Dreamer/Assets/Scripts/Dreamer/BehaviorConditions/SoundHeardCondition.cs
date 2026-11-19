@@ -17,7 +17,6 @@ public partial class SoftSoundHeardCondition : Condition
     {
         List<Sound> soundList = SoundManager.Value.HeardSounds;
 
-
         //Is there currently a soft sound being checked?
         if (IsInvestigating.Value)
         {

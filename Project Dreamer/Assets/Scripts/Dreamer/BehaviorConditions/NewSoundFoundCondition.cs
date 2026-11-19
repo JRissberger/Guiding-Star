@@ -89,7 +89,6 @@ public partial class NewSoundFoundCondition : Condition
                     //If NewTargetSound is null, create the object
                     if (!NewTargetSound.Value)
                     {
-                        Debug.Log("Creating target sound");
                         NewTargetSound.Value = ScriptableObject.CreateInstance<LastHeardSound>();
                         NewTargetSound.Value.Location = closestSound.gameObject.transform.position;
                         NewTargetSound.Value.SoundType = closestSound.SoundType;
@@ -99,7 +98,6 @@ public partial class NewSoundFoundCondition : Condition
                     //Reusing the same objects if this interrupts an existing sound investigation
                     else
                     {
-                        Debug.Log("Updating target sound");
                         NewTargetSound.Value.Location = closestSound.gameObject.transform.position;
                         NewTargetSound.Value.SoundType = closestSound.SoundType;
                     }
