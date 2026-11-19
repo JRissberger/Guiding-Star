@@ -97,6 +97,10 @@ public class PlayerThrowing : BaseThrowing
                     tryTarget = clickedPoint;
                 }
 
+                //If the target info reports that it's on Star's field, adjust the vector3 until it's....not??
+                    //Need to find the distance between the edge of star's radius and the point, then add that value onto the vector to move it back towards the player
+                    //Vector math!! get the direction to the player, multiply the distance by it, then add it to the vector. may need to cross reference this.
+
                 //Cylindrical range check
                 Vector2 displacementXZ = new Vector2(tryTarget.x, tryTarget.z) - new Vector2(transform.position.x, transform.position.z);
                 float distanceXZ = displacementXZ.magnitude;
