@@ -238,6 +238,10 @@ public class PlayerThrowing : BaseThrowing
                 _pickupTarget.GetComponent<InteractableBase>().Interact();
             }
         }
+        else if (_pickupAction.WasPressedThisFrame() && _heldItem != null)
+        {
+            DropItem();
+        }
     }
 
     private void SetPickupTarget(GameObject target)
@@ -303,6 +307,7 @@ public class PlayerThrowing : BaseThrowing
 
     public override void SetHeldItem(GameObject item)
     {
+        _pickupableItems.Remove(item);
         base.SetHeldItem(item);
     }
     
