@@ -88,6 +88,18 @@ public class RespawnManager : MonoBehaviour
         }
     }
 
+    private struct CustomEventTriggerData
+    {
+        public CustomEventTrigger instance;
+        public bool enabled;
+
+        public CustomEventTriggerData(CustomEventTrigger instance, bool enabled)
+        {
+            this.instance = instance;
+            this.enabled = enabled;
+        }
+    }
+
     private struct InteractableData
     {
         public InteractableBase instance;
@@ -124,6 +136,7 @@ public class RespawnManager : MonoBehaviour
     private List<LightData> _savedLights = new();
     private List<WanderStateTriggerData> _savedStateTriggers = new();
     private List<WanderPointTriggerData> _savedPointTriggers = new();
+    private List<CustomEventTriggerData> _savedEventTriggers = new();
     private List<InteractableData> _savedInteractables = new();
 
     public static RespawnManager Instance { get; private set; }
@@ -228,6 +241,12 @@ public class RespawnManager : MonoBehaviour
         foreach (ChangeWanderPointsTrigger trigger in FindObjectsByType<ChangeWanderPointsTrigger>(FindObjectsSortMode.None))
         {
             _savedPointTriggers.Add(new WanderPointTriggerData(trigger, trigger.gameObject.GetComponent<Collider>().enabled));
+        }
+
+        _savedEventTriggers.Clear();
+        foreach (CustomEventTrigger trigger in FindObjectsByType<CustomEventTrigger>(FindObjectsSortMode.None))
+        {
+            _savedEventTriggers.Add(new CustomEventTriggerData(trigger, trigger.gameObject.GetComponent<Collider>().enabled));
         }
     }
 
