@@ -368,9 +368,17 @@ public class RespawnManager : MonoBehaviour
             data.instance.gameObject.GetComponent<Collider>().enabled = data.enabled;
         }
 
+        foreach (CustomEventTriggerData data in _savedEventTriggers)
+        {
+            data.instance.gameObject.GetComponent<Collider>().enabled = data.enabled;
+        }
+
         foreach (InteractableData data in _savedInteractables)
         {
             data.instance.ResetInteraction();
         }
+
+        //Reset the room 3 door and vent
+        FindAnyObjectByType<CloseDoorOpenVent>().Reset();
     }
 }
