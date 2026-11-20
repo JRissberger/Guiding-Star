@@ -52,11 +52,6 @@ public class PlayerThrowing : BaseThrowing
     private List<GameObject> _pickupableItems = new List<GameObject>();
     private GameObject _pickupTarget = null;
 
-    //Used to check the radius/height around Star at which throwing isn't allowed
-    private StarManager starManager;
-
-    //The area around Star that the player can't throw in 
-    private Collider starThrowRestriction;
 
     protected override void Start()
     {
@@ -74,12 +69,6 @@ public class PlayerThrowing : BaseThrowing
         {
             _camera = Camera.main;
         }
-
-        //Get StarManager
-        starManager = GameObject.Find("Star").GetComponent<StarManager>();
-
-        //Get the collider to check against
-        starThrowRestriction = GameObject.Find("ThrowBlocker").GetComponent<Collider>();
     }
 
     private void Update()
@@ -110,73 +99,7 @@ public class PlayerThrowing : BaseThrowing
                     tryTarget = clickedPoint;
                 }
 
-                //Unfortunately there's issues with targeting THROUGH star and how to solve that easily. You can target with what looks really close to star but actually have it be much further away
-                //With star inbetween the target and the player. might try raycasting and seeing if star is hit, but idk how they're NOT being hit to begin with...if I can get a check to fire
-                //I'd then have to move it in a direction...maybe pick the edge it's closest to and move it out that way? but it's not in the thing--would have to snap to be in the direction of Star closest
-                //to the CAMERA--but this issue is occurring on 3/4 of the radius
-
-                //Checking if the target is too close to Star, and adjusting if so
-                if (Vector3.Distance(starThrowRestriction.ClosestPoint(tryTarget), tryTarget) < 0.001f) //if the diff is this small it's in the area
-                {
-                    Debug.Log("Selected area is too close to Star!");
-
-                    //Horizontal only direction between star and targeted point
-                        //Ignoring y axis since height is taken care of later after this check
-                    Vector2 dirToStar = new Vector2(tryTarget.x, tryTarget.z).normalized;
-
-                    //Updating to be out of radius
-                    Vector2 newPos = new Vector2(starThrowRestriction.bounds.center.x, starThrowRestriction.bounds.center.z) + dirToStar * (starThrowRestriction.bounds.extents.x + 0.01f);
-
-                    //Updating target, the clamp later will take care of the height change
-                    tryTarget.x = newPos.x;
-                    tryTarget.z = newPos.y;
-                }
-
-                //Running a check to make sure the area isn't within a set radius around Star, and adjusting if so (if the new position is out of bounds, the clamp covers it)
-
-                //Check the distance to star, ignoring height
-                //Using vector2 since height's being skipped for now
-                //Vector2 starDistVector = new Vector2 (tryTarget.x - starManager.transform.position.x, tryTarget.z - starManager.transform.position.z);
                 
-                //    //Convert to float
-                //float distanceFromStar = starDistVector.magnitude;
-
-                ////If the distance is under the allowed amount, check height as well
-                //if (distanceFromStar < starManager.PlayerThrowRadius)
-                //{
-                //    //Height check
-                //    if (tryTarget.y < starManager.PlayerThrowHeight)
-                //    {
-                //        //The selected point is within the area around Star that's blocked off
-                //        Debug.Log("Selected area is too close to Star!");
-
-                //        //Normalize the direction vector
-                //        Vector2 starDistNormalized = starDistVector.normalized;
-
-                //        //Adjusting location to move the target to right outside the range
-                //            //Should be semi smooth since it'll follow the direction the attempt was done at
-                //            //And then caught by the range clamp below if needed
-                //        Vector2 updatedPos = new Vector2(starManager.transform.position.x, starManager.transform.position.z) + starDistNormalized * (starManager.PlayerThrowRadius + 0.01f);
-
-                //        //Updating the position but keeping original height 
-                //        tryTarget.x = updatedPos.x;
-                //        tryTarget.z = updatedPos.y;
-
-
-                //        //Doing another raycast on the updated target to confirm it's valid
-                //        //Technically overwrites the calculations above but if the target is valid it'll stay the same, just checking if there's suddenly a block
-                //        //Also updates targetInfo since it's used more later and not all the data for that was updated to the updated position in the calculations
-                //        Vector3 updatedDir = tryTarget - transform.position;
-                //        targetHit = Physics.Raycast(transform.position, updatedDir.normalized, out targetInfo, updatedDir.magnitude + 0.1f, _targetableSurfaceMask, QueryTriggerInteraction.Ignore);
-
-                //        if (targetHit)
-                //        {
-                //            tryTarget = targetInfo.point;
-                //        }
-                //    }
-                //}
-
-
 
                 //Cylindrical range check
                 Vector2 displacementXZ = new Vector2(tryTarget.x, tryTarget.z) - new Vector2(transform.position.x, transform.position.z);
