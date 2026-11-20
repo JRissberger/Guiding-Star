@@ -33,7 +33,7 @@ public class CameraController : MonoBehaviour
     {
         spline = this.GetComponent<CinemachineSplineDolly>();
         cam = this.GetComponent<CinemachineCamera>();
-        player = GameObject.Find("Player");
+        player = GameObject.FindGameObjectWithTag("Player");
         timeToMove = defaultTime;
         foreach (UnityEngine.Splines.DataPoint<CinemachineSplineDollyLookAtTargets.Item> i in cam.GetComponent<CinemachineSplineDollyLookAtTargets>().Targets)
         {
@@ -110,7 +110,6 @@ public class CameraController : MonoBehaviour
     public void MoveTo(int index, float t)
     {
         goal = index;
-        Debug.Log(index);
         //group.Targets[0].Object = knots[index].lookAt;
 
         // If the camera is mid-transition handle time and goal assignment
