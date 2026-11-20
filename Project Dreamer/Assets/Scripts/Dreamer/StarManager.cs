@@ -11,7 +11,7 @@ public class StarManager : MonoBehaviour
     public bool IsFearless { get { return isFearless; } set { isFearless = value; } }
 
     [Tooltip("The radius around Star where the player is blocked from throwing")]
-    [SerializeField] private float playerThrowRadius = 1.0f;
+    [SerializeField] private float playerThrowRadius = 3.0f;
     public float PlayerThrowRadius { get { return playerThrowRadius; } }
 
     //The height above star where the player isn't allowed to throw. Star height x2
