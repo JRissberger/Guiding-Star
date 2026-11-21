@@ -29,7 +29,9 @@ public partial class FindWanderIndexAction : Action
                 continue;
             }
 
-            //Get direction to the point (might update to just check radius? getting this working first)
+            //Get direction to the point 
+                //NOTE the center point has to be visible to consider this at all even though I'm using a radius check below for distance. 
+                //May update this down the line depending on behavior.
             Vector3 dirToPoint = mapSegments[i].CenterLoc - Star.Value.transform.position;
 
             //Nulling out height since that's not a factor NOTE: if we add verticality down the line it will become a factor!!
@@ -37,10 +39,12 @@ public partial class FindWanderIndexAction : Action
             Vector3 starForward = new Vector3(Star.Value.transform.forward.x, 0, Star.Value.transform.forward.z); //Also for star's forward, same reason
 
             //Dot product check, > 0 means it's in front, 0 means it's directly to the side, < 0 means it's behind
-            float dot = Vector3.Dot(starForward, dirToPoint);
+            float dot = Vector3.Dot(starForward.normalized, dirToPoint.normalized);
 
-            //if the dot isn't above 1, skip over the index, it's not in view
-            if (dot <= 0)
+            //if the dot isn't above 0, skip over the index, it's not in view
+                //0.5 is 60 degrees off forward, so cutting off 30 degrees in peripheral each direction
+                //note for math, even though it's a 180 degree view it's calculating based on difference from the forward, so it's 90 degrees either direction, so 0 = 90 degrees
+            if (dot <= 0.5f)
             {
                 continue;
             }
