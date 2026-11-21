@@ -136,6 +136,10 @@ PrefabInstance:
       propertyPath: shadow
       value: 
       objectReference: {fileID: 2260677882327686940}
+    - target: {fileID: 2355750428480363185, guid: 01ca99d70aad47c469d059b2abba5aa5, type: 3}
+      propertyPath: rotationSpeed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 3084937341025140326, guid: 01ca99d70aad47c469d059b2abba5aa5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -211,6 +215,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5a5027b0604bd243aa948eaae2e9583, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCorporeality
-  hideMaterial: {fileID: 0}
+  hideMaterial: {fileID: 2100000, guid: 1a573065ef501714b9ad8ef8d719bf5f, type: 2}
   shadowDistance: 5
+  starryMat: {fileID: 2100000, guid: 1a573065ef501714b9ad8ef8d719bf5f, type: 2}
   defaultCorporealityDistance: 15
