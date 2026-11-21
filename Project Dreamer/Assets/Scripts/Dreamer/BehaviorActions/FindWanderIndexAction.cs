@@ -46,7 +46,7 @@ public partial class FindWanderIndexAction : Action
             }
 
             //Check distance and compare
-            float newDistance = Vector3.Distance(Star.Value.transform.position, mapSegments[i].CenterLoc);
+            float newDistance = Mathf.Max(0f, Vector3.Distance(Star.Value.transform.position, mapSegments[i].CenterLoc) - mapSegments[i].Radius);
             if (newDistance < closestDist)
             {
                 //Update data on best pick
