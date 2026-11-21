@@ -32,7 +32,7 @@ public class CloseDoorOpenVent : MonoBehaviour
         while (doorTimer < doorShutTime)
         {
             doorTimer += Time.deltaTime;
-            float angle = doorTimer / doorShutTime * -90.0f;
+            float angle = Mathf.Min(doorTimer / doorShutTime, 1.0f) * -90.0f;
             Vector3 doorRotation = doorStartRotation;
             doorRotation.y += angle;
             doorInstance.transform.rotation = Quaternion.Euler(doorRotation);
@@ -47,7 +47,7 @@ public class CloseDoorOpenVent : MonoBehaviour
         while (ventTimer < ventOpenTime)
         {
             ventTimer += Time.deltaTime;
-            float angle = Mathf.Pow(ventTimer / ventOpenTime, 2.0f) * -60.0f;
+            float angle = Mathf.Pow(Mathf.Min(ventTimer / ventOpenTime, 1.0f), 2.0f) * -60.0f;
             Vector3 ventRotation = ventStartRotation;
             ventRotation.z += angle;
             ventInstance.transform.rotation = Quaternion.Euler(ventRotation);

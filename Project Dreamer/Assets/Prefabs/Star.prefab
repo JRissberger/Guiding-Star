@@ -344,7 +344,7 @@ MonoBehaviour:
   _throwCurveHeight: 1
   _solidToThrownMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 192
   _handOffset: {x: 0, y: 0.5, z: 0.75}
   _drawCurve: 0
   _curveDisplayWidth: 0.01
@@ -682,6 +682,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightHazard
   _lightKillTime: 0.25
+  lightFog: {fileID: 0}
   isActive: 1
 --- !u!64 &1454738024826329390
 MeshCollider:
