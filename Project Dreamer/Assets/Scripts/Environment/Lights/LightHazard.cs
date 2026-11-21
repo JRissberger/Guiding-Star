@@ -24,6 +24,7 @@ public class LightHazard : MonoBehaviour
 
     //References player
     private GameObject player;
+    private PlayerCorporeality playerCorporeality;
 
     private void Start()
     {
@@ -42,6 +43,7 @@ public class LightHazard : MonoBehaviour
         {
             //Reference to player
             player = other.gameObject;
+            playerCorporeality = other.gameObject.GetComponent<PlayerCorporeality>();
             _playerInLight = true;
         }
     }
@@ -58,7 +60,7 @@ public class LightHazard : MonoBehaviour
     private void Update()
     {
         //Extra checks are run if this is a light on Star, to account for their light cone mesh potentially clipping through a wall
-        if (_playerInLight && IsOnStar)
+        if (_playerInLight && IsOnStar && !playerCorporeality.IsHiding())
         {
             //Make sure there's a direct line between star and the player (avoiding clipping through walls incidents)
                 //Using transform.root to use Star's position, since the cone's transform is in the middle
@@ -85,7 +87,7 @@ public class LightHazard : MonoBehaviour
         }
 
         //Standard light, calculate normally without linecast
-        else if (_playerInLight)
+        else if (_playerInLight && !playerCorporeality.IsHiding())
         {
             _inLightTimer += Time.deltaTime;
 
@@ -111,7 +113,7 @@ public class LightHazard : MonoBehaviour
     /// </summary>
     private void PlayerInLight()
     {
-        //Do nothing (for now)
+        // smoke effect
     }
 
     /// <summary>

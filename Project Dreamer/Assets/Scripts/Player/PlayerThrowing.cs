@@ -200,7 +200,7 @@ public class PlayerThrowing : BaseThrowing
         }
 
         //Determining the nearest item, to highlight it
-        if (_pickupableItems.Count > 0 && GetComponent<PlayerCorporeality>().IsCorporeal())
+        if (_pickupableItems.Count > 0)
         {
             GameObject nearestItem = _pickupableItems[0];
             float nearestDistance = (_pickupableItems[0].transform.position - transform.position).magnitude;
@@ -241,6 +241,10 @@ public class PlayerThrowing : BaseThrowing
             {
                 _pickupTarget.GetComponent<InteractableBase>().Interact();
             }
+        }
+        else if (_pickupAction.WasPressedThisFrame() && _heldItem != null)
+        {
+            DropItem();
         }
     }
 

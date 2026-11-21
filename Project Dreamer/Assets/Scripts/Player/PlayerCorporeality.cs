@@ -1,4 +1,6 @@
+using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -13,8 +15,10 @@ public class PlayerCorporeality : MonoBehaviour
     [SerializeField] private float shadowDistance = 5.0f;
 
     private Material defaultMaterial;
+    public Material starryMat;
 
     private int SHADOW_LAYER = 8;
+    private Phaseable[] phaseables;
 
     private bool hiding = false;
     private float ghostDistance = 0.0f;
@@ -32,6 +36,8 @@ public class PlayerCorporeality : MonoBehaviour
         {
             Debug.LogWarning("PlayerCorporeality script on object " + gameObject.name + " does not have hideMaterial assigned! The player may look strange when hiding in a shadow.");
         }
+
+        phaseables = FindGameObjectsInLayer(7); // Phaseables layer = 7
 
         defaultMaterial = rend.material;
         //TEMPORARY: Use debug key 3 to hide, and debug key 4 to "use" incorporeality
@@ -59,7 +65,8 @@ public class PlayerCorporeality : MonoBehaviour
     {
         touchingShadows.Add(other.gameObject);
         SetHiding(true);
-        Debug.Log("setting hiding");
+        SetIncorporeal(defaultCorporealityDistance);
+        Debug.Log("setting hiding and incorporeal");
     }
 
     public void OnShadowExit(ShadowTrigger other)
@@ -67,9 +74,8 @@ public class PlayerCorporeality : MonoBehaviour
         touchingShadows.Remove(other.gameObject);
         if (touchingShadows.Count == 0)
         {
-            SetIncorporeal(defaultCorporealityDistance);
             SetHiding(false);
-            Debug.Log("setting incorporeal");
+            Debug.Log("monitoring incorporeal distance, vulnerable to sight");
         }
     }
 
@@ -89,7 +95,8 @@ public class PlayerCorporeality : MonoBehaviour
     /// </summary>
     public void SetCorporeal()
     {
-        SetCorporealInternal(true);
+        if (!IsHiding())
+            SetCorporealInternal(true);
     }
 
     /// <summary>
@@ -101,6 +108,9 @@ public class PlayerCorporeality : MonoBehaviour
     public void SubtractDistance(float amount)
     {
         ghostDistance -= amount;
+        float transparency = 0.4f + (0.5f - ((ghostDistance / defaultCorporealityDistance) * 0.5f));
+        rend.material.color = new Color(rend.material.color.r, rend.material.color.g, rend.material.color.b, transparency);
+
         if (ghostDistance <= 0)
         {
             ghostDistance = 0;
@@ -133,16 +143,28 @@ public class PlayerCorporeality : MonoBehaviour
     /// <param name="corporeal">True for corporeal, false for incorporeal</param>
     private void SetCorporealInternal(bool corporeal)
     {
+        // Turn Specter corporeal, turn Phaseable objects normal
         if (corporeal)
         {
             Physics.IgnoreLayerCollision(2, 7, false);
             ghostDistance = 0;
             rend.material.color = new Color(rend.material.color.r, rend.material.color.g, rend.material.color.b, 1f);
+
+            foreach (Phaseable g in phaseables)
+            {
+                g.GetComponent<MeshRenderer>().material = g.original;
+            }
         }
+        // Turn Specter incorporeal, turn Phaseable objects starry
         else
         {
             Physics.IgnoreLayerCollision(2, 7, true);
             rend.material.color = new Color(rend.material.color.r, rend.material.color.g, rend.material.color.b, 0.4f);
+
+            foreach (Phaseable g in phaseables)
+            {
+                g.GetComponent<MeshRenderer>().material = starryMat;
+            }
         }
     }
 
@@ -170,5 +192,28 @@ public class PlayerCorporeality : MonoBehaviour
         }
 
         hiding = isHiding;
+    }
+
+    Phaseable[] FindGameObjectsInLayer(int layer)
+    {
+        GameObject[] objects = GameObject.FindObjectsByType<GameObject>(FindObjectsSortMode.None);
+        List<Phaseable> p = new List<Phaseable>();
+
+        for (int i = 0; i < objects.Length; i++)
+        {
+            if (objects[i].layer == layer)
+            {
+                Phaseable newPhaseable = objects[i].AddComponent<Phaseable>();
+                newPhaseable.original = objects[i].GetComponent<MeshRenderer>().material;
+
+                p.Add(newPhaseable);
+            }
+        }
+        if (p.Count == 0)
+        {
+            Debug.Log("No phaseables found");
+            return null;
+        }
+        return p.ToArray();
     }
 }

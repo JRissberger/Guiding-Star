@@ -69,6 +69,10 @@ public class BaseThrowing : MonoBehaviour
                 DropItem();
             }
 
+            PlayerCorporeality pCorp = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerCorporeality>();
+            if (!pCorp.IsCorporeal() && !pCorp.IsHiding())
+                pCorp.SetCorporeal();
+
             _heldItem = item;
             _heldItem.transform.position = transform.position + transform.rotation * _handOffset;
             _heldItem.transform.rotation = Quaternion.identity;
@@ -82,6 +86,10 @@ public class BaseThrowing : MonoBehaviour
             {
                 heldrb.linearVelocity = Vector3.zero;
                 heldrb.isKinematic = true;
+            }
+            if (pCorp.IsHiding())
+            {
+                DropItem();
             }
         }
     }
