@@ -310,6 +310,19 @@ public class RespawnManager : MonoBehaviour
         starBehavior.SetVariableValue<bool>("Can Wander", _savedStarBehavior.canWander);
         starBehavior.SetVariableValue<int>("Wander Index", _savedStarBehavior.wanderIndex);
 
+        FindAnyObjectByType<SoundManager>().HeardSounds.Clear();
+        BlackboardVariable targetSound, newTargetSound;
+        starBehavior.GetVariable("Target Sound", out targetSound);
+        starBehavior.GetVariable("New Target Sound", out newTargetSound);
+        if (targetSound.ObjectValue != null)
+        {
+            Destroy((LastHeardSound)targetSound.ObjectValue);
+        }
+        if (newTargetSound.ObjectValue != null)
+        {
+            Destroy((LastHeardSound)newTargetSound.ObjectValue);
+        }
+
         //Reset the camera
         _cameraController.MoveTo(_savedCameraKnot, 0);
 
