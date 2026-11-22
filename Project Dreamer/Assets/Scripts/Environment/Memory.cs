@@ -17,6 +17,12 @@ public class Memory : MonoBehaviour
     [Tooltip("Used to pause Star while viewing a memory")]
     [SerializeField] private GameObject star;
 
+    [HideInInspector] public bool rising = false;
+    [Tooltip("How fast the memory will rise when star collects it")]
+    public float riseRate = 0.5f;
+    public float riseAmount = 2f;
+    private float totalRise;
+
     private void Start()
     {
         //If there's an interactable, change its layer so Star won't access it
@@ -25,6 +31,7 @@ public class Memory : MonoBehaviour
         {
             door.gameObject.layer = LayerMask.NameToLayer("Default");
         }
+        totalRise = riseAmount + this.transform.position.y;
     }
 
     //Re-find Star if they were destroyed by the respawn system
@@ -34,6 +41,20 @@ public class Memory : MonoBehaviour
         if (star == null)
         {
             star = GameObject.FindGameObjectWithTag("Star");
+        }
+        if (rising)
+        {
+            this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + (riseRate * Time.deltaTime), this.transform.position.z);
+            if (this.transform.position.y >= totalRise)
+            {
+                //Enable memory ui
+                memoryUI.SetActive(true);
+
+                //Start fade in coroutine
+                //Note: Will need to add onto this if we ever want multiple images
+                StartCoroutine(MemoryView(GetComponentInChildren<Image>()));
+                rising = false;
+            }
         }
     }
 
@@ -50,12 +71,8 @@ public class Memory : MonoBehaviour
         //Update the memory in view
         RemoveItemFromView();
 
-        //Enable memory ui
-        memoryUI.SetActive(true);
-
-        //Start fade in coroutine
-            //Note: Will need to add onto this if we ever want multiple images
-        StartCoroutine(MemoryView(GetComponentInChildren<Image>()));
+        //Start raising the memory
+        rising = true;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -138,6 +155,9 @@ public class Memory : MonoBehaviour
 
         //Re enable star's behavior tree
         star.GetComponent<StarManager>().ToggleBehavior();
+
+        //Return camera to its previous position
+        GameObject.Find("CameraManager").GetComponent<CameraManager>().ReturnFromMemory();
 
         //Destroy memory
         Destroy(this.gameObject);
