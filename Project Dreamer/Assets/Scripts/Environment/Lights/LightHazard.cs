@@ -27,6 +27,13 @@ public class LightHazard : MonoBehaviour
     //Action signal sent to scares as needed
     public event Action OnLightOn;
 
+    [Tooltip("Check this if it's a light attached to Star's vision cone!")]
+    [SerializeField] private bool IsOnStar = false;
+
+    //References player
+    private GameObject player;
+    private PlayerCorporeality playerCorporeality;
+
     private void Start()
     {
         //Updates activity based on if the spotlight component is on or not
@@ -46,10 +53,9 @@ public class LightHazard : MonoBehaviour
     {
         if (other.gameObject.tag == "Player" && isActive)
         {
-            if (player == null)
-            {
-                player = other.gameObject.GetComponent<PlayerCorporeality>();
-            }
+            //Reference to player
+            player = other.gameObject;
+            playerCorporeality = other.gameObject.GetComponent<PlayerCorporeality>();
             _playerInLight = true;
             _storedPlayerInstance = other.gameObject;
         }
@@ -73,6 +79,35 @@ public class LightHazard : MonoBehaviour
             _inLightTimer = 0.0f;
         }
         else if (_playerInLight && !player.IsHiding())
+        //Extra checks are run if this is a light on Star, to account for their light cone mesh potentially clipping through a wall
+        if (_playerInLight && IsOnStar && !playerCorporeality.IsHiding())
+        {
+            //Make sure there's a direct line between star and the player (avoiding clipping through walls incidents)
+                //Using transform.root to use Star's position, since the cone's transform is in the middle
+            if (Physics.Linecast(transform.root.position, player.transform.position, out RaycastHit hit, ~LayerMask.GetMask("DreamerCompoundSight", "Star")))
+            { 
+                if (hit.transform.gameObject == player)
+                {
+                    _inLightTimer += Time.deltaTime;
+
+                    PlayerInLight();
+
+                    if (_inLightTimer >= _lightKillTime)
+                    {
+                        KillPlayer();
+                    }
+                }
+            }
+
+            else
+            {
+                Debug.LogWarning("Player in cone but linecast is blocked!");
+            }
+
+        }
+
+        //Standard light, calculate normally without linecast
+        else if (_playerInLight && !playerCorporeality.IsHiding())
         {
             _inLightTimer += Time.deltaTime;
 

@@ -52,6 +52,7 @@ public class PlayerThrowing : BaseThrowing
     private List<GameObject> _pickupableItems = new List<GameObject>();
     private GameObject _pickupTarget = null;
 
+
     protected override void Start()
     {
         base.Start();
@@ -72,6 +73,7 @@ public class PlayerThrowing : BaseThrowing
 
     private void Update()
     {
+
         //Aiming and throwing logic
         if (_aimAction.IsPressed())
         {
@@ -96,6 +98,8 @@ public class PlayerThrowing : BaseThrowing
                 {
                     tryTarget = clickedPoint;
                 }
+
+                
 
                 //Cylindrical range check
                 Vector2 displacementXZ = new Vector2(tryTarget.x, tryTarget.z) - new Vector2(transform.position.x, transform.position.z);
