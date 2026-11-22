@@ -77,7 +77,7 @@ Shader "Custom/Spectre Fur"
             v2f vert(appdata v)
             {
                 v2f OUT;
-                OUT.uv = v.texcoord;
+                OUT.uv = v.texcoord.xy;
                 OUT.pos = ProjectWindDistortVertex(v.vertex.xyz, v.texcoord.y, v.normal.xyz, v.tangent.xyz);
 
                 // the lighting model is now using lambertian diffuse, not realistic but
