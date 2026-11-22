@@ -43,6 +43,8 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 prevPos = Vector3.zero;
     private int waitingForKeyUp = -1;
 
+    public bool canMove = true;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -53,7 +55,8 @@ public class PlayerMovement : MonoBehaviour
             rb.maxLinearVelocity = maxSpeed;
             rb.maxAngularVelocity = rotationSpeed;
         }
-        cam = FindFirstObjectByType<CinemachineCamera>();
+        cam = GameObject.Find("CameraManager").GetComponent<CameraManager>().camera;
+        Debug.Log(cam);
         prevRot = new Vector3(0, 0, -1);
         prevPos = this.transform.position;
         moveAction = InputSystem.actions.FindAction("Move");
@@ -74,86 +77,90 @@ public class PlayerMovement : MonoBehaviour
     {
         // Apply bobbing movement
         this.transform.position = new Vector3(this.transform.position.x, baseHeight + Mathf.Sin(Time.time * bobSpeed) * bobDistance, this.transform.position.z);
-        moveDirection = Vector3.zero;
-        float targetSpeed = 0;
-        if (!playerCorporeality.IsCorporeal() && !playerCorporeality.IsHiding())
-            playerCorporeality.SubtractDistance((this.transform.position - prevPos).magnitude);
 
-        // Get player input
-        if (moveAction.IsPressed())
+        if (canMove)
         {
-            targetSpeed = currentMaxSpeed;
-            Vector2 direction = moveAction.ReadValue<Vector2>();
+            moveDirection = Vector3.zero;
+            float targetSpeed = 0;
+            if (!playerCorporeality.IsCorporeal() && !playerCorporeality.IsHiding())
+                playerCorporeality.SubtractDistance((this.transform.position - prevPos).magnitude);
 
-
-            Quaternion targetRotation;
-            switch (moveType)
+            // Get player input
+            if (moveAction.IsPressed())
             {
-                case 0:
-                    lookAt = this.transform.position - cam.transform.position;
+                targetSpeed = currentMaxSpeed;
+                Vector2 direction = moveAction.ReadValue<Vector2>();
 
-                    moveDirection = velocity = Movement0(direction, Vector3.zero, lookAt);
 
-                    targetRotation = Quaternion.LookRotation(moveDirection);
-                    // Smoothly rotate from current to target rotation
-                    this.transform.rotation = Quaternion.Slerp(this.transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-                    break;
+                Quaternion targetRotation;
+                switch (moveType)
+                {
+                    case 0:
+                        lookAt = this.transform.position - cam.transform.position;
 
-                case 1:
-                    if (direction.x != 0)
-                    {
-                        float speed = rb.linearVelocity.magnitude;
-                        rb.AddTorque(this.transform.up * direction.x * 10 * rotAccelRate, ForceMode.Acceleration); //Quaternion.LookRotation(this.transform.right * direction.x).eulerAngles * rotationSpeed);
-                        //rb.AddForce(-1 * rb.GetAccumulatedForce());
+                        moveDirection = velocity = Movement0(direction, Vector3.zero, lookAt);
 
-                        //prevent loss of speed when changing direction while moving forward or backward
-                        if (direction.y != 0)
-                            rb.AddRelativeForce(new Vector3(0, 0, direction.y * accelRate));
-                            //rb.linearVelocity = rb.linearVelocity.normalized * speed
-                    }
-                    else
-                        rb.AddRelativeForce(new Vector3(0, 0, direction.y * accelRate));
-
-                    break;
-
-                case 2:
-                    moveDirection = velocity = Movement1(direction, Vector3.zero);
-
-                    if ((moveDirection - this.transform.forward).magnitude > 0.01)
-                    {
                         targetRotation = Quaternion.LookRotation(moveDirection);
+                        // Smoothly rotate from current to target rotation
                         this.transform.rotation = Quaternion.Slerp(this.transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-                    }
-                    break;
+                        break;
 
-                case 3:
-                    moveDirection = velocity = Movement3(direction);
+                    case 1:
+                        if (direction.x != 0)
+                        {
+                            float speed = rb.linearVelocity.magnitude;
+                            rb.AddTorque(this.transform.up * direction.x * 10 * rotAccelRate, ForceMode.Acceleration); //Quaternion.LookRotation(this.transform.right * direction.x).eulerAngles * rotationSpeed);
+                                                                                                                       //rb.AddForce(-1 * rb.GetAccumulatedForce());
 
-                    break;
+                            //prevent loss of speed when changing direction while moving forward or backward
+                            if (direction.y != 0)
+                                rb.AddRelativeForce(new Vector3(0, 0, direction.y * accelRate));
+                            //rb.linearVelocity = rb.linearVelocity.normalized * speed
+                        }
+                        else
+                            rb.AddRelativeForce(new Vector3(0, 0, direction.y * accelRate));
 
-                default:
-                    Debug.Log("There is no movement system #" + moveType + ". Try 1 or 3");
-                    break;
+                        break;
+
+                    case 2:
+                        moveDirection = velocity = Movement1(direction, Vector3.zero);
+
+                        if ((moveDirection - this.transform.forward).magnitude > 0.01)
+                        {
+                            targetRotation = Quaternion.LookRotation(moveDirection);
+                            this.transform.rotation = Quaternion.Slerp(this.transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                        }
+                        break;
+
+                    case 3:
+                        moveDirection = velocity = Movement3(direction);
+
+                        break;
+
+                    default:
+                        Debug.Log("There is no movement system #" + moveType + ". Try 1 or 3");
+                        break;
+                }
+
+            }
+            // if W has been released, change axis
+            else if (waitingForKeyUp == 0)
+            {
+                transitionAxis = true;
             }
 
-        }
-        // if W has been released, change axis
-        else if (waitingForKeyUp == 0)
-        {
-            transitionAxis = true;
-        }
+            if (moveType == 2)
+            {
+                float speedDif = targetSpeed - speed;                                                       // How far we are from target speed
+                float movement = Mathf.Pow(Mathf.Abs(speedDif) * accelRate, 0.9f) * Mathf.Sign(speedDif);   // Non-linear acceleration
+                speed += movement * Time.deltaTime;                                                         // Apply to current speed
+                rb.linearVelocity = velocity * speed;
+            }
 
-        if (moveType == 2)
-        {
-            float speedDif = targetSpeed - speed;                                                       // How far we are from target speed
-            float movement = Mathf.Pow(Mathf.Abs(speedDif) * accelRate, 0.9f) * Mathf.Sign(speedDif);   // Non-linear acceleration
-            speed += movement * Time.deltaTime;                                                         // Apply to current speed
-            rb.linearVelocity = velocity * speed;
+            prevPos = this.transform.position;
+
+            shadow.transform.position = new Vector3(this.transform.position.x, shadow.transform.position.y, this.transform.position.z);
         }
-
-        prevPos = this.transform.position;
-
-        shadow.transform.position = new Vector3(this.transform.position.x, shadow.transform.position.y, this.transform.position.z);
     }
 
     /// <summary>

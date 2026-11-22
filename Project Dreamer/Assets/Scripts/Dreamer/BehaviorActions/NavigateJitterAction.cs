@@ -59,7 +59,6 @@ public partial class NavigateJitterAction : Action
 
     protected override Status OnStart()
     {
-
         //Starts equal to Star's rotation
         rotationVar = Star.Value.transform.eulerAngles.y;
         navAgent = Star.Value.GetComponent<NavMeshAgent>();

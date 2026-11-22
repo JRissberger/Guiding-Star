@@ -17,6 +17,8 @@ public partial class UpdateLastHeardSoundAction : Action
     {
 
         TargetSound.Value = NewTargetSound.Value;
+
+
         return Status.Success;
     }
 

@@ -13,10 +13,13 @@ public partial class IsSoundLoudCondition : Condition
 
     public override bool IsTrue()
     {
-        if (Sound.Value.SoundType == SoundType.Loud)
+        //Get the Star manager
+        starManager = GameObject.GetComponent<StarManager>();
+
+        //Ignore sound if Star's fearless
+        if (Sound.Value.SoundType == SoundType.Loud && !starManager.IsFearless)
         {
-            //Get the Star manager and update state
-            starManager = GameObject.GetComponent<StarManager>();
+            //Update state
             starManager.UpdateStar(StarState.Scared);
 
             return true;

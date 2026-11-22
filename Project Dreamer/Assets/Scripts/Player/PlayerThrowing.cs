@@ -52,6 +52,7 @@ public class PlayerThrowing : BaseThrowing
     private List<GameObject> _pickupableItems = new List<GameObject>();
     private GameObject _pickupTarget = null;
 
+
     protected override void Start()
     {
         base.Start();
@@ -72,6 +73,7 @@ public class PlayerThrowing : BaseThrowing
 
     private void Update()
     {
+
         //Aiming and throwing logic
         if (_aimAction.IsPressed())
         {
@@ -96,6 +98,8 @@ public class PlayerThrowing : BaseThrowing
                 {
                     tryTarget = clickedPoint;
                 }
+
+                
 
                 //Cylindrical range check
                 Vector2 displacementXZ = new Vector2(tryTarget.x, tryTarget.z) - new Vector2(transform.position.x, transform.position.z);
@@ -162,14 +166,14 @@ public class PlayerThrowing : BaseThrowing
                     }
                     else
                     {
-                        validCurve = CreateThrowCurve(targetPoint, targetNormal);
+                        validCurve = CreateThrowCurve(targetPoint, targetNormal, false);
                     }
 
                     SetThrowMarker(targetPoint, targetNormal, validCurve);
 
                     if (validCurve && _throwAction.WasPressedThisFrame())
                     {
-                        ThrowItem();
+                        ThrowItem(false);
                     }
                 }
                 else
@@ -367,7 +371,7 @@ public class PlayerThrowing : BaseThrowing
         _activeMarker.transform.rotation = Quaternion.LookRotation(normal);
     }
 
-    protected override void ThrowItem()
+    protected override void ThrowItem(bool fromHand = true)
     {
         ThrowableItem throwable = _heldItem.GetComponent<ThrowableItem>();
         if (throwable != null)
@@ -375,7 +379,7 @@ public class PlayerThrowing : BaseThrowing
             throwable.QueueLandSound();
         }
 
-        base.ThrowItem();
+        base.ThrowItem(fromHand);
     }
     /// <summary>
     /// Removes the throwing target marker if one exists.
