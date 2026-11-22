@@ -78,7 +78,7 @@ public class LightHazard : MonoBehaviour
             _playerInLight = false;
             _inLightTimer = 0.0f;
         }
-        else if (_playerInLight && !player.IsHiding())
+
         //Extra checks are run if this is a light on Star, to account for their light cone mesh potentially clipping through a wall
         if (_playerInLight && IsOnStar && !playerCorporeality.IsHiding())
         {
