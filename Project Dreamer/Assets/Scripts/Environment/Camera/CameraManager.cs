@@ -10,8 +10,7 @@ public class CameraManager : MonoBehaviour
 
     bool wasHiding;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
         CinemachineCamera[] cam = GameObject.FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.InstanceID);
@@ -25,6 +24,11 @@ public class CameraManager : MonoBehaviour
         }
         Debug.Log(camera);
         memCamera.gameObject.SetActive(false);
+    }
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+
     }
 
     // Update is called once per frame
