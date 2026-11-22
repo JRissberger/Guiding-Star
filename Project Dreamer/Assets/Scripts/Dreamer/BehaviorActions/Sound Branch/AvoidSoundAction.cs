@@ -37,10 +37,6 @@ public partial class AvoidSoundAction : Action
         //Normalized, calc actual distance on top of this
         runDir = runDir * RunDistance.Value;
 
-            //Probably want a little bit of angle variation for realism's sake
-
-            //Potentially a speed increase for Star to show they're running?
-
         //Update target location
         Location.Value = Star.Value.transform.position + runDir;
 
