@@ -77,7 +77,7 @@ public class SoundManager : MonoBehaviour
         sound.UpdateAudibleRange(audibleRange);
 
         //Set timer
-        sound.Timer = duration;
+        sound.TimerMax = duration;
 
         //Is the sound persistent
         sound.IsPersistent = isPersistent;
