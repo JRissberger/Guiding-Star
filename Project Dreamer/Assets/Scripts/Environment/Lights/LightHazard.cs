@@ -8,6 +8,7 @@ public class LightHazard : MonoBehaviour
 
     //Temporary field for the fog cone effect, to turn it on/off alongside the light itself
     [SerializeField] private GameObject lightFog = null;
+    PlayerCorporeality player;
 
     private bool _playerInLight = false;
     private float _inLightTimer = 0.0f;
@@ -45,6 +46,10 @@ public class LightHazard : MonoBehaviour
     {
         if (other.gameObject.tag == "Player" && isActive)
         {
+            if (player == null)
+            {
+                player = other.gameObject.GetComponent<PlayerCorporeality>();
+            }
             _playerInLight = true;
             _storedPlayerInstance = other.gameObject;
         }
@@ -67,7 +72,7 @@ public class LightHazard : MonoBehaviour
             _playerInLight = false;
             _inLightTimer = 0.0f;
         }
-        else if (_playerInLight)
+        else if (_playerInLight && !player.IsHiding())
         {
             _inLightTimer += Time.deltaTime;
 
