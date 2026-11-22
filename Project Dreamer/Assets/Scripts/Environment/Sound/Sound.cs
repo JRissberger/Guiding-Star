@@ -1,4 +1,5 @@
 using Unity.Behavior;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum SoundType
@@ -34,31 +35,61 @@ public class Sound : MonoBehaviour
     public bool IsPersistent { get { return isPersistent; } set { isPersistent = value; } }
 
     //Timer for duration of how long it should be around
+    private float timerMax = 0;
+    public float TimerMax { get { return timerMax; } set { timerMax = value; } }
+
     private float timer = 0;
-    public float Timer { get { return timer; } set { timer = value; } }
+    private float effectTargetRadius;
+    private Color baseWaveColor;
+    private Color baseFresnelColor;
+    private MeshRenderer meshRenderer;
 
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
         PlayAudio();
 
+        meshRenderer = effect.GetComponent<MeshRenderer>();
         if (soundType == SoundType.Loud)
         {
-            effect.GetComponent<MeshRenderer>().material = materialLoud;
+            meshRenderer.material = materialLoud;
         }
         else if (soundType == SoundType.Soft)
         {
-            effect.GetComponent<MeshRenderer>().material = materialSoft;
+            meshRenderer.material = materialSoft;
         }
+
+        baseWaveColor = meshRenderer.material.GetColor("_WaveColor");
+        baseFresnelColor = meshRenderer.material.GetColor("_FresnelColor");
     }
 
     void Update()
     {
-        //Call timer update if not persistent
-        if (!isPersistent)
+        UpdateTimer();
+
+        float radius = effectTargetRadius * (1.0f - Mathf.Pow(1.0f - Mathf.Sqrt(timer / timerMax), 2));
+        float diameter = radius * 2.0f;
+        effect.transform.localScale = new Vector3(diameter, diameter, diameter);
+
+        //Fade out in the last 1/4 of the effect time-wise (max 0.5 seconds of fading)
+        float alpha;
+        if (timerMax >= 2.0f)
         {
-            UpdateTimer();
+            alpha = (timerMax - timer) * 2.0f;
         }
+        else
+        {
+            alpha = (timerMax - timer) / timerMax * 4.0f;
+        }
+        alpha = Mathf.Min(1.0f, alpha);
+
+        Color invisible = new Color(0.0f, 0.0f, 0.0f, 0.0f);
+        Color waveColor = meshRenderer.material.GetColor("_WaveColor");
+        waveColor = Color.Lerp(invisible, baseWaveColor, alpha);
+        meshRenderer.material.SetColor("_WaveColor", waveColor);
+        Color fresnelColor = meshRenderer.material.GetColor("_FresnelColor");
+        fresnelColor = Color.Lerp(invisible, baseFresnelColor, alpha);
+        meshRenderer.material.SetColor("_FresnelColor", fresnelColor);
     }
 
     //Adjusts the audible range of the sound (modifying trigger radius)
@@ -68,8 +99,7 @@ public class Sound : MonoBehaviour
         SphereCollider collider = this.GetComponent<SphereCollider>();
         collider.radius = range;
 
-        //Double range for the effect because its scale is based on diameter, not radius
-        effect.transform.localScale = new Vector3(range * 2, range * 2, range * 2);
+        effectTargetRadius = range;
     }
 
 
@@ -99,10 +129,10 @@ public class Sound : MonoBehaviour
     //Update timer, destroy object when timer runs out
     private void UpdateTimer()
     {
-        timer -= Time.deltaTime;
+        timer += Time.deltaTime;
 
-        //Destroy self if timer is at 0
-        if (timer <= 0)
+        //Destroy self if timer is up
+        if (!isPersistent && timer > timerMax)
         {
             soundManager.HeardSounds.Remove(this);
             Destroy(this.gameObject);
