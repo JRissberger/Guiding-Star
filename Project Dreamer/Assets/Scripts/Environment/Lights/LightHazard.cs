@@ -8,7 +8,6 @@ public class LightHazard : MonoBehaviour
 
     //Temporary field for the fog cone effect, to turn it on/off alongside the light itself
     [SerializeField] private GameObject lightFog = null;
-    PlayerCorporeality player;
 
     private bool _playerInLight = false;
     private float _inLightTimer = 0.0f;
