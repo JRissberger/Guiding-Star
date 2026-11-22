@@ -6,8 +6,15 @@ public class LightHazard : MonoBehaviour
     [Tooltip("How long it takes for light to kill the player, in seconds.")]
     [SerializeField] private float _lightKillTime = 1.0f;
 
+    //Temporary field for the fog cone effect, to turn it on/off alongside the light itself
+    [SerializeField] private GameObject lightFog = null;
+
     private bool _playerInLight = false;
     private float _inLightTimer = 0.0f;
+    //Remember the player instance that touched this light
+    //Avoids issues with the player being destroyed by the respawn system
+    //(since destruction doesn't count as exiting the light)
+    private GameObject _storedPlayerInstance = null;
 
     //Whether the light is currently active or not
     [SerializeField] private bool isActive;
@@ -35,6 +42,10 @@ public class LightHazard : MonoBehaviour
             //Adjust activity if needed
             spotlight.enabled = isActive;
         }
+        if (lightFog)
+        {
+            lightFog.SetActive(isActive);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -45,6 +56,7 @@ public class LightHazard : MonoBehaviour
             player = other.gameObject;
             playerCorporeality = other.gameObject.GetComponent<PlayerCorporeality>();
             _playerInLight = true;
+            _storedPlayerInstance = other.gameObject;
         }
     }
 
@@ -54,11 +66,18 @@ public class LightHazard : MonoBehaviour
         {
             _playerInLight = false;
             _inLightTimer = 0.0f;
+            _storedPlayerInstance = null;
         }
     }
 
     private void Update()
     {
+        if (_storedPlayerInstance == null)
+        {
+            _playerInLight = false;
+            _inLightTimer = 0.0f;
+        }
+
         //Extra checks are run if this is a light on Star, to account for their light cone mesh potentially clipping through a wall
         if (_playerInLight && IsOnStar && !playerCorporeality.IsHiding())
         {
@@ -113,7 +132,7 @@ public class LightHazard : MonoBehaviour
     /// </summary>
     private void PlayerInLight()
     {
-        // smoke effect
+        //Do nothing (for now)
     }
 
     /// <summary>
@@ -122,9 +141,13 @@ public class LightHazard : MonoBehaviour
     public void ToggleLight()
     {
         spotlight.enabled = !isActive;
+        if (lightFog)
+        {
+            lightFog.SetActive(!isActive);
+        }
         isActive = !isActive;
 
-        if (isActive)
+        if (isActive && OnLightOn != null)
         {
             //TODO: check this--seems to be throwing a warning
             OnLightOn.Invoke();

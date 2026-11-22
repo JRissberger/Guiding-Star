@@ -98,7 +98,7 @@ public class ThrowableItem : MonoBehaviour
         if (_isMidThrow && collision.gameObject.tag != "Player")
         {
             Land();
-            _isMidThrow = false;
+            ClearThrown();
         }
     }
 }

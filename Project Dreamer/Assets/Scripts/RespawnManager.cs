@@ -15,14 +15,12 @@ public class RespawnManager : MonoBehaviour
         public MapSegmentManager mapSegments;
         public SoundManager soundManager;
         public bool canWander;
-        public int wanderIndex;
 
-        public StarBehaviorData(MapSegmentManager mapSegments, SoundManager soundManager, bool canWander, int wanderIndex)
+        public StarBehaviorData(MapSegmentManager mapSegments, SoundManager soundManager, bool canWander)
         {
             this.mapSegments = mapSegments;
             this.soundManager = soundManager;
             this.canWander = canWander;
-            this.wanderIndex = wanderIndex;
         }
     }
 
@@ -88,6 +86,18 @@ public class RespawnManager : MonoBehaviour
         }
     }
 
+    private struct CustomEventTriggerData
+    {
+        public CustomEventTrigger instance;
+        public bool enabled;
+
+        public CustomEventTriggerData(CustomEventTrigger instance, bool enabled)
+        {
+            this.instance = instance;
+            this.enabled = enabled;
+        }
+    }
+
     private struct InteractableData
     {
         public InteractableBase instance;
@@ -98,12 +108,21 @@ public class RespawnManager : MonoBehaviour
         }
     }
 
+    public enum RespawnItemType
+    {
+        None,
+        Harsh,
+        Soft
+    }
+
     [Header("Level Data")]
     [SerializeField] private MapSegmentManager _mapSegmentManager;
 
     [Header("Instances & Prefabs")]
     [SerializeField] private Image _screenFadeImage;
     [SerializeField] private GameObject _starPrefab;
+    [SerializeField] private GameObject _harshItemPrefab;
+    [SerializeField] private GameObject _softItemPrefab;
 
     private GameObject _playerInstance;
     private GameObject _starInstance;
@@ -116,6 +135,7 @@ public class RespawnManager : MonoBehaviour
     private Vector3 _savedStarPos;
     private float _savedStarAngle;
     private int _savedStarPoint;
+    private RespawnItemType _savedStarItem;
     private int _savedCameraKnot;
 
     private StarBehaviorData _savedStarBehavior = new();
@@ -124,6 +144,7 @@ public class RespawnManager : MonoBehaviour
     private List<LightData> _savedLights = new();
     private List<WanderStateTriggerData> _savedStateTriggers = new();
     private List<WanderPointTriggerData> _savedPointTriggers = new();
+    private List<CustomEventTriggerData> _savedEventTriggers = new();
     private List<InteractableData> _savedInteractables = new();
 
     public static RespawnManager Instance { get; private set; }
@@ -180,7 +201,7 @@ public class RespawnManager : MonoBehaviour
             _savedInteractables.Add(new InteractableData(interact));
         }
 
-        NewRespawn();
+        NewRespawn(_starInstance.transform.position, _starInstance.transform.eulerAngles.y, RespawnItemType.None);
     }
 
     /// <summary>
@@ -188,27 +209,26 @@ public class RespawnManager : MonoBehaviour
     /// These will be loaded when Respawn() is called.
     /// </summary>
     /// <param name="player"></param>
-    public void NewRespawn()
+    public void NewRespawn(Vector3 starRespawnPosition, float starRespawnAngle, RespawnItemType starRespawnItem)
     {
         _savedPlayerPos = _playerInstance.transform.position;
         _savedPlayerAngle = _playerInstance.transform.rotation.eulerAngles.y;
 
-        _savedStarPos = _starInstance.transform.position;
-        _savedStarAngle = _starInstance.transform.rotation.eulerAngles.y;
+        _savedStarPos = starRespawnPosition;
+        _savedStarAngle = starRespawnAngle;
+        _savedStarItem = starRespawnItem;
 
         _savedCameraKnot = _cameraController.goal;
 
         BlackboardReference starBehavior = _starInstance.GetComponent<BehaviorGraphAgent>().BlackboardReference;
-        BlackboardVariable mapSegmentsVar, soundManagerVar, canWanderVar, wanderIndexVar;
+        BlackboardVariable mapSegmentsVar, soundManagerVar, canWanderVar;
         starBehavior.GetVariable("Map Segments", out mapSegmentsVar);
         starBehavior.GetVariable("SoundManager", out soundManagerVar);
         starBehavior.GetVariable("Can Wander", out canWanderVar);
-        starBehavior.GetVariable("Wander Index", out wanderIndexVar);
         MapSegmentManager mapSegments = (MapSegmentManager)mapSegmentsVar.ObjectValue;
         SoundManager soundManager = (SoundManager)soundManagerVar.ObjectValue;
         bool canWander = (bool)canWanderVar.ObjectValue;
-        int wanderIndex = (int)wanderIndexVar.ObjectValue;
-        _savedStarBehavior = new StarBehaviorData(mapSegments, soundManager, canWander, wanderIndex);
+        _savedStarBehavior = new StarBehaviorData(mapSegments, soundManager, canWander);
 
         soundManager.HeardSounds.Clear();
 
@@ -228,6 +248,12 @@ public class RespawnManager : MonoBehaviour
         foreach (ChangeWanderPointsTrigger trigger in FindObjectsByType<ChangeWanderPointsTrigger>(FindObjectsSortMode.None))
         {
             _savedPointTriggers.Add(new WanderPointTriggerData(trigger, trigger.gameObject.GetComponent<Collider>().enabled));
+        }
+
+        _savedEventTriggers.Clear();
+        foreach (CustomEventTrigger trigger in FindObjectsByType<CustomEventTrigger>(FindObjectsSortMode.None))
+        {
+            _savedEventTriggers.Add(new CustomEventTriggerData(trigger, trigger.gameObject.GetComponent<Collider>().enabled));
         }
     }
 
@@ -285,11 +311,24 @@ public class RespawnManager : MonoBehaviour
         _starInstance.GetComponent<DreamerThrowing>().DropItem();
         Destroy(_starInstance);
         _starInstance = Instantiate(_starPrefab, _savedStarPos, Quaternion.Euler(0, _savedStarAngle, 0));
+        _starInstance.GetComponent<BehaviorGraphAgent>().enabled = true;
         BlackboardReference starBehavior = _starInstance.GetComponent<BehaviorGraphAgent>().BlackboardReference;
         starBehavior.SetVariableValue<MapSegmentManager>("Map Segments", _savedStarBehavior.mapSegments);
         starBehavior.SetVariableValue<SoundManager>("SoundManager", _savedStarBehavior.soundManager);
-        starBehavior.SetVariableValue<bool>("Can Wander", _savedStarBehavior.canWander);
-        starBehavior.SetVariableValue<int>("Wander Index", _savedStarBehavior.wanderIndex);
+        starBehavior.SetVariableValue<bool>("Can Wander", _savedStarBehavior.canWander);        
+
+        FindAnyObjectByType<SoundManager>().HeardSounds.Clear();
+        BlackboardVariable targetSound, newTargetSound;
+        starBehavior.GetVariable("Target Sound", out targetSound);
+        starBehavior.GetVariable("New Target Sound", out newTargetSound);
+        if (targetSound.ObjectValue != null)
+        {
+            Destroy((LastHeardSound)targetSound.ObjectValue);
+        }
+        if (newTargetSound.ObjectValue != null)
+        {
+            Destroy((LastHeardSound)newTargetSound.ObjectValue);
+        }
 
         //Reset the camera
         _cameraController.MoveTo(_savedCameraKnot, 0);
@@ -326,6 +365,19 @@ public class RespawnManager : MonoBehaviour
             Destroy(remainingItem);
         }
 
+        //Create and set Star's held item (must be done after throwables are destroyed)
+        switch (_savedStarItem)
+        {
+            case RespawnItemType.Harsh:
+                _starInstance.GetComponent<DreamerThrowing>().SetHeldItem(Instantiate(_harshItemPrefab));
+                break;
+            case RespawnItemType.Soft:
+                _starInstance.GetComponent<DreamerThrowing>().SetHeldItem(Instantiate(_softItemPrefab));
+                break;
+            default:
+                break;
+        }
+
         foreach (MapSegmentData data in _savedMapSegments)
         {
             data.instance.IsActive = data.enabled;
@@ -349,9 +401,45 @@ public class RespawnManager : MonoBehaviour
             data.instance.gameObject.GetComponent<Collider>().enabled = data.enabled;
         }
 
+        foreach (CustomEventTriggerData data in _savedEventTriggers)
+        {
+            data.instance.gameObject.GetComponent<Collider>().enabled = data.enabled;
+        }
+
         foreach (InteractableData data in _savedInteractables)
         {
             data.instance.ResetInteraction();
         }
+
+        //Reset the room 3 door and vent
+        FindAnyObjectByType<CloseDoorOpenVent>().Reset();
+
+        //Change Star's wander index to the first available point
+        int closestPointIndex = 0;
+        float closestDistance = Mathf.Infinity;
+        for (int i = 0; i < _savedMapSegments.Count; i++)
+        {
+            if (_savedMapSegments[i].enabled)
+            {
+                float distance = Vector3.Distance(_starInstance.transform.position, _savedMapSegments[i].instance.CenterLoc);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closestPointIndex = i;
+                }
+            }
+        }
+        //Hardcode points 2 and 3 to advance to the next point
+        //These are the two places where Star's wander is disabled entirely
+        //Once it's re-enabled, Star should advance to the following point, not their current one
+        if (closestPointIndex == 2)
+        {
+            closestPointIndex = 3;
+        }
+        else if (closestPointIndex == 3)
+        {
+            closestPointIndex = 4;
+        }
+        starBehavior.SetVariableValue<int>("Wander Index", closestPointIndex);
     }
 }

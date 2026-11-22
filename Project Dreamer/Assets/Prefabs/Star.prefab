@@ -344,7 +344,7 @@ MonoBehaviour:
   _throwCurveHeight: 1
   _solidToThrownMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 192
   _handOffset: {x: 0, y: 0.5, z: 0.75}
   _drawCurve: 0
   _curveDisplayWidth: 0.01
@@ -681,7 +681,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23ce130f5d067c449bda2e967c937483, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LightHazard
-  _lightKillTime: 0.25
+  _lightKillTime: 0.5
+  lightFog: {fileID: 0}
   isActive: 1
   IsOnStar: 1
 --- !u!64 &1454738024826329390

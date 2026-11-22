@@ -21,7 +21,7 @@ public class DreamerThrowing : BaseThrowing
     {
         //The surface normal is only used in the validity check, so it can be set to zero here.
         CreateThrowCurve(position, Vector3.zero);
-        ThrowItem();
+        ThrowItem(true);
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public class DreamerThrowing : BaseThrowing
     {
         if (Vector3.Distance(position, transform.position) <= maxRange && CreateThrowCurve(position, normal))
         {
-            ThrowItem();
+            ThrowItem(true);
             return true;
         }
         return false;

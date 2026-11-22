@@ -166,14 +166,14 @@ public class PlayerThrowing : BaseThrowing
                     }
                     else
                     {
-                        validCurve = CreateThrowCurve(targetPoint, targetNormal);
+                        validCurve = CreateThrowCurve(targetPoint, targetNormal, false);
                     }
 
                     SetThrowMarker(targetPoint, targetNormal, validCurve);
 
                     if (validCurve && _throwAction.WasPressedThisFrame())
                     {
-                        ThrowItem();
+                        ThrowItem(false);
                     }
                 }
                 else
@@ -371,7 +371,7 @@ public class PlayerThrowing : BaseThrowing
         _activeMarker.transform.rotation = Quaternion.LookRotation(normal);
     }
 
-    protected override void ThrowItem()
+    protected override void ThrowItem(bool fromHand = true)
     {
         ThrowableItem throwable = _heldItem.GetComponent<ThrowableItem>();
         if (throwable != null)
@@ -379,7 +379,7 @@ public class PlayerThrowing : BaseThrowing
             throwable.QueueLandSound();
         }
 
-        base.ThrowItem();
+        base.ThrowItem(fromHand);
     }
     /// <summary>
     /// Removes the throwing target marker if one exists.
