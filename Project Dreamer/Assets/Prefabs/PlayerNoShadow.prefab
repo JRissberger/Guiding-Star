@@ -206,7 +206,9 @@ MonoBehaviour:
   corporeal: 1
   bobDistance: 0.2
   bobSpeed: 3
+  baseHeight: 0
   triggers: []
+  canMove: 1
 --- !u!33 &6350220115256562144
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -361,7 +363,7 @@ MonoBehaviour:
   _solidToThrownMask:
     serializedVersion: 2
     m_Bits: 193
-  _handOffset: {x: 1, y: 0, z: 1}
+  _handOffset: {x: 0, y: 0, z: 1.5}
   _drawCurve: 0
   _curveDisplayWidth: 0.01
   _curveDisplaySegments: 50

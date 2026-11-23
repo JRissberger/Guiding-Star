@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 8559962345966651202}
   - component: {fileID: 7700245615525008898}
   - component: {fileID: 6523086756200796445}
-  - component: {fileID: 149705326163352309}
   - component: {fileID: 2151871917706426628}
+  - component: {fileID: 7481415168202985386}
   m_Layer: 0
   m_Name: Change Star WanderPoints
   m_TagString: Untagged
@@ -92,27 +92,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &149705326163352309
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4341335422946323826}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &2151871917706426628
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131,3 +110,24 @@ MonoBehaviour:
   activeClosedPoints: 
   allOpenPoints: 
   oneShot: 1
+--- !u!135 &7481415168202985386
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4341335422946323826}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.33206093
+  m_Center: {x: 0, y: -0.35162073, z: 0}

@@ -61,7 +61,7 @@ public class CameraManager : MonoBehaviour
         memCamera.Follow = memory.transform;
         Vector3 offset = (memory.transform.position - GameObject.FindGameObjectWithTag("Star").transform.position);
         offset.y += 2;
-        offset = offset.normalized * 4;
+        offset = offset.normalized * 2;
         memCamera.GetComponent<CinemachineFollow>().FollowOffset = offset;
     }
 }

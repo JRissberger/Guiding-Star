@@ -1,9 +1,24 @@
 fileFormatVersion: 2
-guid: f845174570b5bbb4bb8acdbf317ec812
+guid: 514709815238f0e4396dffde0c6019a9
 ModelImporter:
   serializedVersion: 24300
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: FloorMat
+    second: {fileID: 2100000, guid: ad794d3fbc787194ca9be41509d35491, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: TrimMat
+    second: {fileID: 2100000, guid: 1add6b5f7ccdba241b025a5c78c57e95, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: WallMat
+    second: {fileID: 2100000, guid: 1d578ecaf56ec8041a6c7f168914c6ef, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

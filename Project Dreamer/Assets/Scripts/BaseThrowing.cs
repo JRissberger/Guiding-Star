@@ -124,11 +124,13 @@ public class BaseThrowing : MonoBehaviour
     {
         //Create the Bezier curve
         Vector3 startPos = transform.position;
+        Vector3 endPos = position;
         if (fromHand)
         {
-            startPos += transform.rotation * _handOffset;
+            Vector3 diff = endPos - startPos;
+            diff.y = 0;
+            startPos += Quaternion.LookRotation(diff) * _handOffset;
         }
-        Vector3 endPos = position;
 
         Collider heldCollider = _heldItem.GetComponent<Collider>();
         Vector3 heldExtents = Vector3.zero;
@@ -229,7 +231,9 @@ public class BaseThrowing : MonoBehaviour
             throwItem.transform.position = transform.position;
             if (fromHand)
             {
-                throwItem.transform.position += transform.rotation * _handOffset;
+                Vector3 diff = (Vector3)_throwCurve.Value.P3 - transform.position;
+                diff.y = 0;
+                throwItem.transform.position += Quaternion.LookRotation(diff) * _handOffset;
             }
 
             ThrowableItem throwable = throwItem.GetComponent<ThrowableItem>();

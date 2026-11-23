@@ -32,7 +32,7 @@ public class PlayerMovement : MonoBehaviour
     // Y-axis movement
     [SerializeField] float bobDistance = 0.2f;
     [SerializeField] float bobSpeed = 2f;
-    private float baseHeight;
+    [HideInInspector] public float baseHeight;
 
     // Camera
     private CinemachineCamera cam;
