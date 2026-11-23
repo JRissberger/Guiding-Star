@@ -166,14 +166,14 @@ public class PlayerThrowing : BaseThrowing
                     }
                     else
                     {
-                        validCurve = CreateThrowCurve(targetPoint, targetNormal, false);
+                        validCurve = CreateThrowCurve(targetPoint, targetNormal, true);
                     }
 
                     SetThrowMarker(targetPoint, targetNormal, validCurve);
 
                     if (validCurve && _throwAction.WasPressedThisFrame())
                     {
-                        ThrowItem(false);
+                        ThrowItem(true);
                     }
                 }
                 else
