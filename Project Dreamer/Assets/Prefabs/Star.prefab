@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6579933288962368456}
   - component: {fileID: 189916225719374951}
   - component: {fileID: 5542413116903600619}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: DreamerLowPolyHands
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -154,7 +154,7 @@ GameObject:
   - component: {fileID: 3584670860819520310}
   - component: {fileID: 5224808990599484579}
   - component: {fileID: 8394324932200581471}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: DreamerLowPolyEars
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -244,7 +244,7 @@ GameObject:
   - component: {fileID: 2221267266125126030}
   - component: {fileID: 1551311242544972745}
   - component: {fileID: 1806395929402337795}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: DreamerLowPolyShirt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -334,7 +334,7 @@ GameObject:
   - component: {fileID: 626707963276177892}
   - component: {fileID: 6949605816181269820}
   - component: {fileID: 5677793326919711198}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: DreamerLowPolyHatStar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -477,7 +477,7 @@ GameObject:
   - component: {fileID: 8516771151636947505}
   - component: {fileID: 480341081875915765}
   - component: {fileID: 4559583468475352114}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: DreamerLowPolyCollar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -676,7 +676,7 @@ CapsuleCollider:
   m_Radius: 0.5
   m_Height: 2
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &427048634303787054
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -860,7 +860,7 @@ GameObject:
   - component: {fileID: 1325224206008726357}
   - component: {fileID: 4202353232595074846}
   - component: {fileID: 3674792503416757726}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: DreamerLowPolyFeet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -950,7 +950,7 @@ GameObject:
   - component: {fileID: 3537377726512016057}
   - component: {fileID: 4976414723583748365}
   - component: {fileID: 2735307493431099593}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: DreamerLowPolyHead
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1093,7 +1093,7 @@ GameObject:
   - component: {fileID: 2256922280469091600}
   - component: {fileID: 6421134665139430001}
   - component: {fileID: 2044368226657138268}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: DreamerLowPolyBell
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1183,7 +1183,7 @@ GameObject:
   - component: {fileID: 9062264383356751911}
   - component: {fileID: 7463778943409440804}
   - component: {fileID: 1971774003887958822}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: DreamerLowPolyEyes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1273,7 +1273,7 @@ GameObject:
   - component: {fileID: 2796106126729672860}
   - component: {fileID: 4584557478954811272}
   - component: {fileID: 8786120970629829313}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: DreamerLowPolyPants
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1363,7 +1363,7 @@ GameObject:
   - component: {fileID: 2095925329225808690}
   - component: {fileID: 7184477243840811084}
   - component: {fileID: 3242417285764638993}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: DreamerLowPolyMouth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1453,7 +1453,7 @@ GameObject:
   - component: {fileID: 8675809947329321873}
   - component: {fileID: 6937912350879795952}
   - component: {fileID: 652642176943318521}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: DreamerLowPolyHair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1543,7 +1543,7 @@ GameObject:
   - component: {fileID: 5419009088947511018}
   - component: {fileID: 146673748184904092}
   - component: {fileID: 6354934900970616189}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: DreamerLowPolyHat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1633,7 +1633,7 @@ GameObject:
   - component: {fileID: 760345113381087946}
   - component: {fileID: 2509303224261573276}
   - component: {fileID: 3709060247714220283}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: DreamerLowPolyHorns
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1726,7 +1726,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8725c8bc5cf28e149ad16e0c37ab74a2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.81
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8725c8bc5cf28e149ad16e0c37ab74a2, type: 3}
       propertyPath: m_LocalPosition.z

@@ -287,8 +287,8 @@ CapsuleCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Direction: 2
+  m_Center: {x: 0, y: 0.5, z: 1.5}
 --- !u!114 &3912119730255754600
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -363,7 +363,7 @@ MonoBehaviour:
   _solidToThrownMask:
     serializedVersion: 2
     m_Bits: 193
-  _handOffset: {x: 0, y: 0, z: 1.5}
+  _handOffset: {x: 0, y: 0, z: 2}
   _drawCurve: 0
   _curveDisplayWidth: 0.01
   _curveDisplaySegments: 50
