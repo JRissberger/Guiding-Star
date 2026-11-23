@@ -96,7 +96,7 @@ public class DreamerSight : MonoBehaviour
     {
         //Using collider as target since the pivot can be offset
         Vector3 target = item.GetComponent<Collider>().bounds.center;
-        if (Physics.Linecast(transform.position, target, out RaycastHit hit, ~LayerMask.GetMask("DreamerCompoundSight", "Star", "Ignore Raycast")))
+        if (Physics.Linecast(transform.position, target, out RaycastHit hit, LayerMask.GetMask("Barriers", "Phaseable", "Interactable")))
         {
 
             if (hit.transform.gameObject == item)

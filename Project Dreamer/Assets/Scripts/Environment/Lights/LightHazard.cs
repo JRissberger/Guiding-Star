@@ -81,9 +81,13 @@ public class LightHazard : MonoBehaviour
         //Extra checks are run if this is a light on Star, to account for their light cone mesh potentially clipping through a wall
         if (_playerInLight && IsOnStar && !playerCorporeality.IsHiding())
         {
+            RaycastHit hit;
+
+            Debug.Log("Start: " + transform.root.position + " | End: " + player.transform.position);
+
             //Make sure there's a direct line between star and the player (avoiding clipping through walls incidents)
                 //Using transform.root to use Star's position, since the cone's transform is in the middle
-            if (Physics.Linecast(transform.root.position, player.transform.position, out RaycastHit hit, ~LayerMask.GetMask("DreamerCompoundSight", "Star")))
+            if (Physics.Linecast(transform.root.position, player.transform.position, out hit, ~LayerMask.GetMask("DreamerCompoundSight", "Star"), QueryTriggerInteraction.Ignore))
             { 
                 if (hit.transform.gameObject == player)
                 {
@@ -96,13 +100,11 @@ public class LightHazard : MonoBehaviour
                         KillPlayer();
                     }
                 }
+                else
+                {
+                    Debug.LogWarning("Player in cone but linecast is blocked!");
+                }
             }
-
-            else
-            {
-                Debug.LogWarning("Player in cone but linecast is blocked!");
-            }
-
         }
 
         //Standard light, calculate normally without linecast
