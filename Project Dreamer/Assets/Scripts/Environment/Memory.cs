@@ -137,6 +137,8 @@ public class Memory : MonoBehaviour
     /// <returns></returns>
     IEnumerator MemoryView(Image image)
     {
+        this.GetComponent<MeshRenderer>().material.color = Color.clear;
+
         //Fade in memory
         yield return StartCoroutine(FadeIMG(image));
 

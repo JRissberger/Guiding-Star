@@ -109,7 +109,7 @@ public class PlayerCorporeality : MonoBehaviour
     {
         ghostDistance -= amount;
         float transparency = 0.4f + (0.5f - ((ghostDistance / defaultCorporealityDistance) * 0.5f));
-        rend.material.color = new Color(rend.material.color.r, rend.material.color.g, rend.material.color.b, transparency);
+        hideMaterial.color = new Color(rend.material.color.r, rend.material.color.g, rend.material.color.b, transparency);
 
         if (ghostDistance <= 0)
         {
@@ -148,7 +148,7 @@ public class PlayerCorporeality : MonoBehaviour
         {
             Physics.IgnoreLayerCollision(2, 7, false);
             ghostDistance = 0;
-            rend.material.color = new Color(rend.material.color.r, rend.material.color.g, rend.material.color.b, 1f);
+            hideMaterial.color = new Color(rend.material.color.r, rend.material.color.g, rend.material.color.b, 1f);
 
             foreach (Phaseable g in phaseables)
             {
@@ -159,7 +159,7 @@ public class PlayerCorporeality : MonoBehaviour
         else
         {
             Physics.IgnoreLayerCollision(2, 7, true);
-            rend.material.color = new Color(rend.material.color.r, rend.material.color.g, rend.material.color.b, 0.4f);
+            hideMaterial.color = new Color(rend.material.color.r, rend.material.color.g, rend.material.color.b, 0.4f);
 
             foreach (Phaseable g in phaseables)
             {
@@ -181,11 +181,13 @@ public class PlayerCorporeality : MonoBehaviour
         //At some point we should add a method within movement to disable it more cleanly.
         if (isHiding == true && hiding == false) //Entering a shadow
         {
+            //GetComponent<PlayerMovement>().baseHeight = 0.2f;
             //rend.material = hideMaterial;
             //GetComponent<PlayerMovement>().enabled = false;
         }
         else if (isHiding == false && hiding == true) //Leaving a shadow
         {
+            //GetComponent<PlayerMovement>().baseHeight = 0.5f;
             //rend.material = defaultMaterial;
             //GetComponent<PlayerMovement>().enabled = true;
             //SetIncorporeal(shadowDistance);

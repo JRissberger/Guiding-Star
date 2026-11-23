@@ -100,7 +100,7 @@ public partial class ThrowItemAction : Action
                     Vector3 throwTarget = Star.Value.transform.position + direction * distance;
 
                     //Try throw
-                    if (throwing.ThrowItemAtTry(throwTarget, Vector3.up, distance))
+                    if (throwTarget != null && throwing.ThrowItemAtTry(throwTarget, Vector3.up, distance))
                     {
                         HoldingItem.Value = false;
                         HeldItem.Value = null;
